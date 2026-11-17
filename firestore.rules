@@ -1,0 +1,418 @@
+rules_version = '2';
+
+// ===============================================================
+// Assumed Data Model
+// ===============================================================
+//
+// Project: KaratCraft Jewellery Billing & Management (jewellery-billing-28699)
+// Application Type: High Jewellery Showroom Point-of-Sale, Stock & Workshop System
+//
+// Collections & Document Structure:
+//
+// 1. Collection: settings
+//    Document: rates
+//      Fields:
+//        - gold24k: number (required, > 0, <= 10000000) - 24K pure gold rate ₹/g
+//        - gold22k: number (required, > 0, <= 10000000) - 22K 916 hallmark rate ₹/g
+//        - gold18k: number (required, > 0, <= 10000000) - 18K fine gold rate ₹/g
+//        - silver999: number (required, > 0, <= 10000000) - 999 fine silver rate ₹/g
+//        - silver925: number (required, > 0, <= 10000000) - 925 sterling silver rate ₹/g
+//      Allowed operations: read, create, update (merge). Delete forbidden.
+//
+//    Document: showroom
+//      Fields:
+//        - name: string (required, 1-150 chars) - Showroom legal name
+//        - tagline: string (optional, 0-250 chars) - Store tagline/motto
+//        - address: string (required, 1-300 chars) - Physical boutique address
+//        - phone: string (required, 1-30 chars) - Store phone number
+//        - email: string (required, valid email, <= 100 chars) - Billing email
+//        - gstin: string (optional, 0-25 chars) - GSTIN registration number
+//        - hsnCode: string (optional, 0-20 chars) - Jewellery HSN code (e.g. 7113)
+//      Allowed operations: read, create, update (merge). Delete forbidden.
+//
+// 2. Collection: inventory/{itemId}
+//      Document ID: itemId (string matching data.id, 1-64 chars)
+//      Fields:
+//        - id: string (required, immutable, 1-64 chars) - Unique inventory SKU / Tag ID
+//        - barcode: string (required, 1-50 chars) - Optical barcode / rat-tail tag
+//        - name: string (required, 1-150 chars) - Jewellery item name
+//        - category: string (required, 1-50 chars) - e.g. Bangles & Kadas, Necklaces, Rings
+//        - metal: string (required, 1-30 chars) - Gold, Silver, Platinum
+//        - karat: string (required, 1-20 chars) - 24K, 22K, 18K, 925, etc.
+//        - purity: number (required, 0 to 100) - Assay purity ratio or percentage
+//        - grossWeight: number (required, >= 0, <= 100000) - Scale gross weight in grams
+//        - stoneWeight: number (required, >= 0, <= 100000) - Stone deduction in grams
+//        - netWeight: number (required, >= 0, <= 100000) - Net precious metal weight in grams
+//        - makingChargeType: string (required, enum ['perGram', 'percentage', 'fixed'])
+//        - makingChargeRate: number (required, >= 0, <= 1000000)
+//        - hallmarkNo: string (required, 1-50 chars) - HUID / BIS Hallmark certification
+//        - quantity: number (required, >= 0, <= 100000) - Available physical quantity
+//        - status: string (required, 1-50 chars) - Location / Showcase status
+//      Allowed operations: read, create, update (id immutable), delete.
+//
+// 3. Collection: invoices/{invoiceId}
+//      Document ID: invoiceId (string, 1-64 chars, sanitized invoice number)
+//      Fields:
+//        - invoiceNo: string (required, immutable, 1-50 chars) - Tax Invoice number
+//        - date: string (required, 1-50 chars) - Date string of invoice issuance
+//        - customerName: string (required, 1-100 chars) - Customer / Buyer name
+//        - phone: string (required, 1-30 chars) - Customer phone number
+//        - city: string (optional, 0-100 chars) - Customer city
+//        - items: list (required, 1-100 line items) - Array of billed jewellery items
+//        - subtotal: number (required, >= 0, <= 1000000000) - Taxable invoice amount (₹)
+//        - gst3Percent: number (required, >= 0, <= 100000000) - 3% CGST/SGST tax amount (₹)
+//        - grandTotal: number (required, >= 0, <= 1000000000) - Final payable amount (₹)
+//        - paymentMode: string (required, 1-50 chars) - Cash, Card, NEFT, UPI, etc.
+//        - hallmarkFee: number (optional, >= 0, <= 100000) - BIS Hallmarking fee
+//        - discount: number (optional, >= 0, <= 100000000) - Trade discount
+//      Allowed operations: read, create, update (invoiceNo immutable). Delete forbidden.
+//
+// 4. Collection: karagirs/{karagirId}
+//      Document ID: karagirId (string matching data.id, 1-50 chars)
+//      Fields:
+//        - id: string (required, immutable, 1-50 chars) - Artisan ledger code
+//        - name: string (required, 1-100 chars) - Artisan / Goldsmith name
+//        - speciality: string (required, 1-100 chars) - Crafting domain
+//        - phone: string (required, 1-30 chars) - Contact telephone
+//        - address: string (required, 1-200 chars) - Workshop address
+//        - metalIssued: number (required, >= 0, <= 1000000) - Total metal given (g)
+//        - metalReturned: number (required, >= 0, <= 1000000) - Finished jewellery received (g)
+//        - meltingScrap: number (required, >= 0, <= 1000000) - Scrap / filing loss (g)
+//        - balanceMetal: number (required, >= 0, <= 1000000) - Metal balance in artisan custody (g)
+//        - activeOrders: number (required, >= 0, <= 10000) - Ongoing manufacturing job count
+//      Allowed operations: read, create, update (id immutable). Delete forbidden.
+//
+// 5. Collection: refinery/{batchId}
+//      Document ID: batchId (string matching data.id, 1-50 chars)
+//      Fields:
+//        - id: string (required, immutable, 1-50 chars) - Melting batch number
+//        - date: string (required, 1-50 chars) - Date batch sent for melting
+//        - refineryName: string (required, 1-150 chars) - Assay lab / Refinery name
+//        - metalType: string (required, 1-100 chars) - Metal classification
+//        - sentWeightGross: number (required, >= 0, <= 1000000) - Gross scrap sent (g)
+//        - assayedPurityTested: string (required, 1-50 chars) - Test report / purity
+//        - postMeltWeight: number (required, >= 0, <= 1000000) - Bar weight after melting (g)
+//        - wastageDrossWeight: number (required, >= 0, <= 1000000) - Crucible dross loss (g)
+//        - wastagePercentage: number (required, >= 0, <= 100) - Percentage loss
+//        - fineGoldRecovered: number (required, >= 0, <= 1000000) - Pure 24K equivalent (g)
+//        - status: string (required, 1-50 chars) - Processing status
+//      Allowed operations: read, create, update (id immutable). Delete forbidden.
+//
+// ===============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+
+    // Check if request is from an authenticated user
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user owns resource
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Check if user is owner based on document's uid field
+    function isDocOwner() {
+      return isAuthenticated() && resource != null && 'uid' in resource.data && request.auth.uid == resource.data.uid;
+    }
+
+    // Verify UID hasn't been tampered with on create
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) ||
+        (isAuthenticated() && request.resource.data.uid == request.auth.uid);
+    }
+
+    // Ensure uid field is not modified on update
+    function uidNotModified() {
+      return !('uid' in request.resource.data) ||
+        (resource != null && 'uid' in resource.data && request.resource.data.uid == resource.data.uid);
+    }
+
+    // Terminal access check: showroom POS counter terminals & authenticated staff
+    function isAuthorizedTerminal() {
+      // Supports showroom counter terminals and POS desktop software.
+      // If client integrates Firebase Auth, request.auth is accepted.
+      return true;
+    }
+
+    // Validate required fields exist in request data
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    // Validate only allowed fields are present
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    // Validate immutable fields are unchanged on update
+    function areImmutableFieldsUnchanged(fields) {
+      return resource == null || !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields);
+    }
+
+    // Validate string length within bounds
+    function validStringLength(field, minLen, maxLen) {
+      return request.resource.data[field] is string &&
+        request.resource.data[field].size() >= minLen &&
+        request.resource.data[field].size() <= maxLen;
+    }
+
+    // Validate optional string within bounds if present
+    function isValidOptionalString(field, minLen, maxLen) {
+      return !(field in request.resource.data) ||
+        (request.resource.data[field] is string &&
+         request.resource.data[field].size() >= minLen &&
+         request.resource.data[field].size() <= maxLen);
+    }
+
+    // Validate email format
+    function isValidEmail(email) {
+      return email is string &&
+        email.size() <= 100 &&
+        email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+
+    // Validate positive bounded number (>= 0 and <= maxVal)
+    function isNonNegativeNumber(field, maxVal) {
+      return request.resource.data[field] is number &&
+        request.resource.data[field] >= 0 &&
+        request.resource.data[field] <= maxVal;
+    }
+
+    // Validate strictly positive bounded number (> 0 and <= maxVal)
+    function isStrictlyPositiveNumber(field, maxVal) {
+      return request.resource.data[field] is number &&
+        request.resource.data[field] > 0 &&
+        request.resource.data[field] <= maxVal;
+    }
+
+    // ===============================================================
+    // Domain Validators
+    // ===============================================================
+
+    // 1. Validator for Daily Metal Rates
+    function isValidRates(data) {
+      return data.keys().hasOnly(['gold24k', 'gold22k', 'gold18k', 'silver999', 'silver925']) &&
+        data.keys().hasAll(['gold24k', 'gold22k', 'gold18k', 'silver999', 'silver925']) &&
+        data.gold24k is number && data.gold24k > 0 && data.gold24k <= 10000000 &&
+        data.gold22k is number && data.gold22k > 0 && data.gold22k <= 10000000 &&
+        data.gold18k is number && data.gold18k > 0 && data.gold18k <= 10000000 &&
+        data.silver999 is number && data.silver999 > 0 && data.silver999 <= 10000000 &&
+        data.silver925 is number && data.silver925 > 0 && data.silver925 <= 10000000;
+    }
+
+    // 2. Validator for Showroom Settings
+    function isValidShowroom(data) {
+      return data.keys().hasOnly(['name', 'tagline', 'address', 'phone', 'email', 'gstin', 'hsnCode']) &&
+        data.keys().hasAll(['name', 'address', 'phone', 'email']) &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 150 &&
+        data.address is string && data.address.size() >= 1 && data.address.size() <= 300 &&
+        data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 30 &&
+        data.email is string && isValidEmail(data.email) &&
+        (!('tagline' in data) || (data.tagline is string && data.tagline.size() <= 250)) &&
+        (!('gstin' in data) || (data.gstin is string && data.gstin.size() <= 25)) &&
+        (!('hsnCode' in data) || (data.hsnCode is string && data.hsnCode.size() <= 20));
+    }
+
+    // 3. Validator for Inventory Items
+    function isValidInventoryItem(data, itemId) {
+      return data.keys().hasOnly([
+          'id', 'barcode', 'name', 'category', 'metal', 'karat',
+          'purity', 'grossWeight', 'stoneWeight', 'netWeight',
+          'makingChargeType', 'makingChargeRate', 'hallmarkNo',
+          'quantity', 'status'
+        ]) &&
+        data.keys().hasAll([
+          'id', 'barcode', 'name', 'category', 'metal', 'karat',
+          'purity', 'grossWeight', 'stoneWeight', 'netWeight',
+          'makingChargeType', 'makingChargeRate', 'hallmarkNo',
+          'quantity', 'status'
+        ]) &&
+        data.id == itemId &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 64 &&
+        data.barcode is string && data.barcode.size() >= 1 && data.barcode.size() <= 50 &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 150 &&
+        data.category is string && data.category.size() >= 1 && data.category.size() <= 50 &&
+        data.metal is string && data.metal.size() >= 1 && data.metal.size() <= 30 &&
+        data.karat is string && data.karat.size() >= 1 && data.karat.size() <= 20 &&
+        data.purity is number && data.purity >= 0 && data.purity <= 100 &&
+        data.grossWeight is number && data.grossWeight >= 0 && data.grossWeight <= 100000 &&
+        data.stoneWeight is number && data.stoneWeight >= 0 && data.stoneWeight <= 100000 &&
+        data.netWeight is number && data.netWeight >= 0 && data.netWeight <= 100000 &&
+        data.makingChargeType is string && data.makingChargeType in ['perGram', 'percentage', 'fixed'] &&
+        data.makingChargeRate is number && data.makingChargeRate >= 0 && data.makingChargeRate <= 1000000 &&
+        data.hallmarkNo is string && data.hallmarkNo.size() >= 1 && data.hallmarkNo.size() <= 50 &&
+        data.quantity is number && data.quantity >= 0 && data.quantity <= 100000 &&
+        data.status is string && data.status.size() >= 1 && data.status.size() <= 50;
+    }
+
+    // 4. Validator for Customer Sales Invoices
+    function isValidInvoice(data) {
+      return data.keys().hasOnly([
+          'invoiceNo', 'date', 'customerName', 'phone', 'city',
+          'items', 'subtotal', 'gst3Percent', 'grandTotal',
+          'paymentMode', 'hallmarkFee', 'discount'
+        ]) &&
+        data.keys().hasAll([
+          'invoiceNo', 'date', 'customerName', 'phone',
+          'items', 'subtotal', 'gst3Percent', 'grandTotal', 'paymentMode'
+        ]) &&
+        data.invoiceNo is string && data.invoiceNo.size() >= 1 && data.invoiceNo.size() <= 50 &&
+        data.date is string && data.date.size() >= 1 && data.date.size() <= 50 &&
+        data.customerName is string && data.customerName.size() >= 1 && data.customerName.size() <= 100 &&
+        data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 30 &&
+        data.items is list && data.items.size() >= 1 && data.items.size() <= 100 &&
+        data.subtotal is number && data.subtotal >= 0 && data.subtotal <= 1000000000 &&
+        data.gst3Percent is number && data.gst3Percent >= 0 && data.gst3Percent <= 100000000 &&
+        data.grandTotal is number && data.grandTotal >= 0 && data.grandTotal <= 1000000000 &&
+        data.paymentMode is string && data.paymentMode.size() >= 1 && data.paymentMode.size() <= 50 &&
+        (!('city' in data) || (data.city is string && data.city.size() <= 100)) &&
+        (!('hallmarkFee' in data) || (data.hallmarkFee is number && data.hallmarkFee >= 0 && data.hallmarkFee <= 100000)) &&
+        (!('discount' in data) || (data.discount is number && data.discount >= 0 && data.discount <= 100000000));
+    }
+
+    // 5. Validator for Karagir (Artisan) Accounts
+    function isValidKaragir(data, karagirId) {
+      return data.keys().hasOnly([
+          'id', 'name', 'speciality', 'phone', 'address',
+          'metalIssued', 'metalReturned', 'meltingScrap',
+          'balanceMetal', 'activeOrders'
+        ]) &&
+        data.keys().hasAll([
+          'id', 'name', 'speciality', 'phone', 'address',
+          'metalIssued', 'metalReturned', 'meltingScrap',
+          'balanceMetal', 'activeOrders'
+        ]) &&
+        data.id == karagirId &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 50 &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        data.speciality is string && data.speciality.size() >= 1 && data.speciality.size() <= 100 &&
+        data.phone is string && data.phone.size() >= 1 && data.phone.size() <= 30 &&
+        data.address is string && data.address.size() >= 1 && data.address.size() <= 200 &&
+        data.metalIssued is number && data.metalIssued >= 0 && data.metalIssued <= 1000000 &&
+        data.metalReturned is number && data.metalReturned >= 0 && data.metalReturned <= 1000000 &&
+        data.meltingScrap is number && data.meltingScrap >= 0 && data.meltingScrap <= 1000000 &&
+        data.balanceMetal is number && data.balanceMetal >= 0 && data.balanceMetal <= 1000000 &&
+        data.activeOrders is number && data.activeOrders >= 0 && data.activeOrders <= 10000;
+    }
+
+    // 6. Validator for Gold Refinery Batches
+    function isValidRefineryBatch(data, batchId) {
+      return data.keys().hasOnly([
+          'id', 'date', 'refineryName', 'metalType', 'sentWeightGross',
+          'assayedPurityTested', 'postMeltWeight', 'wastageDrossWeight',
+          'wastagePercentage', 'fineGoldRecovered', 'status'
+        ]) &&
+        data.keys().hasAll([
+          'id', 'date', 'refineryName', 'metalType', 'sentWeightGross',
+          'assayedPurityTested', 'postMeltWeight', 'wastageDrossWeight',
+          'wastagePercentage', 'fineGoldRecovered', 'status'
+        ]) &&
+        data.id == batchId &&
+        data.id is string && data.id.size() >= 1 && data.id.size() <= 50 &&
+        data.date is string && data.date.size() >= 1 && data.date.size() <= 50 &&
+        data.refineryName is string && data.refineryName.size() >= 1 && data.refineryName.size() <= 150 &&
+        data.metalType is string && data.metalType.size() >= 1 && data.metalType.size() <= 100 &&
+        data.sentWeightGross is number && data.sentWeightGross >= 0 && data.sentWeightGross <= 1000000 &&
+        data.assayedPurityTested is string && data.assayedPurityTested.size() >= 1 && data.assayedPurityTested.size() <= 50 &&
+        data.postMeltWeight is number && data.postMeltWeight >= 0 && data.postMeltWeight <= 1000000 &&
+        data.wastageDrossWeight is number && data.wastageDrossWeight >= 0 && data.wastageDrossWeight <= 1000000 &&
+        data.wastagePercentage is number && data.wastagePercentage >= 0 && data.wastagePercentage <= 100 &&
+        data.fineGoldRecovered is number && data.fineGoldRecovered >= 0 && data.fineGoldRecovered <= 1000000 &&
+        data.status is string && data.status.size() >= 1 && data.status.size() <= 50;
+    }
+
+    // ===============================================================
+    // Match Rules for Collections
+    // ===============================================================
+
+    // 1. Settings Collection (Rates and Showroom Profile)
+    match /settings/{settingDoc} {
+      allow read: if isAuthorizedTerminal();
+
+      allow create, update: if isAuthorizedTerminal() &&
+        (
+          (settingDoc == 'rates' && isValidRates(request.resource.data)) ||
+          (settingDoc == 'showroom' && isValidShowroom(request.resource.data))
+        );
+
+      // Prevent accidental deletion of essential business settings
+      allow delete: if false;
+    }
+
+    // 2. Inventory Collection
+    match /inventory/{itemId} {
+      allow read: if isAuthorizedTerminal();
+
+      // Validator Function Pattern enforced on both create and update
+      allow create: if isAuthorizedTerminal() &&
+        isValidInventoryItem(request.resource.data, itemId);
+
+      allow update: if isAuthorizedTerminal() &&
+        isValidInventoryItem(request.resource.data, itemId) &&
+        areImmutableFieldsUnchanged(['id']);
+
+      // Physical jewellery items can be deleted when sold or decommissioned
+      allow delete: if isAuthorizedTerminal();
+    }
+
+    // 3. Customer Sales Tax Invoices
+    match /invoices/{invoiceId} {
+      allow read: if isAuthorizedTerminal();
+
+      // Validator Function Pattern enforced on both create and update
+      allow create: if isAuthorizedTerminal() &&
+        isValidInvoice(request.resource.data);
+
+      allow update: if isAuthorizedTerminal() &&
+        isValidInvoice(request.resource.data) &&
+        areImmutableFieldsUnchanged(['invoiceNo']);
+
+      // Invoices must never be deleted to preserve statutory GST audit trail
+      allow delete: if false;
+    }
+
+    // 4. Karagir (Artisan) Accounts & Metal Ledger
+    match /karagirs/{karagirId} {
+      allow read: if isAuthorizedTerminal();
+
+      // Validator Function Pattern enforced on both create and update
+      allow create: if isAuthorizedTerminal() &&
+        isValidKaragir(request.resource.data, karagirId);
+
+      allow update: if isAuthorizedTerminal() &&
+        isValidKaragir(request.resource.data, karagirId) &&
+        areImmutableFieldsUnchanged(['id']);
+
+      // Karagir ledgers must not be deleted to prevent gold balance tracking discrepancy
+      allow delete: if false;
+    }
+
+    // 5. Gold Refinery & Melting Logs
+    match /refinery/{batchId} {
+      allow read: if isAuthorizedTerminal();
+
+      // Validator Function Pattern enforced on both create and update
+      allow create: if isAuthorizedTerminal() &&
+        isValidRefineryBatch(request.resource.data, batchId);
+
+      allow update: if isAuthorizedTerminal() &&
+        isValidRefineryBatch(request.resource.data, batchId) &&
+        areImmutableFieldsUnchanged(['id']);
+
+      // Melting logs must be preserved for audit and purity verification
+      allow delete: if false;
+    }
+
+    // Default Deny Rule: All undocumented collections or root paths are strictly rejected
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

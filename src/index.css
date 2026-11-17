@@ -1,0 +1,212 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --gold-glow: 212, 175, 55;
+    --card-surface: 16, 20, 31;
+  }
+
+  body {
+    background-color: #05060A;
+    color: #F1F5F9;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Laser sweep animation for barcode viewfinder */
+@keyframes laserSweep {
+  0% {
+    top: 8%;
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 90%;
+    opacity: 0.7;
+  }
+}
+
+/* Custom luxury scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #07080D;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(212, 175, 55, 0.25);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(212, 175, 55, 0.5);
+  }
+}
+
+/* Glassmorphism & Luxury Utilities */
+.glass-panel {
+  background: rgba(16, 20, 31, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.glass-card {
+  background: rgba(14, 18, 28, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(20, 26, 40, 0.85);
+  border-color: rgba(212, 175, 55, 0.35);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px -5px rgba(212, 175, 55, 0.2), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-input {
+  background: rgba(10, 13, 20, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #F8FAFC;
+  transition: all 0.25s ease;
+}
+
+.glass-input:focus {
+  border-color: #D4AF37;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.5);
+  background: rgba(13, 17, 26, 0.9);
+}
+
+/* Gradients */
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FFF6D3 0%, #D4AF37 50%, #AA7C11 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.silver-gradient-text {
+  background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gold-gradient-btn {
+  background: linear-gradient(135deg, #D4AF37 0%, #B8860B 100%);
+  color: #07080D;
+  font-weight: 700;
+  box-shadow: 0 8px 25px -4px rgba(212, 175, 55, 0.4);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gold-gradient-btn:hover {
+  background: linear-gradient(135deg, #E5C358 0%, #C7971C 100%);
+  box-shadow: 0 12px 35px -2px rgba(212, 175, 55, 0.6);
+  transform: translateY(-2px);
+}
+
+/* Background Luxury Ambient Orbs */
+.bg-ambient-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Barcode simulation styling */
+.barcode-stripes {
+  background: repeating-linear-gradient(
+    90deg,
+    #fff 0px,
+    #fff 2px,
+    transparent 2px,
+    transparent 4px,
+    #fff 4px,
+    #fff 7px,
+    transparent 7px,
+    transparent 9px,
+    #fff 9px,
+    #fff 13px,
+    transparent 13px,
+    transparent 14px
+  );
+}
+
+/* ========================================================
+   PRINT ENGINE STYLES (A4 Tax Invoice, Thermal POS, Tags, Reports)
+   ======================================================== */
+@media print {
+  html, body {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* When printing, hide all app content by default */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Make ONLY the printable document container and its contents visible */
+  #printable-area,
+  #printable-area * {
+    visibility: visible !important;
+  }
+
+  /* Position document at top-left of page with zero margin bleed */
+  #printable-area {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  #printable-area.thermal-format {
+    width: 80mm !important;
+    max-width: 80mm !important;
+    margin: 0 auto !important;
+  }
+
+  /* Explicitly hide non-printable UI elements */
+  .no-print,
+  aside,
+  header,
+  nav,
+  button,
+  footer {
+    display: none !important;
+  }
+
+  /* Page setup for clean A4 printing */
+  @page {
+    size: A4 portrait;
+    margin: 8mm;
+  }
+}
