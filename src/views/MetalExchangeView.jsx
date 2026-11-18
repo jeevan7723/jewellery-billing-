@@ -56,26 +56,28 @@ export default function MetalExchangeView({ onNavigate }) {
   // 1: gold-to-gold, 2: silver-to-silver, 3: gold-to-silver, 4: silver-to-gold
   const [exchangeMode, setExchangeMode] = useState('gold-to-gold');
 
-  // Customer KYC
+  // Customer KYC (Default is clean and empty for actual entry)
   const [voucherNo, setVoucherNo] = useState(() => `EXCH-${Math.floor(1000 + Math.random() * 9000)}`);
-  const [customerName, setCustomerName] = useState('Mr. Anandram Verma');
-  const [phone, setPhone] = useState('+91 98220 88771');
-  const [voucherDate, setVoucherDate] = useState('16-Nov-2026');
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [voucherDate, setVoucherDate] = useState(() => 
+    new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+  );
 
-  // Inward Metal State
+  // Inward Metal State (Default clean and empty)
   const [inwardMetal, setInwardMetal] = useState('Gold');
   const [inwardPurityIndex, setInwardPurityIndex] = useState(1); // 22K default
-  const [inwardDescription, setInwardDescription] = useState('Old Bangles & Chain');
-  const [inwardGrossWeight, setInwardGrossWeight] = useState(32.500); // g
-  const [inwardStoneWeight, setInwardStoneWeight] = useState(1.200); // g
-  const [inwardMeltingLossPercent, setInwardMeltingLossPercent] = useState(1.5); // %
+  const [inwardDescription, setInwardDescription] = useState('');
+  const [inwardGrossWeight, setInwardGrossWeight] = useState(''); // g
+  const [inwardStoneWeight, setInwardStoneWeight] = useState(''); // g
+  const [inwardMeltingLossPercent, setInwardMeltingLossPercent] = useState(''); // %
 
-  // Outward Metal State
+  // Outward Metal State (Default clean and empty)
   const [selectedStockId, setSelectedStockId] = useState('');
   const [outwardMetal, setOutwardMetal] = useState('Gold');
   const [outwardPurityIndex, setOutwardPurityIndex] = useState(1); // 22K default
-  const [outwardDescription, setOutwardDescription] = useState('New 22K Bridal Necklace');
-  const [outwardGrossWeight, setOutwardGrossWeight] = useState(28.000); // g
+  const [outwardDescription, setOutwardDescription] = useState('');
+  const [outwardGrossWeight, setOutwardGrossWeight] = useState(''); // g
   const [userCustomMakingCharges, setUserCustomMakingCharges] = useState(null); // null = automatically as per stored % by owner
   const [showVoucherModal, setShowVoucherModal] = useState(false);
 
@@ -84,48 +86,38 @@ export default function MetalExchangeView({ onNavigate }) {
   const [savedSuccessVoucher, setSavedSuccessVoucher] = useState(null);
   const [savedInvoiceData, setSavedInvoiceData] = useState(null);
 
-  // Switch conversion modes helper
+  // Switch conversion modes helper (clean state on switch)
   const handleModeSwitch = (mode) => {
     setExchangeMode(mode);
     setSelectedStockId('');
     setUserCustomMakingCharges(null);
     setVoucherNo(`EXCH-${Math.floor(1000 + Math.random() * 9000)}`);
+    setInwardDescription('');
+    setOutwardDescription('');
+    setInwardGrossWeight('');
+    setInwardStoneWeight('');
+    setInwardMeltingLossPercent('');
+    setOutwardGrossWeight('');
     if (mode === 'gold-to-gold') {
       setInwardMetal('Gold');
       setInwardPurityIndex(1); // 22K
       setOutwardMetal('Gold');
       setOutwardPurityIndex(1); // 22K
-      setInwardDescription('Old 22K Gold Ornaments');
-      setOutwardDescription('New 22K Gold Hallmarked Jewellery');
-      setInwardGrossWeight(30.000);
-      setOutwardGrossWeight(25.000);
     } else if (mode === 'silver-to-silver') {
       setInwardMetal('Silver');
       setInwardPurityIndex(1); // 925
       setOutwardMetal('Silver');
       setOutwardPurityIndex(0); // 999
-      setInwardDescription('Old Silver Anklets & Utensils');
-      setOutwardDescription('New 999 Silver Puja Thali Set');
-      setInwardGrossWeight(450.000);
-      setOutwardGrossWeight(400.000);
     } else if (mode === 'gold-to-silver') {
       setInwardMetal('Gold');
       setInwardPurityIndex(1); // 22K
       setOutwardMetal('Silver');
       setOutwardPurityIndex(0); // 999
-      setInwardDescription('Old Gold Rings & Scrap');
-      setOutwardDescription('Fine Silver 999 Bullion Bars');
-      setInwardGrossWeight(15.000);
-      setOutwardGrossWeight(1000.000); // 1kg silver
     } else if (mode === 'silver-to-gold') {
       setInwardMetal('Silver');
       setInwardPurityIndex(1); // 925
       setOutwardMetal('Gold');
       setOutwardPurityIndex(1); // 22K
-      setInwardDescription('Old Silver Utensils & Payal');
-      setOutwardDescription('New 22K Gold Chain');
-      setInwardGrossWeight(2500.000); // 2.5 kg silver
-      setOutwardGrossWeight(25.000);
     }
   };
 
@@ -154,7 +146,11 @@ export default function MetalExchangeView({ onNavigate }) {
   const handlePickStockItem = (itemId) => {
     setSelectedStockId(itemId);
     setUserCustomMakingCharges(null);
-    if (!itemId) return;
+    if (!itemId) {
+      setOutwardDescription('');
+      setOutwardGrossWeight('');
+      return;
+    }
 
     const item = inventory.find(i => i.id === itemId);
     if (!item) return;
@@ -168,7 +164,7 @@ export default function MetalExchangeView({ onNavigate }) {
     setOutwardPurityIndex(purityIdx);
 
     // 3. Name / Description
-    setOutwardDescription(item.name || 'Showroom Stock Jewellery');
+    setOutwardDescription(item.name || '');
 
     // 4. Weight
     const wt = parseFloat(item.grossWeight || item.netWeight) || 0;
@@ -190,10 +186,10 @@ export default function MetalExchangeView({ onNavigate }) {
     return 3200;
   };
 
-  const safeInwardGross = Number(inwardGrossWeight) || 0;
-  const safeInwardStone = Number(inwardStoneWeight) || 0;
-  const safeMeltingLoss = Number(inwardMeltingLossPercent) || 0;
-  const safeOutwardGross = Number(outwardGrossWeight) || 0;
+  const safeInwardGross = parseFloat(inwardGrossWeight) || 0;
+  const safeInwardStone = parseFloat(inwardStoneWeight) || 0;
+  const safeMeltingLoss = parseFloat(inwardMeltingLossPercent) || 0;
+  const safeOutwardGross = parseFloat(outwardGrossWeight) || 0;
 
   // Inward Calculations
   const inwardPurityObj = METAL_PURITY_OPTIONS[inwardMetal]?.[inwardPurityIndex] || METAL_PURITY_OPTIONS.Gold[0];
@@ -212,7 +208,7 @@ export default function MetalExchangeView({ onNavigate }) {
   const outwardMetalValue = outwardFinePureRequired * outwardUnitRate;
 
   // Making charges automatically calculated as per stored making charges by owner (e.g. 5%)
-  const autoMakingCharges = Math.round(outwardMetalValue * (storedMakingPercent / 100));
+  const autoMakingCharges = safeOutwardGross > 0 ? Math.round(outwardMetalValue * (storedMakingPercent / 100)) : 0;
   const outwardMakingCharges = userCustomMakingCharges !== null ? Number(userCustomMakingCharges) : autoMakingCharges;
   const safeOutwardMakingRate = safeOutwardGross > 0 ? (outwardMakingCharges / safeOutwardGross) : 0;
   const outwardTotalPayable = outwardMetalValue + outwardMakingCharges;
@@ -344,9 +340,18 @@ export default function MetalExchangeView({ onNavigate }) {
   const handleNewExchange = () => {
     const newVoucher = `EXCH-${Math.floor(1000 + Math.random() * 9000)}`;
     setVoucherNo(newVoucher);
+    setVoucherDate(new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }));
     setSavedSuccessVoucher(null);
     setSavedInvoiceData(null);
     setSelectedStockId('');
+    setCustomerName('');
+    setPhone('');
+    setInwardDescription('');
+    setInwardGrossWeight('');
+    setInwardStoneWeight('');
+    setInwardMeltingLossPercent('');
+    setOutwardDescription('');
+    setOutwardGrossWeight('');
     setUserCustomMakingCharges(null);
   };
 
@@ -458,6 +463,7 @@ export default function MetalExchangeView({ onNavigate }) {
               type="text"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
+              placeholder="Enter customer name"
               className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-semibold"
             />
           </div>
@@ -467,6 +473,7 @@ export default function MetalExchangeView({ onNavigate }) {
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              placeholder="+91 00000 00000"
               className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-mono"
             />
           </div>
@@ -476,6 +483,7 @@ export default function MetalExchangeView({ onNavigate }) {
               type="text"
               value={voucherDate}
               onChange={(e) => setVoucherDate(e.target.value)}
+              placeholder="DD-MMM-YYYY"
               className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-mono"
             />
           </div>
@@ -554,7 +562,8 @@ export default function MetalExchangeView({ onNavigate }) {
                     type="number"
                     step="0.001"
                     value={inwardGrossWeight}
-                    onChange={(e) => setInwardGrossWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setInwardGrossWeight(e.target.value)}
+                    placeholder="0.000"
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input font-bold"
                   />
                 </div>
@@ -565,7 +574,8 @@ export default function MetalExchangeView({ onNavigate }) {
                     type="number"
                     step="0.001"
                     value={inwardStoneWeight}
-                    onChange={(e) => setInwardStoneWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setInwardStoneWeight(e.target.value)}
+                    placeholder="0.000"
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input text-slate-300"
                   />
                 </div>
@@ -576,7 +586,8 @@ export default function MetalExchangeView({ onNavigate }) {
                     type="number"
                     step="0.1"
                     value={inwardMeltingLossPercent}
-                    onChange={(e) => setInwardMeltingLossPercent(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setInwardMeltingLossPercent(e.target.value)}
+                    placeholder="0.0"
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input text-rose-400"
                   />
                 </div>
@@ -748,9 +759,10 @@ export default function MetalExchangeView({ onNavigate }) {
                     step="0.001"
                     value={outwardGrossWeight}
                     onChange={(e) => {
-                      setOutwardGrossWeight(parseFloat(e.target.value) || 0);
+                      setOutwardGrossWeight(e.target.value);
                       setUserCustomMakingCharges(null);
                     }}
+                    placeholder="0.000"
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input font-bold"
                   />
                 </div>
@@ -764,8 +776,9 @@ export default function MetalExchangeView({ onNavigate }) {
                   </div>
                   <input 
                     type="number"
-                    value={userCustomMakingCharges !== null ? userCustomMakingCharges : autoMakingCharges}
-                    onChange={(e) => setUserCustomMakingCharges(parseFloat(e.target.value) || 0)}
+                    value={userCustomMakingCharges !== null ? userCustomMakingCharges : (autoMakingCharges > 0 ? autoMakingCharges : '')}
+                    onChange={(e) => setUserCustomMakingCharges(e.target.value === '' ? null : (parseFloat(e.target.value) || 0))}
+                    placeholder="0"
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input text-emerald-300 font-bold"
                   />
                 </div>
@@ -876,7 +889,7 @@ export default function MetalExchangeView({ onNavigate }) {
               <span className="text-emerald-300 font-bold">
                 ₹{Math.round(outwardTotalPayable || 0).toLocaleString('en-IN')}
               </span>
-              <div className="text-[10px] text-slate-500 mt-0.5">({Number(outwardGrossWeight || 0).toFixed(3)}g {outwardPurityObj?.karat || '22K'})</div>
+              <div className="text-[10px] text-slate-500 mt-0.5">({safeOutwardGross.toFixed(3)}g {outwardPurityObj?.karat || '22K'})</div>
             </div>
 
             <div className="p-3.5 rounded-xl bg-obsidian-950/80 border border-white/5">
