@@ -3,7 +3,7 @@ import { useJewellery } from '../context/JewelleryContext';
 import { 
   RefreshCw, Scale, ArrowRightLeft, 
   Printer, CheckCircle2, Sparkles, Coins, FileText,
-  Boxes, PackageCheck
+  Boxes, PackageCheck, Save, ArrowRight, Check
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import PrintModal from '../components/print/PrintModal';
@@ -30,8 +30,8 @@ const METAL_PURITY_OPTIONS = {
   ]
 };
 
-export default function MetalExchangeView() {
-  const { rates: contextRates, showroom: contextShowroom, inventory = [] } = useJewellery();
+export default function MetalExchangeView({ onNavigate }) {
+  const { rates: contextRates, showroom: contextShowroom, inventory = [], addInvoice, updateInventoryItem } = useJewellery();
 
   const rates = {
     gold24k: 7425,
@@ -77,6 +77,11 @@ export default function MetalExchangeView() {
   const [outwardGrossWeight, setOutwardGrossWeight] = useState(28.000); // g
   const [outwardMakingRate, setOutwardMakingRate] = useState(480); // ₹ / g
   const [showVoucherModal, setShowVoucherModal] = useState(false);
+
+  // Persistence & Save States
+  const [isSaving, setIsSaving] = useState(false);
+  const [savedSuccessVoucher, setSavedSuccessVoucher] = useState(null);
+  const [savedInvoiceData, setSavedInvoiceData] = useState(null);
 
   // Switch conversion modes helper
   const handleModeSwitch = (mode) => {
@@ -229,6 +234,114 @@ export default function MetalExchangeView() {
     setShowVoucherModal(true);
   };
 
+  const handleSaveAndPrint = async (shouldOpenPrint = true) => {
+    if (isSaving) return;
+    setIsSaving(true);
+
+    try {
+      const exchangeRecord = {
+        invoiceNo: voucherNo,
+        date: voucherDate,
+        customerName: customerName.trim() || 'Walk-in Customer',
+        phone: phone.trim() || '',
+        paymentMode: 'Metal Exchange / Barter',
+        invoiceType: 'exchange',
+        isExchange: true,
+        exchangeMode,
+
+        // Inward Scrap Details (Customer brings to shop)
+        inwardMetal,
+        inwardKarat: inwardPurityObj?.karat || '22K',
+        inwardDescription: inwardDescription || 'Old Metal Scrap',
+        inwardGrossWeight: safeInwardGross,
+        inwardStoneWeight: safeInwardStone,
+        inwardNetWeight: inwardNetScaleWeight,
+        inwardMeltingLossPercent: safeMeltingLoss,
+        inwardPostMeltWeight: Number(inwardPostMeltWeight.toFixed(3)),
+        inwardFineEquivalent: Number(inwardFinePureWeight.toFixed(3)),
+        inwardRate: inwardUnitRate,
+        inwardValuation: Math.round(inwardValuation || 0),
+
+        // Outward New Jewellery Details (Shop sells to customer)
+        outwardMetal,
+        outwardKarat: outwardPurityObj?.karat || '22K',
+        outwardDescription: selectedItemDetails ? `${outwardDescription} [SKU: ${selectedItemDetails.barcode}]` : outwardDescription,
+        outwardGrossWeight: safeOutwardGross,
+        outwardMakingCharges: Math.round(outwardMakingCharges || 0),
+        outwardMakingRate: safeOutwardMakingRate,
+        outwardValuation: Math.round(outwardTotalPayable || 0),
+        selectedStockId: selectedStockId || null,
+
+        // Financial Settlement & Differences
+        metalDifferenceGrams: sameMetalTrade && typeof fineWeightDifference === 'number' && !isNaN(fineWeightDifference) 
+          ? Number(fineWeightDifference.toFixed(3)) 
+          : null,
+        cashSettlement: Math.round(cashBalanceDifference || 0),
+        settlementType: cashBalanceDifference >= 0 ? 'Refund Due to Customer' : 'Customer Paid Balance',
+
+        // Standard invoice structure so it integrates seamlessly across all reports, dashboards & sales
+        items: [
+          {
+            name: `${outwardDescription} (Exchanged for old ${inwardMetal} ${inwardPurityObj?.karat || '22K'})`,
+            metal: outwardMetal,
+            karat: outwardPurityObj?.karat || '22K',
+            grossWeight: safeOutwardGross,
+            netWeight: safeOutwardGross,
+            rate: outwardUnitRate,
+            makingCharges: Math.round(outwardMakingCharges || 0),
+            total: Math.round(outwardTotalPayable || 0)
+          }
+        ],
+        subtotal: Math.round(outwardTotalPayable || 0),
+        exchangeCredit: Math.round(inwardValuation || 0),
+        gst3Percent: 0,
+        grandTotal: Math.abs(Math.round(cashBalanceDifference || 0)),
+        status: cashBalanceDifference >= 0 ? 'Refund Settled' : 'Customer Paid',
+        createdAt: new Date().toISOString()
+      };
+
+      // 1. Save directly to Context & Firebase Cloud Firestore
+      if (addInvoice) {
+        await addInvoice(exchangeRecord);
+      }
+
+      // 2. If a showroom stock item was picked, update its vault status
+      if (selectedStockId && updateInventoryItem) {
+        await updateInventoryItem(selectedStockId, {
+          status: `Exchanged (${voucherNo})`
+        });
+      }
+
+      // 3. Trigger celebration confetti
+      confetti({
+        particleCount: 90,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#D4AF37', '#A855F7', '#FFF6D3', '#10B981']
+      });
+
+      setSavedSuccessVoucher(voucherNo);
+      setSavedInvoiceData(exchangeRecord);
+
+      // 4. Open print slip modal if requested
+      if (shouldOpenPrint) {
+        setShowVoucherModal(true);
+      }
+    } catch (err) {
+      console.error('Error saving exchange bill:', err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleNewExchange = () => {
+    const newVoucher = `EXCH-${Math.floor(1000 + Math.random() * 9000)}`;
+    setVoucherNo(newVoucher);
+    setSavedSuccessVoucher(null);
+    setSavedInvoiceData(null);
+    setSelectedStockId('');
+  };
+
   return (
     <div className="p-4 sm:p-8 space-y-8 animate-in fade-in duration-300">
       
@@ -274,6 +387,57 @@ export default function MetalExchangeView() {
           </button>
         ))}
       </div>
+
+      {/* SUCCESS CONFIRMATION BANNER */}
+      {savedSuccessVoucher && (
+        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-obsidian-900 to-emerald-950/80 border border-emerald-500/50 shadow-glass-lg flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-3 duration-300">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-white text-sm">Exchange Bill #{savedSuccessVoucher} Saved!</span>
+                <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-mono font-bold border border-emerald-500/30">
+                  LIVE SYNCED
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 font-light">
+                Recorded in <strong>Customer Sales</strong> and <strong>Inward Gold Purchases</strong>. Synced to Cloud Firestore.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowVoucherModal(true)}
+              className="px-3.5 py-2 rounded-xl glass-card hover:border-purple-400 text-purple-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span>Print Slip</span>
+            </button>
+            {onNavigate && (
+              <button
+                type="button"
+                onClick={() => onNavigate('sales-purchase')}
+                className="px-3.5 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-200 border border-purple-500/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>View in Sales & Purchases</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={handleNewExchange}
+              className="px-3.5 py-2 rounded-xl glass-card hover:border-gold-500 text-gold-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>New Exchange (+)</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Form */}
       <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-purple-500/30 shadow-2xl space-y-8">
@@ -613,11 +777,16 @@ export default function MetalExchangeView() {
 
         {/* BOTTOM: SIMPLE SETTLEMENT RESULT */}
         <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-obsidian-900 via-obsidian-850 to-obsidian-900 border border-purple-500/40 space-y-5">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-white/10">
             <div>
-              <span className="text-xs uppercase font-mono tracking-widest text-purple-400 font-bold block mb-1">
-                Final Exchange Calculation
-              </span>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xs uppercase font-mono tracking-widest text-purple-400 font-bold block">
+                  Final Exchange Calculation
+                </span>
+                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
+                  Voucher #{voucherNo}
+                </span>
+              </div>
               <div className="text-xl sm:text-2xl font-serif font-extrabold text-white">
                 {cashBalanceDifference >= 0 ? (
                   <span className="text-emerald-400">
@@ -631,13 +800,49 @@ export default function MetalExchangeView() {
               </div>
             </div>
 
-            <button 
-              onClick={handleOpenVoucher}
-              className="px-6 py-3 rounded-xl gold-gradient-btn text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-gold-glow whitespace-nowrap"
-            >
-              <Printer className="w-4 h-4" />
-              <span>Print Exchange Slip</span>
-            </button>
+            {/* ACTION BUTTONS: SAVE & PRINT, SAVE RECORD, PREVIEW */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button 
+                type="button"
+                onClick={() => handleSaveAndPrint(true)}
+                disabled={isSaving}
+                className="px-6 py-3 rounded-xl gold-gradient-btn text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-gold-glow whitespace-nowrap active:scale-95 transition-transform disabled:opacity-50"
+              >
+                {isSaving ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin text-obsidian-950" />
+                    <span>Saving & Syncing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Printer className="w-4 h-4 text-obsidian-950" />
+                    <Save className="w-4 h-4 text-obsidian-950" />
+                    <span>Save & Print Bill</span>
+                  </>
+                )}
+              </button>
+
+              <button 
+                type="button"
+                onClick={() => handleSaveAndPrint(false)}
+                disabled={isSaving}
+                className="px-4 py-3 rounded-xl glass-card hover:border-emerald-500/50 text-emerald-300 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap active:scale-95 transition-transform disabled:opacity-50"
+                title="Save record to Sales & Purchases without opening print dialog"
+              >
+                <Save className="w-4 h-4 text-emerald-400" />
+                <span>Save to Records</span>
+              </button>
+
+              <button 
+                type="button"
+                onClick={handleOpenVoucher}
+                className="px-4 py-3 rounded-xl glass-card hover:border-purple-400/50 text-slate-300 text-xs font-semibold flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap"
+                title="Preview barter slip memorandum before saving"
+              >
+                <FileText className="w-4 h-4 text-purple-400" />
+                <span>Slip Preview</span>
+              </button>
+            </div>
           </div>
 
           {/* Simple Summary */}
@@ -683,7 +888,7 @@ export default function MetalExchangeView() {
         formatToggle={false}
       >
         <MetalExchangeTemplate 
-          exchangeData={{
+          exchangeData={savedInvoiceData || {
             voucherNo,
             date: voucherDate,
             customerName,

@@ -51,7 +51,7 @@ function AppContent() {
       case 'barcode':
         return <BarcodeBillingView />;
       case 'metal-exchange':
-        return <MetalExchangeView />;
+        return <MetalExchangeView onNavigate={setActiveView} />;
       case 'inventory':
         return <InventoryView />;
       case 'karagir':
