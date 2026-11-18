@@ -6,6 +6,16 @@
   :root {
     --gold-glow: 212, 175, 55;
     --card-surface: 16, 20, 31;
+    
+    /* Modern Web Guidance: Reflect color-scheme from meta */
+    color-scheme: light dark;
+
+    &:has(> head > meta[name="color-scheme"][content="dark"]) {
+      color-scheme: dark;
+    }
+    &:has(> head > meta[name="color-scheme"][content="light"]) {
+      color-scheme: light;
+    }
   }
 
   body {
@@ -13,6 +23,12 @@
     color: #F1F5F9;
     font-family: 'Plus Jakarta Sans', sans-serif;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.light body {
+    background-color: #F8F9FA;
+    color: #0F172A;
   }
 
   /* Laser sweep animation for barcode viewfinder */
@@ -33,6 +49,7 @@
 /* Custom luxury scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
     background: #07080D;
@@ -44,6 +61,16 @@
   ::-webkit-scrollbar-thumb:hover {
     background: rgba(212, 175, 55, 0.5);
   }
+
+  html.light ::-webkit-scrollbar-track {
+    background: #F1F5F9;
+  }
+  html.light ::-webkit-scrollbar-thumb {
+    background: rgba(184, 134, 11, 0.35);
+  }
+  html.light ::-webkit-scrollbar-thumb:hover {
+    background: rgba(184, 134, 11, 0.6);
+  }
 }
 
 /* Glassmorphism & Luxury Utilities */
@@ -53,6 +80,13 @@
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.5), inset 0 1px 1px 0 rgba(255, 255, 255, 0.12);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.05), inset 0 1px 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .glass-card {
@@ -71,11 +105,30 @@
   transform: translateY(-4px);
 }
 
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+}
+
+html.light .glass-card:hover {
+  background: #FFFFFF;
+  border-color: rgba(212, 175, 55, 0.5);
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.08), 0 0 30px -5px rgba(212, 175, 55, 0.25);
+}
+
 .glass-pill {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
+}
+
+html.light .glass-pill {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .glass-input {
@@ -90,6 +143,24 @@
   outline: none;
   box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.2), inset 0 1px 2px rgba(0, 0, 0, 0.5);
   background: rgba(13, 17, 26, 0.9);
+}
+
+html.light .glass-input {
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: #0F172A;
+}
+
+html.light .glass-input:focus {
+  border-color: #D4AF37;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.25);
+  background: #FFFFFF;
+}
+
+html.light select.glass-input option {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
 }
 
 /* Gradients */
@@ -145,6 +216,110 @@
     transparent 13px,
     transparent 14px
   );
+}
+
+/* ========================================================
+   LIGHT THEME (ALABASTER / SHOWROOM IVORY) ENGINE
+   ======================================================== */
+html.light .bg-obsidian-950 {
+  background-color: #F8F9FA !important;
+}
+html.light .bg-obsidian-900 {
+  background-color: #FFFFFF !important;
+}
+html.light .bg-obsidian-850 {
+  background-color: #F1F5F9 !important;
+}
+html.light .bg-obsidian-800 {
+  background-color: #E2E8F0 !important;
+}
+html.light .bg-obsidian-750 {
+  background-color: #CBD5E1 !important;
+}
+html.light .bg-obsidian-700 {
+  background-color: #94A3B8 !important;
+}
+
+html.light .bg-obsidian-950\/95,
+html.light .bg-obsidian-950\/90,
+html.light .bg-obsidian-950\/85,
+html.light .bg-obsidian-950\/80,
+html.light .bg-obsidian-950\/70 {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+}
+
+html.light .bg-obsidian-900\/95,
+html.light .bg-obsidian-900\/90,
+html.light .bg-obsidian-900\/80 {
+  background-color: rgba(255, 255, 255, 0.98) !important;
+}
+
+/* Light mode text contrast */
+html.light .text-white {
+  color: #0F172A !important;
+}
+html.light .text-slate-100 {
+  color: #1E293B !important;
+}
+html.light .text-slate-200 {
+  color: #334155 !important;
+}
+html.light .text-slate-300 {
+  color: #475569 !important;
+}
+html.light .text-slate-400 {
+  color: #64748B !important;
+}
+
+/* Light mode borders */
+html.light .border-white\/5,
+html.light .border-white\/10,
+html.light .border-white\/15,
+html.light .border-white\/20,
+html.light .border-white\/30 {
+  border-color: rgba(0, 0, 0, 0.08) !important;
+}
+html.light .bg-white\/5 {
+  background-color: rgba(0, 0, 0, 0.03) !important;
+}
+html.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+}
+html.light .bg-white\/\[0\.02\] {
+  background-color: rgba(0, 0, 0, 0.02) !important;
+}
+
+/* Maintain light text on dark accent buttons & badges */
+html.light .keep-white,
+html.light .keep-white *,
+html.light [class*="bg-emerald-600"] .text-white,
+html.light [class*="bg-purple-600"] .text-white,
+html.light [class*="bg-rose-600"] .text-white,
+html.light [class*="bg-blue-600"] .text-white,
+html.light [class*="bg-sky-600"] .text-white,
+html.light [class*="bg-amber-600"] .text-white,
+html.light [class*="bg-purple-950"] .text-white,
+html.light [class*="bg-purple-900"] .text-white {
+  color: #FFFFFF !important;
+}
+
+/* Gold Gradient Button text remains dark */
+.gold-gradient-btn {
+  color: #07080D !important;
+}
+
+/* Enhanced Gold text contrast in Light mode */
+html.light .text-gold-200,
+html.light .text-gold-300 {
+  color: #B8860B !important;
+}
+html.light .text-gold-400 {
+  color: #946608 !important;
+}
+html.light .gold-gradient-text {
+  background: linear-gradient(135deg, #784E00 0%, #B8860B 50%, #603D00 100%) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 /* ========================================================

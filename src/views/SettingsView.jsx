@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useJewellery, INITIAL_RATES, INITIAL_INVENTORY, INITIAL_KARAGIRS, INITIAL_REFINERY_BATCHES, INITIAL_INVOICES, INITIAL_SHOWROOM } from '../context/JewelleryContext';
-import { Settings, Save, RotateCcw, Building2, TrendingUp, CheckCircle2, Shield, Wrench, Sparkles, Cloud, Database, RefreshCw } from 'lucide-react';
+import { Settings, Save, RotateCcw, Building2, TrendingUp, CheckCircle2, Shield, Wrench, Sparkles, Cloud, Database, RefreshCw, Palette, Sun, Moon } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function SettingsView() {
-  const { rates, updateRates, showroom, setShowroom, cloudStatus, syncAllToCloud } = useJewellery();
+  const { rates, updateRates, showroom, setShowroom, cloudStatus, syncAllToCloud, theme, setTheme } = useJewellery();
   const [syncingCloud, setSyncingCloud] = useState(false);
   const [syncMessage, setSyncMessage] = useState(null);
 
@@ -264,6 +264,93 @@ export default function SettingsView() {
           </div>
         </form>
 
+      </div>
+
+      {/* Showroom Display Theme (Dark / Light Mode) */}
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 shadow-glass-lg space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-white/10">
+          <div className="p-3 rounded-2xl bg-gold-500/10 border border-gold-500/20 text-gold-400">
+            <Palette className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-serif text-lg font-bold text-white">
+              Showroom Theme & Appearance
+            </h3>
+            <p className="text-xs text-slate-400">
+              Customize the visual environment for billing counters, point-of-sale terminals, and executive desks.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Dark Mode Card */}
+          <div
+            onClick={() => setTheme('dark')}
+            className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+              theme === 'dark'
+                ? 'bg-obsidian-900 border-amber-400/60 shadow-gold-glow'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-obsidian-950 border border-amber-400/30 flex items-center justify-center text-amber-300">
+                <Moon className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <span>Obsidian Dark Mode</span>
+                  {theme === 'dark' && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40">
+                      ACTIVE
+                    </span>
+                  )}
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Deep black & gold contrast. Ideal for low-light jewellery counters and executive suites.
+                </p>
+              </div>
+            </div>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              theme === 'dark' ? 'border-amber-400 bg-amber-400' : 'border-slate-500'
+            }`}>
+              {theme === 'dark' && <div className="w-2 h-2 rounded-full bg-obsidian-950" />}
+            </div>
+          </div>
+
+          {/* Light Mode Card */}
+          <div
+            onClick={() => setTheme('light')}
+            className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+              theme === 'light'
+                ? 'bg-white border-gold-500 shadow-md'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-amber-50 border border-amber-300 flex items-center justify-center text-amber-600">
+                <Sun className="w-6 h-6" />
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <span>Showroom Light Mode</span>
+                  {theme === 'light' && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 border border-emerald-400/40">
+                      ACTIVE
+                    </span>
+                  )}
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Crisp ivory & gold aesthetics. Ideal for brightly lit retail showrooms and daylight counters.
+                </p>
+              </div>
+            </div>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              theme === 'light' ? 'border-gold-500 bg-gold-500' : 'border-slate-500'
+            }`}>
+              {theme === 'light' && <div className="w-2 h-2 rounded-full bg-white" />}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Firebase Cloud Firestore Card */}

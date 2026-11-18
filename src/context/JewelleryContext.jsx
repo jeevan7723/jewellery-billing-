@@ -294,6 +294,61 @@ export function JewelleryProvider({ children }) {
     }, 4000);
   };
 
+  // Modern Web Guidance compliant Theme State (Dark / Light)
+  const [theme, setThemeState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') return saved;
+        return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      } catch (e) {
+        return 'dark';
+      }
+    }
+    return 'dark';
+  });
+
+  const applyThemeToDOM = (newTheme) => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    if (newTheme === 'light') {
+      root.classList.add('light');
+      root.classList.remove('dark');
+    } else {
+      root.classList.add('dark');
+      root.classList.remove('light');
+    }
+    const meta = document.querySelector('meta[name="color-scheme"]');
+    if (meta) meta.content = newTheme;
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.content = newTheme === 'light' ? '#F8F9FA' : '#07080D';
+  };
+
+  const setTheme = (newTheme) => {
+    setThemeState(newTheme);
+    try {
+      localStorage.setItem('theme', newTheme);
+    } catch (e) {}
+    applyThemeToDOM(newTheme);
+  };
+
+  const toggleTheme = () => {
+    const next = theme === 'dark' ? 'light' : 'dark';
+    setTheme(next);
+  };
+
+  useEffect(() => {
+    applyThemeToDOM(theme);
+    const handleStorage = (e) => {
+      if (e.key === 'theme' && (e.newValue === 'light' || e.newValue === 'dark')) {
+        setThemeState(e.newValue);
+        applyThemeToDOM(e.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [theme]);
+
   // Real-Time Firebase Subscriptions
   useEffect(() => {
     let isMounted = true;
@@ -718,7 +773,10 @@ export function JewelleryProvider({ children }) {
       addInvoice,
       cloudStatus,
       liveSyncNotification,
-      syncAllToCloud
+      syncAllToCloud,
+      theme,
+      setTheme,
+      toggleTheme
     }}>
       {children}
     </JewelleryContext.Provider>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Menu, Plus, ScanBarcode, Cloud, CloudCheck, CloudOff } from 'lucide-react';
 import { APP_MODULES } from './Sidebar';
 import { useJewellery } from '../context/JewelleryContext';
+import ThemeToggle from './ThemeToggle';
 
 export default function TopHeader({ 
   activeView, 
@@ -104,6 +105,9 @@ export default function TopHeader({
           <span className="text-slate-400">Silver:</span>
           <span className="text-slate-100 font-bold">₹{rates.silver999}/g</span>
         </div>
+
+        {/* Theme Mode Toggle (Dark / Light) */}
+        <ThemeToggle />
 
         {/* Quick New Bill Action */}
         <button

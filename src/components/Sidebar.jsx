@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, X, Radio 
 } from 'lucide-react';
 import { useJewellery } from '../context/JewelleryContext';
+import ThemeToggle from './ThemeToggle';
 
 export const APP_MODULES = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: 'Home' },
@@ -141,8 +142,19 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* Bottom Section: Live Rates Widget */}
-        <div className="p-3 sm:p-4 border-t border-white/10 space-y-2">
+        {/* Bottom Section: Live Rates Widget & Theme Toggle */}
+        <div className="p-3 sm:p-4 border-t border-white/10 space-y-2.5">
+          {!isCollapsed ? (
+            <div className="flex items-center justify-between px-1 text-[11px] font-mono text-slate-400">
+              <span className="text-slate-500 uppercase tracking-wider text-[10px] font-bold">Theme Mode</span>
+              <ThemeToggle variant="pill" />
+            </div>
+          ) : (
+            <div className="flex justify-center pb-1">
+              <ThemeToggle variant="icon-only" />
+            </div>
+          )}
+
           {!isCollapsed ? (
             <div className="p-3 rounded-2xl bg-obsidian-900/90 border border-white/5 space-y-1.5 font-mono text-xs">
               <div className="flex items-center justify-between text-[10px] text-slate-400">

@@ -61,7 +61,7 @@ function AppContent() {
   };
 
   return (
-    <div className="min-h-screen bg-obsidian-950 text-slate-100 relative selection:bg-gold-500/30 selection:text-gold-200">
+    <div className="min-h-screen bg-slate-50 dark:bg-obsidian-950 text-slate-900 dark:text-slate-100 transition-colors duration-300 relative selection:bg-gold-500/30 selection:text-gold-800 dark:selection:text-gold-200">
       
       {/* Luxury dynamic mouse spotlight */}
       <div 

@@ -4,7 +4,29 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h12l4 6-10 12L2 9z'/%3E%3Cpath d='M11 3 8 9l4 12 4-12-3-6'/%3E%3Cpath d='M2 9h20'/%3E%3C/svg%3E" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#07080D" />
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var isDark = saved ? saved === 'dark' : prefersDark;
+          var root = document.documentElement;
+          if (isDark) {
+            root.classList.add('dark');
+            root.classList.remove('light');
+          } else {
+            root.classList.add('light');
+            root.classList.remove('dark');
+          }
+          var meta = document.querySelector('meta[name="color-scheme"]');
+          if (meta) meta.content = isDark ? 'dark' : 'light';
+          var themeColor = document.querySelector('meta[name="theme-color"]');
+          if (themeColor) themeColor.content = isDark ? '#07080D' : '#F8F9FA';
+        } catch (e) {}
+      })();
+    </script>
     <title>KaratCraft ERP™ | Jewellery Billing & Management Software</title>
     
     <!-- Google Fonts: Cinzel & Plus Jakarta Sans & JetBrains Mono -->
