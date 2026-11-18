@@ -146,15 +146,57 @@ export default function MetalExchangeView({ onNavigate }) {
     return 0;
   };
 
+  // Metal Rates
+  const getRate = (metalType) => {
+    if (metalType === 'Gold') return Number(rates?.gold24k || 7425);
+    if (metalType === 'Silver') return Number(rates?.silver999 || 88.5);
+    return 3200;
+  };
+
+  // Helper to extract making charge from any inventory item
+  const getItemMakingCharge = (item, weight, metal) => {
+    if (!item) return 0;
+    const wt = parseFloat(weight) || parseFloat(item.grossWeight || item.netWeight) || 0;
+    
+    // 1. Explicit fixed amount or 'fixed' type set by owner
+    if (item.makingChargeAmount !== undefined && Number(item.makingChargeAmount) > 0) {
+      return Math.round(Number(item.makingChargeAmount));
+    }
+    if (item.makingChargeType === 'fixed' && item.makingChargeRate !== undefined) {
+      return Math.round(Number(item.makingChargeRate));
+    }
+    
+    // 2. Per Gram rate
+    if (item.makingChargeType === 'perGram' && item.makingChargeRate) {
+      return Math.round(wt * parseFloat(item.makingChargeRate));
+    }
+    
+    // 3. Percentage rate
+    if (item.makingChargeType === 'percentage' && item.makingChargeRate) {
+      const metalVal = (wt * (item.purity || 0.916)) * getRate(metal || item.metal || 'Gold');
+      return Math.round(metalVal * (parseFloat(item.makingChargeRate) / 100));
+    }
+    
+    // 4. Fallback if any numeric charge exists
+    if (item.makingCharges !== undefined && Number(item.makingCharges) > 0) {
+      return Math.round(Number(item.makingCharges));
+    }
+    if (item.makingChargeRate !== undefined && Number(item.makingChargeRate) > 0) {
+      return Math.round(Number(item.makingChargeRate));
+    }
+
+    return 0;
+  };
+
   // Handler when selecting an item from Showroom Stock dropdown
   const handlePickStockItem = (itemId) => {
     setSelectedStockId(itemId);
-    setIsCustomMaking(false);
-    setCustomMakingInput('');
-    setCustomRateLabel(null);
     if (!itemId) {
       setOutwardDescription('');
       setOutwardGrossWeight('');
+      setIsCustomMaking(false);
+      setCustomMakingInput('');
+      setCustomRateLabel(null);
       return;
     }
 
@@ -176,26 +218,18 @@ export default function MetalExchangeView({ onNavigate }) {
     const wt = parseFloat(item.grossWeight || item.netWeight) || 0;
     if (wt > 0) setOutwardGrossWeight(wt);
 
-    // 5. Making charges if item explicitly specifies it
-    if (item.makingChargeType === 'perGram' && item.makingChargeRate) {
-      const charge = Math.round(wt * parseFloat(item.makingChargeRate));
+    // 5. AUTOMATICALLY POPULATE MAKING CHARGES FROM THE STOCK ITEM!
+    const stockMaking = getItemMakingCharge(item, wt, targetMetal);
+    if (stockMaking > 0) {
       setIsCustomMaking(true);
-      setCustomMakingInput(String(charge));
-      setCustomRateLabel(`₹${item.makingChargeRate}/g Stock Rate`);
-    } else if (item.makingChargeType === 'percentage' && item.makingChargeRate) {
-      const metalVal = (wt * (item.purity || 0.916)) * getRate(targetMetal);
-      const charge = Math.round(metalVal * (parseFloat(item.makingChargeRate) / 100));
-      setIsCustomMaking(true);
-      setCustomMakingInput(String(charge));
-      setCustomRateLabel(`${item.makingChargeRate}% Stock Rate`);
+      setCustomMakingInput(String(stockMaking));
+      setCustomRateLabel(`₹${stockMaking.toLocaleString('en-IN')} Stock Making`);
+    } else {
+      // If item has no making charge set, calculate as per store % default
+      setIsCustomMaking(false);
+      setCustomMakingInput('');
+      setCustomRateLabel(null);
     }
-  };
-
-  // Metal Rates
-  const getRate = (metalType) => {
-    if (metalType === 'Gold') return Number(rates?.gold24k || 7425);
-    if (metalType === 'Silver') return Number(rates?.silver999 || 88.5);
-    return 3200;
   };
 
   const safeInwardGross = parseFloat(inwardGrossWeight) || 0;
@@ -671,21 +705,27 @@ export default function MetalExchangeView({ onNavigate }) {
 
                 {matchingStock.length > 0 && (
                   <optgroup label={`✨ Available ${outwardMetal} Stock (${matchingStock.length})`} className="bg-obsidian-900 font-bold text-emerald-400">
-                    {matchingStock.map((item) => (
-                      <option key={item.id} value={item.id} className="bg-obsidian-900 text-slate-100 font-mono">
-                        {item.name} • {item.grossWeight || item.netWeight}g • {item.karat || ''} • ₹{item.makingChargeRate || 0}/g making [{item.barcode || item.id}]
-                      </option>
-                    ))}
+                    {matchingStock.map((item) => {
+                      const itemMaking = getItemMakingCharge(item, item.grossWeight || item.netWeight, item.metal);
+                      return (
+                        <option key={item.id} value={item.id} className="bg-obsidian-900 text-slate-100 font-mono">
+                          {item.name} • {item.grossWeight || item.netWeight}g • {item.karat || ''}{itemMaking > 0 ? ` • Making: ₹${itemMaking.toLocaleString('en-IN')}` : ''} [{item.barcode || item.id}]
+                        </option>
+                      );
+                    })}
                   </optgroup>
                 )}
 
                 {otherStock.length > 0 && (
                   <optgroup label={`📦 Other Metals Stock (${otherStock.length})`} className="bg-obsidian-900 font-bold text-slate-400">
-                    {otherStock.map((item) => (
-                      <option key={item.id} value={item.id} className="bg-obsidian-900 text-slate-300 font-mono">
-                        [{item.metal}] {item.name} • {item.grossWeight || item.netWeight}g • [{item.barcode || item.id}]
-                      </option>
-                    ))}
+                    {otherStock.map((item) => {
+                      const itemMaking = getItemMakingCharge(item, item.grossWeight || item.netWeight, item.metal);
+                      return (
+                        <option key={item.id} value={item.id} className="bg-obsidian-900 text-slate-300 font-mono">
+                          [{item.metal}] {item.name} • {item.grossWeight || item.netWeight}g{itemMaking > 0 ? ` • Making: ₹${itemMaking.toLocaleString('en-IN')}` : ''} • [{item.barcode || item.id}]
+                        </option>
+                      );
+                    })}
                   </optgroup>
                 )}
               </select>
