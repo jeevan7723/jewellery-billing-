@@ -386,18 +386,57 @@ html.light .gold-gradient-text {
   -webkit-text-fill-color: transparent !important;
 }
 
-/* Enhanced Amber/Emerald/Purple text contrast in Light mode */
+/* Enhanced Color family text & button contrast in Light mode */
+html.light .text-amber-100,
+html.light .text-amber-200,
 html.light .text-amber-300,
 html.light .text-amber-400 {
   color: #B45309 !important;
 }
+html.light .text-emerald-100,
+html.light .text-emerald-200,
 html.light .text-emerald-300,
 html.light .text-emerald-400 {
   color: #047857 !important;
 }
+html.light .text-purple-100,
+html.light .text-purple-200,
 html.light .text-purple-300,
 html.light .text-purple-400 {
-  color: #7E22CE !important;
+  color: #6B21A8 !important;
+}
+html.light .text-rose-100,
+html.light .text-rose-200,
+html.light .text-rose-300,
+html.light .text-rose-400 {
+  color: #BE123C !important;
+}
+html.light .text-blue-100,
+html.light .text-blue-200,
+html.light .text-blue-300,
+html.light .text-blue-400 {
+  color: #1D4ED8 !important;
+}
+html.light .text-sky-100,
+html.light .text-sky-200,
+html.light .text-sky-300,
+html.light .text-sky-400 {
+  color: #0369A1 !important;
+}
+
+/* Light mode purple button & badge accents */
+html.light .bg-purple-500\/20,
+html.light .bg-purple-500\/15,
+html.light .bg-purple-500\/10 {
+  background-color: rgba(147, 51, 234, 0.12) !important;
+}
+html.light .border-purple-500\/40,
+html.light .border-purple-500\/30 {
+  border-color: rgba(147, 51, 234, 0.35) !important;
+}
+html.light .hover\:bg-purple-500\/30:hover,
+html.light .hover\:bg-purple-500\/25:hover {
+  background-color: rgba(147, 51, 234, 0.22) !important;
 }
 
 /* Fix Tailwind gradient stop variables in Light mode for obsidian */
