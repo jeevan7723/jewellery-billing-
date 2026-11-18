@@ -135,7 +135,10 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
         </div>
 
         <div className="text-right space-y-1">
-          <div className="inline-block bg-slate-900 text-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded">
+          <div 
+            className="inline-block bg-slate-900 text-white keep-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded"
+            style={{ color: '#ffffff' }}
+          >
             TAX INVOICE
           </div>
           <div className="text-slate-600 text-[10px] font-mono">
@@ -195,7 +198,10 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
       <div className="border border-slate-300 rounded overflow-hidden mb-4">
         <table className="w-full text-left border-collapse text-[11px]">
           <thead>
-            <tr className="bg-slate-900 text-white font-mono text-[10px] uppercase tracking-wider">
+            <tr 
+              className="bg-slate-900 text-white keep-white font-mono text-[10px] uppercase tracking-wider"
+              style={{ color: '#ffffff' }}
+            >
               <th className="py-2 px-2.5 text-center w-8">#</th>
               <th className="py-2 px-3">Description of Jewellery</th>
               <th className="py-2 px-2 text-center">HSN</th>
@@ -316,7 +322,10 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
                   <td className="py-1.5 px-3 text-right font-bold text-amber-900">-₹{oldGoldCredit.toLocaleString('en-IN')}</td>
                 </tr>
               )}
-              <tr className="bg-slate-900 text-white">
+              <tr 
+                className="bg-slate-900 text-white keep-white"
+                style={{ color: '#ffffff' }}
+              >
                 <td className="py-2.5 px-3 font-serif font-bold text-sm uppercase">Grand Total:</td>
                 <td className="py-2.5 px-3 text-right font-serif font-bold text-base">
                   ₹{grandTotal.toLocaleString('en-IN')}

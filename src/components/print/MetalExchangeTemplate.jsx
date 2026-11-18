@@ -125,7 +125,10 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
         </div>
 
         <div className="text-right space-y-1">
-          <div className="inline-block bg-purple-950 text-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded">
+          <div 
+            className="inline-block bg-purple-950 text-white keep-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded shadow-sm"
+            style={{ color: '#ffffff' }}
+          >
             METAL BARTER SLIP
           </div>
           <div className="text-slate-600 text-[10px] font-mono">

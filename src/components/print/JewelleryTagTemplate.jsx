@@ -49,7 +49,12 @@ export default function JewelleryTagTemplate({ item, items = [], showroom, mode 
 
                 <div className="flex justify-between items-center text-[8px] font-bold text-gray-800">
                   <span>TAG: {code}</span>
-                  <span className="bg-black text-white px-1 rounded text-[7px]">{karat}</span>
+                  <span 
+                    className="bg-black text-white keep-white px-1 rounded text-[7px]"
+                    style={{ color: '#ffffff' }}
+                  >
+                    {karat}
+                  </span>
                 </div>
               </div>
 

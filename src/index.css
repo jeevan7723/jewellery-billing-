@@ -303,14 +303,28 @@ html.light .bg-white\/\[0\.02\] {
 /* Maintain light text on dark accent buttons & badges */
 html.light .keep-white,
 html.light .keep-white *,
-html.light [class*="bg-emerald-600"] .text-white,
-html.light [class*="bg-purple-600"] .text-white,
-html.light [class*="bg-rose-600"] .text-white,
-html.light [class*="bg-blue-600"] .text-white,
-html.light [class*="bg-sky-600"] .text-white,
-html.light [class*="bg-amber-600"] .text-white,
-html.light [class*="bg-purple-950"] .text-white,
-html.light [class*="bg-purple-900"] .text-white {
+html.light [class*="bg-black"],
+html.light [class*="bg-black"] *,
+html.light [class*="bg-purple-950"],
+html.light [class*="bg-purple-950"] *,
+html.light [class*="bg-purple-900"],
+html.light [class*="bg-purple-900"] *,
+html.light [class*="bg-slate-900"],
+html.light [class*="bg-slate-900"] *,
+html.light [class*="bg-slate-950"],
+html.light [class*="bg-slate-950"] *,
+html.light [class*="bg-emerald-600"],
+html.light [class*="bg-emerald-600"] *,
+html.light [class*="bg-purple-600"],
+html.light [class*="bg-purple-600"] *,
+html.light [class*="bg-rose-600"],
+html.light [class*="bg-rose-600"] *,
+html.light [class*="bg-blue-600"],
+html.light [class*="bg-blue-600"] *,
+html.light [class*="bg-sky-600"],
+html.light [class*="bg-sky-600"] *,
+html.light [class*="bg-amber-600"],
+html.light [class*="bg-amber-600"] * {
   color: #FFFFFF !important;
 }
 

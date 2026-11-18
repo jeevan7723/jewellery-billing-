@@ -51,7 +51,10 @@ export default function ReportTemplate({ reportType, data, showroom }) {
         </div>
 
         <div className="text-right space-y-1">
-          <div className="inline-block bg-slate-900 text-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded">
+          <div 
+            className="inline-block bg-slate-900 text-white keep-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded"
+            style={{ color: '#ffffff' }}
+          >
             AUDIT STATEMENT
           </div>
           <div className="font-mono text-xs pt-1 font-bold text-slate-900">
@@ -105,7 +108,10 @@ export default function ReportTemplate({ reportType, data, showroom }) {
         {reportType === 'sales' && (
           <table className="w-full text-left font-mono text-[10px] border-collapse">
             <thead>
-              <tr className="bg-slate-900 text-white uppercase text-[9px]">
+              <tr 
+                className="bg-slate-900 text-white keep-white uppercase text-[9px]"
+                style={{ color: '#ffffff' }}
+              >
                 <th className="py-2 px-2 text-center">#</th>
                 <th className="py-2 px-2.5">Invoice No</th>
                 <th className="py-2 px-2.5">Date</th>
@@ -152,7 +158,10 @@ export default function ReportTemplate({ reportType, data, showroom }) {
         {reportType === 'inventory' && (
           <table className="w-full text-left font-mono text-[10px] border-collapse">
             <thead>
-              <tr className="bg-slate-900 text-white uppercase text-[9px]">
+              <tr 
+                className="bg-slate-900 text-white keep-white uppercase text-[9px]"
+                style={{ color: '#ffffff' }}
+              >
                 <th className="py-2 px-2 text-center">#</th>
                 <th className="py-2 px-2.5">Tag / Barcode</th>
                 <th className="py-2 px-3">Jewellery Description</th>
@@ -196,7 +205,10 @@ export default function ReportTemplate({ reportType, data, showroom }) {
         {reportType === 'karagir' && (
           <table className="w-full text-left font-mono text-[10px] border-collapse">
             <thead>
-              <tr className="bg-slate-900 text-white uppercase text-[9px]">
+              <tr 
+                className="bg-slate-900 text-white keep-white uppercase text-[9px]"
+                style={{ color: '#ffffff' }}
+              >
                 <th className="py-2 px-2 text-center">#</th>
                 <th className="py-2 px-2.5">Karagir ID</th>
                 <th className="py-2 px-3">Artisan Name</th>
@@ -246,7 +258,10 @@ export default function ReportTemplate({ reportType, data, showroom }) {
         {reportType === 'refinery' && (
           <table className="w-full text-left font-mono text-[10px] border-collapse">
             <thead>
-              <tr className="bg-slate-900 text-white uppercase text-[9px]">
+              <tr 
+                className="bg-slate-900 text-white keep-white uppercase text-[9px]"
+                style={{ color: '#ffffff' }}
+              >
                 <th className="py-2 px-2 text-center">#</th>
                 <th className="py-2 px-2.5">Batch ID</th>
                 <th className="py-2 px-2.5">Date</th>
