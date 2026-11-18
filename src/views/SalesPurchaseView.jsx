@@ -172,7 +172,8 @@ export default function SalesPurchaseView({ onNavigate }) {
                   <th className="py-3 px-4">Phone</th>
                   <th className="py-3 px-4">Item & Exchange Details</th>
                   <th className="py-3 px-4 text-right">Subtotal</th>
-                  <th className="py-3 px-4 text-right">GST / Old Gold Credit</th>
+                  <th className="py-3 px-4 text-right">GST (3%)</th>
+                  <th className="py-3 px-4 text-right text-amber-300">Old Gold Credit</th>
                   <th className="py-3 px-4 text-right text-gold-300">Net Payable (₹)</th>
                   <th className="py-3 px-4 text-center">Actions</th>
                 </tr>
@@ -180,13 +181,16 @@ export default function SalesPurchaseView({ onNavigate }) {
               <tbody className="divide-y divide-white/5">
                 {invoices.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="py-10 text-center text-slate-400">
+                    <td colSpan="10" className="py-10 text-center text-slate-400">
                       No invoices recorded yet. Create a bill or save an exchange to see it here.
                     </td>
                   </tr>
                 ) : (
                   invoices.map((inv, idx) => {
                     const isExch = Boolean(inv.isExchange || inv.invoiceType === 'exchange');
+                    const oldGoldCredit = Number(inv.exchangeCredit || inv.inwardValuation || 0);
+                    const gstAmount = Number(inv.gst3Percent || 0);
+
                     return (
                       <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
                         <td className="py-3 px-4">
@@ -237,16 +241,25 @@ export default function SalesPurchaseView({ onNavigate }) {
                           ₹{Number(inv.subtotal || 0).toLocaleString('en-IN')}
                         </td>
 
+                        {/* Separate GST Column */}
                         <td className="py-3 px-4 text-right font-mono">
-                          {isExch ? (
-                            <span className="text-amber-400 text-[11px] font-bold">
-                              -₹{Number(inv.exchangeCredit || inv.inwardValuation || 0).toLocaleString('en-IN')}
-                              <span className="block text-[9px] text-slate-500 font-normal">Old Gold Credit</span>
+                          {gstAmount > 0 ? (
+                            <span className="text-slate-300">
+                              ₹{gstAmount.toLocaleString('en-IN')}
                             </span>
                           ) : (
-                            <span className="text-slate-400">
-                              ₹{Number(inv.gst3Percent || 0).toLocaleString('en-IN')}
+                            <span className="text-slate-500">—</span>
+                          )}
+                        </td>
+
+                        {/* Separate Old Gold Credit Column */}
+                        <td className="py-3 px-4 text-right font-mono">
+                          {oldGoldCredit > 0 ? (
+                            <span className="text-amber-400 font-bold">
+                              -₹{oldGoldCredit.toLocaleString('en-IN')}
                             </span>
+                          ) : (
+                            <span className="text-slate-500">—</span>
                           )}
                         </td>
 
