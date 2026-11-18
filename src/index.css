@@ -178,12 +178,14 @@ html.light select.glass-input option {
 .gold-gradient-text {
   background: linear-gradient(135deg, #FFF6D3 0%, #D4AF37 50%, #AA7C11 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .silver-gradient-text {
   background: linear-gradient(135deg, #FFFFFF 0%, #CBD5E1 50%, #94A3B8 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
@@ -383,6 +385,7 @@ html.light .text-gold-400 {
 html.light .gold-gradient-text {
   background: linear-gradient(135deg, #784E00 0%, #B8860B 50%, #603D00 100%) !important;
   -webkit-background-clip: text !important;
+  background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
