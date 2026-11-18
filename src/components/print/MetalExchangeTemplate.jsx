@@ -148,9 +148,9 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
           {phone && phone !== '—' && <span className="text-slate-600 ml-2 font-mono">({phone})</span>}
         </div>
         <div className="col-span-4 text-center border-l border-slate-200">
-          <span className="text-slate-500 uppercase text-[10px] font-mono block">Gold Rate (Benchmark):</span>
+          <span className="text-slate-500 uppercase text-[10px] font-mono block">Purchased Gold Rate:</span>
           <span className="font-bold font-mono text-xs text-amber-900">
-            ₹{(safeInwardRate || safeOutwardRate).toLocaleString('en-IN')} / g
+            ₹{effectiveInwardRate.toLocaleString('en-IN')} / g {inwardKarat ? `(${inwardKarat})` : ''}
           </span>
         </div>
         <div className="col-span-3 text-right border-l border-slate-200">
@@ -177,20 +177,12 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 <td className="py-1 text-slate-600">Metal & Purity Karat:</td>
                 <td className="py-1 text-right font-bold">{inwardMetal} ({inwardKarat})</td>
               </tr>
-              <tr className="border-b border-slate-200">
-                <td className="py-1 text-slate-600">Benchmark Rate (24K Pure):</td>
-                <td className="py-1 text-right font-bold text-amber-900 font-mono">
-                  ₹{safeInwardRate.toLocaleString('en-IN')} / g
+              <tr className="border-b border-slate-200 bg-amber-50/70">
+                <td className="py-1.5 text-amber-950 font-bold">Purchased Gold Rate ({inwardKarat}):</td>
+                <td className="py-1.5 text-right font-bold text-amber-900 font-mono text-xs">
+                  ₹{effectiveInwardRate.toLocaleString('en-IN')} / g
                 </td>
               </tr>
-              {inwardKarat && !inwardKarat.includes('24') && (
-                <tr className="border-b border-slate-200 bg-amber-50/70">
-                  <td className="py-1 text-amber-950 font-medium">Purchased Gold Rate ({inwardKarat} • {Math.round(inwardRatio * 1000) / 10}%):</td>
-                  <td className="py-1 text-right font-bold text-amber-900 font-mono">
-                    ₹{effectiveInwardRate.toLocaleString('en-IN')} / g
-                  </td>
-                </tr>
-              )}
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Scale Weight:</td>
                 <td className="py-1 text-right font-medium">{safeInwardGross.toFixed(3)}g</td>
@@ -214,7 +206,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 <td className="py-1 text-right text-xs">{safeInwardFine.toFixed(3)}g</td>
               </tr>
               <tr className="pt-2 text-slate-900">
-                <td className="py-1 font-bold">Assessed Value (@ ₹{safeInwardRate}/g):</td>
+                <td className="py-1 font-bold">Purchased Gold Valuation:</td>
                 <td className="py-1 text-right font-bold font-serif text-sm">
                   ₹{safeInwardValuation.toLocaleString('en-IN')}
                 </td>
@@ -240,20 +232,12 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 <td className="py-1 text-slate-600">Metal & Hallmark Karat:</td>
                 <td className="py-1 text-right font-bold">{outwardMetal} ({outwardKarat})</td>
               </tr>
-              <tr className="border-b border-slate-200">
-                <td className="py-1 text-slate-600">Benchmark Rate (24K Pure):</td>
-                <td className="py-1 text-right font-bold text-emerald-900 font-mono">
-                  ₹{safeOutwardRate.toLocaleString('en-IN')} / g
+              <tr className="border-b border-slate-200 bg-emerald-50/70">
+                <td className="py-1.5 text-emerald-950 font-bold">Gold Rate ({outwardKarat}):</td>
+                <td className="py-1.5 text-right font-bold text-emerald-900 font-mono text-xs">
+                  ₹{effectiveOutwardRate.toLocaleString('en-IN')} / g
                 </td>
               </tr>
-              {outwardKarat && !outwardKarat.includes('24') && (
-                <tr className="border-b border-slate-200 bg-emerald-50/70">
-                  <td className="py-1 text-emerald-950 font-medium">New Jewellery Rate ({outwardKarat} • {Math.round(outwardRatio * 1000) / 10}%):</td>
-                  <td className="py-1 text-right font-bold text-emerald-900 font-mono">
-                    ₹{effectiveOutwardRate.toLocaleString('en-IN')} / g
-                  </td>
-                </tr>
-              )}
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Weight:</td>
                 <td className="py-1 text-right font-medium">{safeOutwardGross.toFixed(3)}g</td>
