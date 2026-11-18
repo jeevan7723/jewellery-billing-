@@ -138,6 +138,57 @@ export function JewelleryProvider({ children }) {
   const [liveSyncNotification, setLiveSyncNotification] = useState(null);
   const notificationTimeoutRef = useRef(null);
 
+  // Combined Purchased Gold Tracking (Stored in LocalStorage & Context)
+  const getPurchasedGoldSummary = (invList = invoices) => {
+    const exchangeInvs = (invList || []).filter(inv => 
+      Boolean(inv.isExchange || inv.invoiceType === 'exchange' || Number(inv.inwardValuation || 0) > 0)
+    );
+    
+    let totalValue = 0;
+    let totalGrossWeight = 0;
+    let totalNetWeight = 0;
+    let totalFineWeight = 0;
+
+    exchangeInvs.forEach(inv => {
+      const val = Number(inv.purchasedGoldValue || inv.purchasedGoldCombinedValue || inv.inwardValuation || inv.exchangeCredit || 0);
+      const gross = Number(inv.purchasedGoldGrossWeight || inv.inwardGrossWeight || 0);
+      const net = Number(inv.purchasedGoldNetWeight || inv.inwardNetWeight || gross);
+      const fine = Number(inv.purchasedGoldFineWeight || inv.inwardFineEquivalent || (net * 0.916));
+
+      totalValue += val;
+      totalGrossWeight += gross;
+      totalNetWeight += net;
+      totalFineWeight += fine;
+    });
+
+    return {
+      count: exchangeInvs.length,
+      totalValue: Math.round(totalValue),
+      totalGrossWeight: Number(totalGrossWeight.toFixed(3)),
+      totalNetWeight: Number(totalNetWeight.toFixed(3)),
+      totalFineWeight: Number(totalFineWeight.toFixed(3)),
+    };
+  };
+
+  const [purchasedGoldSummary, setPurchasedGoldSummary] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kc_purchased_gold_combined_value');
+      return saved ? JSON.parse(saved) : getPurchasedGoldSummary([]);
+    } catch (e) {
+      return getPurchasedGoldSummary([]);
+    }
+  });
+
+  useEffect(() => {
+    const summary = getPurchasedGoldSummary(invoices);
+    setPurchasedGoldSummary(summary);
+    try {
+      localStorage.setItem('kc_purchased_gold_combined_value', JSON.stringify(summary));
+    } catch (e) {
+      console.warn('Could not store kc_purchased_gold_combined_value in localStorage:', e);
+    }
+  }, [invoices]);
+
   // Trigger floating feedback toast
   const triggerSyncNotification = (notif) => {
     if (notificationTimeoutRef.current) {
@@ -693,6 +744,8 @@ export function JewelleryProvider({ children }) {
       invoices,
       addInvoice,
       deleteInvoice,
+      purchasedGoldSummary,
+      getPurchasedGoldSummary,
       cloudStatus,
       liveSyncNotification,
       syncAllToCloud,

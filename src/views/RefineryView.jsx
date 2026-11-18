@@ -6,7 +6,7 @@ import PrintModal from '../components/print/PrintModal';
 import ReportTemplate from '../components/print/ReportTemplate';
 
 export default function RefineryView() {
-  const { refineryBatches, addRefineryBatch, showroom } = useJewellery();
+  const { refineryBatches, addRefineryBatch, showroom, purchasedGoldSummary } = useJewellery();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
@@ -78,6 +78,38 @@ export default function RefineryView() {
             <Plus className="w-4 h-4" />
             <span>Add Melting Batch</span>
           </button>
+        </div>
+      </div>
+
+      {/* Purchased Scrap Gold in Vault Status */}
+      <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 font-mono text-xs shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center shrink-0 border border-amber-500/30">
+            <Scale className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="text-white font-bold text-sm">
+              Inward Purchased Scrap Gold in Vault
+            </div>
+            <p className="text-[11px] text-slate-400">
+              Gold purchased from customer exchanges ready to melt or refine
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4 sm:border-l sm:border-amber-500/20 sm:pl-4">
+          <div>
+            <span className="text-slate-400 block text-[10px]">COMBINED WEIGHT:</span>
+            <span className="text-white font-bold text-base">
+              {Number(purchasedGoldSummary?.totalGrossWeight || 0).toFixed(3)}g
+            </span>
+          </div>
+          <div>
+            <span className="text-slate-400 block text-[10px]">COMBINED VALUE:</span>
+            <span className="text-amber-300 font-bold text-base">
+              ₹{Number(purchasedGoldSummary?.totalValue || 0).toLocaleString('en-IN')}
+            </span>
+          </div>
         </div>
       </div>
 

@@ -8,7 +8,7 @@ import PrintModal from '../components/print/PrintModal';
 import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
 
 export default function DashboardView({ onNavigate }) {
-  const { rates, inventory, invoices, karagirs, refineryBatches, showroom } = useJewellery();
+  const { rates, inventory, invoices, karagirs, refineryBatches, showroom, purchasedGoldSummary } = useJewellery();
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [printFormat, setPrintFormat] = useState('a4');
@@ -64,8 +64,8 @@ export default function DashboardView({ onNavigate }) {
         </div>
       </div>
 
-      {/* 4 Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      {/* 5 Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         
         {/* Card 1: Today's Sales */}
         <div 
@@ -107,7 +107,27 @@ export default function DashboardView({ onNavigate }) {
           </div>
         </div>
 
-        {/* Card 3: Artisan Metal with Karagirs */}
+        {/* Card 3: Purchased Old Gold (Combined Value) */}
+        <div 
+          onClick={() => onNavigate('sales-purchase')}
+          className="glass-card p-5 rounded-2xl border border-amber-500/20 hover:border-amber-500/50 cursor-pointer space-y-3 transition-all"
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono uppercase tracking-wider text-amber-300">Purchased Old Gold</span>
+            <div className="w-8 h-8 rounded-lg bg-amber-500/15 text-amber-300 flex items-center justify-center">
+              <Scale className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="font-serif text-2xl font-bold text-amber-300">
+            ₹{Number(purchasedGoldSummary?.totalValue || 0).toLocaleString('en-IN')}
+          </div>
+          <div className="text-[11px] font-mono text-slate-400 flex items-center justify-between pt-1 border-t border-white/5">
+            <span>{Number(purchasedGoldSummary?.totalGrossWeight || 0).toFixed(3)}g Inward</span>
+            <span className="text-amber-400">View Inward →</span>
+          </div>
+        </div>
+
+        {/* Card 4: Artisan Metal with Karagirs */}
         <div 
           onClick={() => onNavigate('karagir')}
           className="glass-card p-5 rounded-2xl border border-white/10 hover:border-gold-500/40 cursor-pointer space-y-3 transition-all"
@@ -127,7 +147,7 @@ export default function DashboardView({ onNavigate }) {
           </div>
         </div>
 
-        {/* Card 4: Active Refinery Batches */}
+        {/* Card 5: Active Refinery Batches */}
         <div 
           onClick={() => onNavigate('refinery')}
           className="glass-card p-5 rounded-2xl border border-white/10 hover:border-gold-500/40 cursor-pointer space-y-3 transition-all"

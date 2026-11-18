@@ -313,6 +313,16 @@ export default function MetalExchangeView({ onNavigate }) {
         inwardRate: inwardUnitRate,
         inwardValuation: Math.round(inwardValuation || 0),
 
+        // Explicit Purchased Gold Combined Tracking
+        purchasedGoldValue: Math.round(inwardValuation || 0),
+        purchasedGoldCombinedValue: Math.round(inwardValuation || 0),
+        purchasedGoldRate: inwardUnitRate,
+        purchasedGoldGrossWeight: safeInwardGross,
+        purchasedGoldNetWeight: inwardNetScaleWeight,
+        purchasedGoldFineWeight: Number(inwardFinePureWeight.toFixed(3)),
+        purchasedGoldKarat: inwardPurityObj?.karat || '22K',
+        purchasedGoldMetal: inwardMetal,
+
         // Outward New Jewellery Details (Shop sells to customer)
         outwardMetal,
         outwardKarat: outwardPurityObj?.karat || '22K',

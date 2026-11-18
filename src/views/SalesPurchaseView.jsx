@@ -3,7 +3,7 @@ import { useJewellery } from '../context/JewelleryContext';
 import { 
   Receipt, ShoppingCart, Users, Truck, ArrowUpRight, ArrowDownLeft, 
   Printer, Plus, ArrowRightLeft, Sparkles, Scale, RefreshCw, Layers,
-  Trash2, AlertTriangle, X
+  Trash2, AlertTriangle, X, Coins
 } from 'lucide-react';
 import PrintModal from '../components/print/PrintModal';
 import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
@@ -76,6 +76,11 @@ export default function SalesPurchaseView({ onNavigate }) {
 
   // Combined Purchases: Supplier Bullion + Inward Customer Old Gold
   const allPurchases = [...customerOldGoldPurchases, ...supplierPurchases];
+
+  const combinedPurchasedValue = allPurchases.reduce((sum, p) => sum + (Number(p.totalAmount) || 0), 0);
+  const combinedPurchasedWeight = allPurchases.reduce((sum, p) => sum + (Number(p.grossWeight) || 0), 0);
+  const combinedPurchasedNetWeight = allPurchases.reduce((sum, p) => sum + (Number(p.netWeight) || 0), 0);
+  const avgPurchaseRate = combinedPurchasedWeight > 0 ? Math.round(combinedPurchasedValue / combinedPurchasedWeight) : Number(rates?.gold24k || 0);
 
   const filteredPurchases = allPurchases.filter(p => {
     if (purchaseFilter === 'exchange') return p.isExchange;
@@ -321,6 +326,30 @@ export default function SalesPurchaseView({ onNavigate }) {
                   })
                 )}
               </tbody>
+              {invoices.length > 0 && (
+                <tfoot className="border-t-2 border-white/15 bg-white/[0.03] font-bold text-white">
+                  <tr>
+                    <td colSpan="5" className="py-3 px-4 uppercase text-[11px] font-mono text-slate-300">
+                      Total Sales Summary ({invoices.length} Bills):
+                    </td>
+                    <td className="py-3 px-4 text-right text-slate-300 font-mono">
+                      ₹{invoices.reduce((s, i) => s + (Number(i.subtotal) || 0), 0).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-4 text-right text-slate-300 font-mono">
+                      ₹{invoices.reduce((s, i) => s + (Number(i.gst3Percent) || 0), 0).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-4 text-right text-amber-300 font-mono">
+                      {invoices.reduce((s, i) => s + (Number(i.exchangeCredit || i.inwardValuation) || 0), 0) > 0 
+                        ? `-₹${invoices.reduce((s, i) => s + (Number(i.exchangeCredit || i.inwardValuation) || 0), 0).toLocaleString('en-IN')}` 
+                        : '—'}
+                    </td>
+                    <td className="py-3 px-4 text-right font-serif font-extrabold text-gold-300 text-sm">
+                      ₹{invoices.reduce((s, i) => s + (Number(i.grandTotal) || 0), 0).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-4 text-center text-slate-400 text-[10px] font-mono">—</td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
@@ -348,6 +377,65 @@ export default function SalesPurchaseView({ onNavigate }) {
                   <span>Receive Old Gold Exchange</span>
                 </button>
               )}
+            </div>
+          </div>
+
+          {/* Combined Purchased Gold Summary Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 sm:p-5 bg-white/[0.02] border-b border-white/10">
+            {/* Card 1: Combined Purchased Gold Value */}
+            <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-1.5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                <span>COMBINED VALUE</span>
+                <span className="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">TOTAL</span>
+              </div>
+              <div className="font-serif text-2xl font-bold text-amber-300">
+                ₹{combinedPurchasedValue.toLocaleString('en-IN')}
+              </div>
+              <p className="text-[10px] font-mono text-slate-400">
+                Combined value of all purchased gold
+              </p>
+            </div>
+
+            {/* Card 2: Total Purchased Weight */}
+            <div className="p-4 rounded-2xl bg-obsidian-950/70 border border-white/10 space-y-1.5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                <span>TOTAL WEIGHT</span>
+                <Scale className="w-3.5 h-3.5 text-gold-400" />
+              </div>
+              <div className="font-serif text-2xl font-bold text-white">
+                {combinedPurchasedWeight.toFixed(3)}g
+              </div>
+              <p className="text-[10px] font-mono text-slate-400">
+                Net weight: <strong className="text-gold-300">{combinedPurchasedNetWeight.toFixed(3)}g</strong>
+              </p>
+            </div>
+
+            {/* Card 3: Inward Inventory Breakdown */}
+            <div className="p-4 rounded-2xl bg-obsidian-950/70 border border-white/10 space-y-1.5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                <span>INWARD TRANSACTIONS</span>
+                <Coins className="w-3.5 h-3.5 text-purple-400" />
+              </div>
+              <div className="font-serif text-2xl font-bold text-purple-300">
+                {allPurchases.length} Inward
+              </div>
+              <p className="text-[10px] font-mono text-slate-400">
+                {customerOldGoldPurchases.length} Old Gold • {supplierPurchases.length} Bullion
+              </p>
+            </div>
+
+            {/* Card 4: Average Purchase Rate */}
+            <div className="p-4 rounded-2xl bg-obsidian-950/70 border border-white/10 space-y-1.5 shadow-sm">
+              <div className="flex items-center justify-between text-slate-400 text-xs font-mono">
+                <span>AVG PURCHASE RATE</span>
+                <span className="text-emerald-400 text-[10px] font-mono font-bold">CALCULATED</span>
+              </div>
+              <div className="font-serif text-2xl font-bold text-emerald-300">
+                ₹{avgPurchaseRate.toLocaleString('en-IN')}<span className="text-xs text-slate-400 font-normal">/g</span>
+              </div>
+              <p className="text-[10px] font-mono text-slate-400">
+                Benchmark 24K: ₹{Number(rates?.gold24k || 13680).toLocaleString('en-IN')}/g
+              </p>
             </div>
           </div>
 
@@ -484,6 +572,28 @@ export default function SalesPurchaseView({ onNavigate }) {
                   ))
                 )}
               </tbody>
+              {filteredPurchases.length > 0 && (
+                <tfoot className="border-t-2 border-white/15 bg-white/[0.03] font-bold text-white">
+                  <tr>
+                    <td colSpan="4" className="py-3 px-4 uppercase text-[11px] font-mono text-slate-300">
+                      Combined Purchased Gold Total ({filteredPurchases.length} Records):
+                    </td>
+                    <td className="py-3 px-4 text-right text-gold-300 font-mono">
+                      {filteredPurchases.reduce((s, p) => s + (Number(p.grossWeight) || 0), 0).toFixed(3)}g
+                    </td>
+                    <td className="py-3 px-4 text-slate-400 text-[10px] font-mono text-center">—</td>
+                    <td className="py-3 px-4 text-right text-slate-300 font-mono text-[11px]">
+                      Avg ₹{Math.round(filteredPurchases.reduce((s, p) => s + (Number(p.totalAmount) || 0), 0) / Math.max(1, filteredPurchases.reduce((s, p) => s + (Number(p.grossWeight) || 0), 0))).toLocaleString('en-IN')}/g
+                    </td>
+                    <td className="py-3 px-4 text-right font-serif font-extrabold text-gold-300 text-sm">
+                      ₹{filteredPurchases.reduce((s, p) => s + (Number(p.totalAmount) || 0), 0).toLocaleString('en-IN')}
+                    </td>
+                    <td colSpan="2" className="py-3 px-4 text-center text-amber-300 text-[10px] font-mono">
+                      In Vault (Scrap & Bullion)
+                    </td>
+                  </tr>
+                </tfoot>
+              )}
             </table>
           </div>
         </div>
