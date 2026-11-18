@@ -529,25 +529,38 @@ export function JewelleryProvider({ children }) {
     }
   };
 
-  // 4. Update / Mark Inventory Item (e.g. Billed / Sold)
+  // 4. Update / Mark Inventory Item (e.g. Billed / Sold / Edited)
   const updateInventoryItem = async (id, updates) => {
     let updatedItem = null;
-    setInventory(prev => prev.map(item => {
-      if (item.id === id) {
-        updatedItem = { ...item, ...updates };
-        return updatedItem;
+    let nextInventory = [];
+    setInventory(prev => {
+      nextInventory = prev.map(item => {
+        if (item.id === id) {
+          updatedItem = { ...item, ...updates };
+          return updatedItem;
+        }
+        return item;
+      });
+      try {
+        localStorage.setItem('kc_inventory', JSON.stringify(nextInventory));
+      } catch (e) {
+        console.warn('Could not save inventory to localStorage:', e);
       }
-      return item;
-    }));
+      return nextInventory;
+    });
+
     if (updatedItem) {
+      setCloudStatus(prev => ({ ...prev, isSyncing: true }));
       try {
         await setDoc(doc(db, 'inventory', id), sanitizeForFirestore(updatedItem), { merge: true });
         triggerSyncNotification({
-          title: 'Stock Status Updated',
-          message: `${updatedItem.name} marked as ${updatedItem.status} in Firebase Cloud.`,
+          title: 'Stock Item Updated',
+          message: `${updatedItem.name} details saved and synced to Firebase Cloud.`,
         });
+        setCloudStatus(prev => ({ ...prev, isSyncing: false, lastSynced: new Date().toLocaleTimeString() }));
       } catch (err) {
         console.warn('[Firebase] Could not live update inventory item:', err.message);
+        setCloudStatus(prev => ({ ...prev, isSyncing: false, error: err.message }));
       }
     }
   };

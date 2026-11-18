@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { useJewellery } from '../context/JewelleryContext';
 import { 
   Boxes, Plus, Search, Tag, Trash2, CheckCircle2, 
-  Sparkles, Filter, Scale, Camera 
+  Sparkles, Filter, Scale, Camera, Pencil, X 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 
 export default function InventoryView() {
-  const { inventory, addInventoryItem, deleteInventoryItem } = useJewellery();
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useJewellery();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -25,6 +25,20 @@ export default function InventoryView() {
   const [makingType, setMakingType] = useState('perGram');
   const [makingRate, setMakingRate] = useState(500);
   const [hallmarkNo, setHallmarkNo] = useState(`HUID-${Math.floor(1000 + Math.random() * 9000)}-MH`);
+
+  // Edit Item Form State
+  const [editingItem, setEditingItem] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editCategory, setEditCategory] = useState('Necklaces');
+  const [editMetal, setEditMetal] = useState('Gold');
+  const [editKarat, setEditKarat] = useState('22K');
+  const [editGrossWeight, setEditGrossWeight] = useState('');
+  const [editStoneWeight, setEditStoneWeight] = useState('');
+  const [editMakingType, setEditMakingType] = useState('perGram');
+  const [editMakingRate, setEditMakingRate] = useState('');
+  const [editHallmarkNo, setEditHallmarkNo] = useState('');
+  const [editStatus, setEditStatus] = useState('In Showcase');
+  const [editBarcode, setEditBarcode] = useState('');
 
   const filteredInventory = inventory.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -64,6 +78,63 @@ export default function InventoryView() {
       spread: 60,
       origin: { y: 0.6 },
       colors: ['#D4AF37', '#FFF6D3', '#10B981']
+    });
+  };
+
+  const handleStartEdit = (item) => {
+    setEditingItem(item);
+    setEditName(item.name || '');
+    setEditCategory(item.category || 'Necklaces');
+    setEditMetal(item.metal || 'Gold');
+    setEditKarat(item.karat || '22K');
+    setEditGrossWeight(item.grossWeight !== undefined ? item.grossWeight : '');
+    setEditStoneWeight(item.stoneWeight !== undefined ? item.stoneWeight : 0);
+    setEditMakingType(item.makingChargeType || 'perGram');
+    setEditMakingRate(item.makingChargeRate !== undefined ? item.makingChargeRate : 500);
+    setEditHallmarkNo(item.hallmarkNo || '');
+    setEditStatus(item.status || 'In Showcase');
+    setEditBarcode(item.barcode || '');
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editingItem) return;
+
+    const gross = parseFloat(editGrossWeight) || 0;
+    const stone = parseFloat(editStoneWeight) || 0;
+    const net = Math.max(0, gross - stone);
+    
+    let purityRatio = 0.916;
+    if (editKarat === '24K') purityRatio = 0.999;
+    else if (editKarat === '22K') purityRatio = 0.916;
+    else if (editKarat === '18K') purityRatio = 0.750;
+    else if (editKarat === '14K') purityRatio = 0.585;
+    else if (editKarat === '999') purityRatio = 0.999;
+    else if (editKarat === '925') purityRatio = 0.925;
+
+    const updates = {
+      name: editName.trim() || editingItem.name,
+      category: editCategory,
+      metal: editMetal,
+      karat: editKarat,
+      purity: purityRatio,
+      grossWeight: gross,
+      stoneWeight: stone,
+      netWeight: net,
+      makingChargeType: editMakingType,
+      makingChargeRate: parseFloat(editMakingRate) || 0,
+      hallmarkNo: editHallmarkNo.trim(),
+      status: editStatus,
+      barcode: editBarcode.trim() || editingItem.barcode,
+    };
+
+    updateInventoryItem(editingItem.id, updates);
+    setEditingItem(null);
+    confetti({
+      particleCount: 65,
+      spread: 55,
+      origin: { y: 0.6 },
+      colors: ['#D4AF37', '#10B981', '#38BDF8']
     });
   };
 
@@ -194,13 +265,22 @@ export default function InventoryView() {
                   <td className="py-3 px-4 text-slate-400 text-[11px]">{item.hallmarkNo}</td>
                   <td className="py-3 px-4 text-emerald-400 text-[11px]">{item.status}</td>
                   <td className="py-3 px-4 text-center">
-                    <button 
-                      onClick={() => deleteInventoryItem(item.id)}
-                      className="p-1 rounded-lg text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
-                      title="Delete item"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button 
+                        onClick={() => handleStartEdit(item)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-amber-400 hover:bg-amber-400/10 transition-colors cursor-pointer"
+                        title="Edit jewellery item"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button 
+                        onClick={() => deleteInventoryItem(item.id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                        title="Delete item"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -300,6 +380,221 @@ export default function InventoryView() {
                   className="px-6 py-2 rounded-xl gold-gradient-btn text-xs font-bold"
                 >
                   Save Item & Make Barcode
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Item Modal */}
+      {editingItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-md">
+          <div className="relative w-full max-w-xl glass-panel p-6 sm:p-8 rounded-3xl border border-amber-500/40 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+              <div>
+                <h3 className="font-serif text-xl font-bold text-white flex items-center gap-2">
+                  <Pencil className="w-4 h-4 text-amber-400" />
+                  <span>Edit Jewellery Item</span>
+                </h3>
+                <span className="text-[11px] font-mono text-sky-400">
+                  Tag: #{editingItem.barcode} • ID: {editingItem.id}
+                </span>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setEditingItem(null)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1">Item Name *</label>
+                <input 
+                  type="text"
+                  required
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  placeholder="e.g. Traditional Peacock Jhumka (22K)"
+                  className="w-full px-3 py-2 rounded-xl glass-input text-xs font-semibold"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Category</label>
+                  <select 
+                    value={editCategory}
+                    onChange={(e) => setEditCategory(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs"
+                  >
+                    <option value="Bangles & Kadas" className="bg-obsidian-900">Bangles & Kadas</option>
+                    <option value="Necklaces" className="bg-obsidian-900">Necklaces</option>
+                    <option value="Rings" className="bg-obsidian-900">Rings</option>
+                    <option value="Chains & Mangalsutra" className="bg-obsidian-900">Chains & Mangalsutra</option>
+                    <option value="Bullion" className="bg-obsidian-900">Gold Coins & Bars</option>
+                    <option value="Silver Articles" className="bg-obsidian-900">Silver Articles</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Metal</label>
+                  <select 
+                    value={editMetal}
+                    onChange={(e) => setEditMetal(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-bold text-amber-300"
+                  >
+                    <option value="Gold" className="bg-obsidian-900">Gold</option>
+                    <option value="Silver" className="bg-obsidian-900">Silver</option>
+                    <option value="Platinum" className="bg-obsidian-900">Platinum</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Purity / Karat</label>
+                  <select 
+                    value={editKarat}
+                    onChange={(e) => setEditKarat(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono text-gold-300"
+                  >
+                    <option value="24K" className="bg-obsidian-900">Gold 24K (999)</option>
+                    <option value="22K" className="bg-obsidian-900">Gold 22K (916)</option>
+                    <option value="18K" className="bg-obsidian-900">Gold 18K (750)</option>
+                    <option value="14K" className="bg-obsidian-900">Gold 14K (585)</option>
+                    <option value="999" className="bg-obsidian-900">Silver 999 Fine</option>
+                    <option value="925" className="bg-obsidian-900">Silver 925 Sterling</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Gross Wt (g) *</label>
+                  <input 
+                    type="number"
+                    step="0.001"
+                    required
+                    value={editGrossWeight}
+                    onChange={(e) => setEditGrossWeight(e.target.value)}
+                    placeholder="0.000"
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Stone/Wax (g)</label>
+                  <input 
+                    type="number"
+                    step="0.001"
+                    value={editStoneWeight}
+                    onChange={(e) => setEditStoneWeight(e.target.value)}
+                    placeholder="0.000"
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono text-slate-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-amber-400 mb-1">Net Metal (g)</label>
+                  <div className="w-full px-3 py-2 rounded-xl bg-obsidian-950/80 border border-amber-500/30 text-xs font-mono font-bold text-amber-300 flex items-center">
+                    {Math.max(0, (parseFloat(editGrossWeight) || 0) - (parseFloat(editStoneWeight) || 0)).toFixed(3)}g
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Making Charge Type</label>
+                  <select 
+                    value={editMakingType}
+                    onChange={(e) => setEditMakingType(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs"
+                  >
+                    <option value="perGram" className="bg-obsidian-900">Per Gram (₹ / g)</option>
+                    <option value="percentage" className="bg-obsidian-900">Percentage (%)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">
+                    Making Rate {editMakingType === 'perGram' ? '(₹/g)' : '(%)'}
+                  </label>
+                  <input 
+                    type="number"
+                    step="0.01"
+                    value={editMakingRate}
+                    onChange={(e) => setEditMakingRate(e.target.value)}
+                    placeholder={editMakingType === 'perGram' ? '500' : '10'}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Hallmark HUID</label>
+                  <input 
+                    type="text"
+                    value={editHallmarkNo}
+                    onChange={(e) => setEditHallmarkNo(e.target.value)}
+                    placeholder="e.g. HUID-8731-MH"
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">Location / Status</label>
+                  <select 
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs text-emerald-400 font-mono"
+                  >
+                    <option value="In Showcase" className="bg-obsidian-900">In Showcase</option>
+                    <option value="In Vault Showcase" className="bg-obsidian-900">In Vault Showcase</option>
+                    <option value="In Counter Tray 04" className="bg-obsidian-900">In Counter Tray 04</option>
+                    <option value="In Safe" className="bg-obsidian-900">In Safe</option>
+                    <option value="Sold / Billed" className="bg-obsidian-900">Sold / Billed</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1">Barcode Tag</label>
+                <div className="flex items-center gap-2">
+                  <input 
+                    type="text"
+                    value={editBarcode}
+                    onChange={(e) => setEditBarcode(e.target.value)}
+                    placeholder="Barcode string"
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono text-sky-400 font-bold"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEditBarcode(`KC${Math.floor(100000 + Math.random() * 900000)}`)}
+                    className="px-2.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-mono text-slate-300 whitespace-nowrap cursor-pointer"
+                    title="Generate new barcode"
+                  >
+                    Regen
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+                <button 
+                  type="button"
+                  onClick={() => setEditingItem(null)}
+                  className="px-4 py-2 rounded-xl glass-pill text-xs font-semibold text-slate-400 hover:text-white cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="px-6 py-2 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Update Stock Item</span>
                 </button>
               </div>
             </form>
