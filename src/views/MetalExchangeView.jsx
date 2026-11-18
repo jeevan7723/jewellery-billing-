@@ -76,11 +76,7 @@ export default function MetalExchangeView({ onNavigate }) {
   const [outwardPurityIndex, setOutwardPurityIndex] = useState(1); // 22K default
   const [outwardDescription, setOutwardDescription] = useState('New 22K Bridal Necklace');
   const [outwardGrossWeight, setOutwardGrossWeight] = useState(28.000); // g
-  
-  // Making Charges State (Automatically defaults to % from Gold Rate Settings)
-  const [outwardMakingType, setOutwardMakingType] = useState('percentage'); // 'percentage' | 'perGram'
-  const [outwardMakingPercent, setOutwardMakingPercent] = useState(() => (rates.makingChargePercent ?? 5));
-  const [outwardMakingRate, setOutwardMakingRate] = useState(480); // ₹ / g
+  const [userCustomMakingCharges, setUserCustomMakingCharges] = useState(null); // null = automatically as per stored % by owner
   const [showVoucherModal, setShowVoucherModal] = useState(false);
 
   // Persistence & Save States
@@ -88,20 +84,12 @@ export default function MetalExchangeView({ onNavigate }) {
   const [savedSuccessVoucher, setSavedSuccessVoucher] = useState(null);
   const [savedInvoiceData, setSavedInvoiceData] = useState(null);
 
-  // Keep making charges automatically synchronized with rates settings when not picked from custom stock
-  useEffect(() => {
-    if (rates.makingChargePercent !== undefined && !selectedStockId && outwardMakingType === 'percentage') {
-      setOutwardMakingPercent(rates.makingChargePercent);
-    }
-  }, [rates.makingChargePercent, selectedStockId, outwardMakingType]);
-
   // Switch conversion modes helper
   const handleModeSwitch = (mode) => {
     setExchangeMode(mode);
     setSelectedStockId('');
+    setUserCustomMakingCharges(null);
     setVoucherNo(`EXCH-${Math.floor(1000 + Math.random() * 9000)}`);
-    setOutwardMakingType('percentage');
-    setOutwardMakingPercent(rates.makingChargePercent ?? 5);
     if (mode === 'gold-to-gold') {
       setInwardMetal('Gold');
       setInwardPurityIndex(1); // 22K
@@ -165,12 +153,8 @@ export default function MetalExchangeView({ onNavigate }) {
   // Handler when selecting an item from Showroom Stock dropdown
   const handlePickStockItem = (itemId) => {
     setSelectedStockId(itemId);
-    if (!itemId) {
-      // Revert to given % from settings
-      setOutwardMakingType('percentage');
-      setOutwardMakingPercent(rates.makingChargePercent ?? 5);
-      return;
-    }
+    setUserCustomMakingCharges(null);
+    if (!itemId) return;
 
     const item = inventory.find(i => i.id === itemId);
     if (!item) return;
@@ -190,18 +174,12 @@ export default function MetalExchangeView({ onNavigate }) {
     const wt = parseFloat(item.grossWeight || item.netWeight) || 0;
     if (wt > 0) setOutwardGrossWeight(wt);
 
-    // 5. Making rate or percentage
-    if (item.makingChargeType === 'percentage') {
-      setOutwardMakingType('percentage');
-      const p = parseFloat(item.makingChargeRate);
-      setOutwardMakingPercent(p > 0 ? p : (rates.makingChargePercent ?? 5));
-    } else if (item.makingChargeType === 'perGram') {
-      setOutwardMakingType('perGram');
-      const r = parseFloat(item.makingChargeRate);
-      setOutwardMakingRate(r > 0 ? r : 480);
-    } else {
-      setOutwardMakingType('percentage');
-      setOutwardMakingPercent(rates.makingChargePercent ?? 5);
+    // 5. Making charges if item explicitly specifies it
+    if (item.makingChargeType === 'perGram' && item.makingChargeRate) {
+      setUserCustomMakingCharges(Math.round(wt * parseFloat(item.makingChargeRate)));
+    } else if (item.makingChargeType === 'percentage' && item.makingChargeRate) {
+      const metalVal = (wt * (item.purity || 0.916)) * getRate(targetMetal);
+      setUserCustomMakingCharges(Math.round(metalVal * (parseFloat(item.makingChargeRate) / 100)));
     }
   };
 
@@ -216,8 +194,6 @@ export default function MetalExchangeView({ onNavigate }) {
   const safeInwardStone = Number(inwardStoneWeight) || 0;
   const safeMeltingLoss = Number(inwardMeltingLossPercent) || 0;
   const safeOutwardGross = Number(outwardGrossWeight) || 0;
-  const safeMakingPercent = Number(outwardMakingPercent) || 0;
-  const safeMakingRate = Number(outwardMakingRate) || 0;
 
   // Inward Calculations
   const inwardPurityObj = METAL_PURITY_OPTIONS[inwardMetal]?.[inwardPurityIndex] || METAL_PURITY_OPTIONS.Gold[0];
@@ -229,26 +205,16 @@ export default function MetalExchangeView({ onNavigate }) {
   const inwardValuation = inwardFinePureWeight * inwardUnitRate;
 
   // Outward Calculations
+  const storedMakingPercent = Number(rates?.makingChargePercent ?? 5);
   const outwardPurityObj = METAL_PURITY_OPTIONS[outwardMetal]?.[outwardPurityIndex] || METAL_PURITY_OPTIONS.Gold[0];
   const outwardFinePureRequired = safeOutwardGross * (outwardPurityObj?.ratio || 0.916);
   const outwardUnitRate = getRate(outwardMetal);
   const outwardMetalValue = outwardFinePureRequired * outwardUnitRate;
 
-  // AUTOMATIC MAKING CHARGES CALCULATION (As per given % from Settings, or direct ₹/g)
-  let outwardMakingCharges = 0;
-  let effectiveMakingPerGram = 0;
-
-  if (outwardMakingType === 'percentage') {
-    // Automatically calculates making charges based on the given % of metal value
-    outwardMakingCharges = outwardMetalValue * (safeMakingPercent / 100);
-    effectiveMakingPerGram = safeOutwardGross > 0 ? (outwardMakingCharges / safeOutwardGross) : ((outwardUnitRate * (outwardPurityObj?.ratio || 0.916)) * (safeMakingPercent / 100));
-  } else {
-    // Flat ₹ per gram
-    outwardMakingCharges = safeOutwardGross * safeMakingRate;
-    effectiveMakingPerGram = safeMakingRate;
-  }
-
-  const safeOutwardMakingRate = effectiveMakingPerGram;
+  // Making charges automatically calculated as per stored making charges by owner (e.g. 5%)
+  const autoMakingCharges = Math.round(outwardMetalValue * (storedMakingPercent / 100));
+  const outwardMakingCharges = userCustomMakingCharges !== null ? Number(userCustomMakingCharges) : autoMakingCharges;
+  const safeOutwardMakingRate = safeOutwardGross > 0 ? (outwardMakingCharges / safeOutwardGross) : 0;
   const outwardTotalPayable = outwardMetalValue + outwardMakingCharges;
 
   // Selected Stock Item details & grouped inventory
@@ -381,8 +347,7 @@ export default function MetalExchangeView({ onNavigate }) {
     setSavedSuccessVoucher(null);
     setSavedInvoiceData(null);
     setSelectedStockId('');
-    setOutwardMakingType('percentage');
-    setOutwardMakingPercent(rates.makingChargePercent ?? 5);
+    setUserCustomMakingCharges(null);
   };
 
   return (
@@ -771,124 +736,38 @@ export default function MetalExchangeView({ onNavigate }) {
 
             {/* Outward Weight & Making charges */}
             <div className="p-3.5 rounded-xl bg-obsidian-950/70 border border-white/5 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-mono text-emerald-400 uppercase font-bold block">
-                  Weight & Making Charges
-                </span>
+              <span className="text-[11px] font-mono text-emerald-400 uppercase font-bold block">
+                Weight & Making Charges
+              </span>
 
-                {/* Type toggle: % vs ₹/g */}
-                <div className="flex items-center gap-1 p-0.5 rounded-lg bg-obsidian-900 border border-white/10 text-[10px] font-mono">
-                  <button
-                    type="button"
-                    onClick={() => setOutwardMakingType('percentage')}
-                    className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                      outwardMakingType === 'percentage'
-                        ? 'bg-emerald-500 text-obsidian-950 font-bold shadow-sm'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    % (Given Rate)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOutwardMakingType('perGram');
-                      if (!outwardMakingRate || outwardMakingRate === 0) {
-                        setOutwardMakingRate(Math.round(effectiveMakingPerGram) || 480);
-                      }
-                    }}
-                    className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
-                      outwardMakingType === 'perGram'
-                        ? 'bg-emerald-500 text-obsidian-950 font-bold shadow-sm'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                  >
-                    ₹ / g
-                  </button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+              <div className="grid grid-cols-2 gap-3 text-xs font-mono">
                 <div>
                   <label className="block text-[10px] text-slate-400 mb-1">Weight (g)</label>
                   <input 
                     type="number"
                     step="0.001"
                     value={outwardGrossWeight}
-                    onChange={(e) => setOutwardGrossWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => {
+                      setOutwardGrossWeight(parseFloat(e.target.value) || 0);
+                      setUserCustomMakingCharges(null);
+                    }}
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input font-bold"
                   />
                 </div>
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-[10px] text-slate-400">
-                      {outwardMakingType === 'percentage' ? 'Making Charges (%)' : 'Making Charges (₹ per gram)'}
-                    </label>
-                    <span className="text-[9px] text-emerald-400 font-bold">
-                      {outwardMakingType === 'percentage' ? `Default: ${rates.makingChargePercent ?? 5}%` : `Flat Rate`}
+                    <label className="block text-[10px] text-slate-400">Making Charges (₹)</label>
+                    <span className="text-[10px] text-emerald-400 font-mono">
+                      ({storedMakingPercent}% as per Settings)
                     </span>
                   </div>
-
-                  {outwardMakingType === 'percentage' ? (
-                    <div className="space-y-1.5">
-                      <div className="relative">
-                        <input 
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          max="100"
-                          value={outwardMakingPercent}
-                          onChange={(e) => setOutwardMakingPercent(parseFloat(e.target.value) || 0)}
-                          className="w-full px-2.5 py-1.5 pr-8 rounded-lg glass-input text-emerald-300 font-bold"
-                        />
-                        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none">
-                          %
-                        </span>
-                      </div>
-                      
-                      {/* Quick preset buttons */}
-                      <div className="flex items-center gap-1">
-                        {[3, 5, 8, 10, 12, 14].map(p => (
-                          <button
-                            key={p}
-                            type="button"
-                            onClick={() => setOutwardMakingPercent(p)}
-                            className={`flex-1 py-0.5 text-[9px] rounded font-mono cursor-pointer transition-all border ${
-                              Number(outwardMakingPercent) === p
-                                ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50 font-bold'
-                                : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
-                            }`}
-                          >
-                            {p}%
-                          </button>
-                        ))}
-                      </div>
-
-                      <div className="text-[10px] text-slate-400 flex items-center justify-between pt-0.5">
-                        <span>Auto Per Gram:</span>
-                        <span className="text-white font-bold">₹{Math.round(effectiveMakingPerGram).toLocaleString('en-IN')} / g</span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-1.5">
-                      <div className="relative">
-                        <input 
-                          type="number"
-                          value={outwardMakingRate}
-                          onChange={(e) => setOutwardMakingRate(parseFloat(e.target.value) || 0)}
-                          className="w-full px-2.5 py-1.5 pr-10 rounded-lg glass-input text-slate-200 font-bold"
-                        />
-                        <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-[10px] pointer-events-none">
-                          ₹/g
-                        </span>
-                      </div>
-                      <div className="text-[10px] text-slate-400 flex items-center justify-between pt-0.5">
-                        <span>Equivalent %:</span>
-                        <span className="text-emerald-400 font-bold">{outwardMetalValue > 0 ? ((outwardMakingCharges / outwardMetalValue) * 100).toFixed(1) : 0}%</span>
-                      </div>
-                    </div>
-                  )}
+                  <input 
+                    type="number"
+                    value={userCustomMakingCharges !== null ? userCustomMakingCharges : autoMakingCharges}
+                    onChange={(e) => setUserCustomMakingCharges(parseFloat(e.target.value) || 0)}
+                    className="w-full px-2.5 py-1.5 rounded-lg glass-input text-emerald-300 font-bold"
+                  />
                 </div>
               </div>
             </div>
@@ -900,12 +779,8 @@ export default function MetalExchangeView({ onNavigate }) {
                 <span className="text-white font-bold">{Number(outwardFinePureRequired || 0).toFixed(3)}g</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>
-                  Making Charges ({outwardMakingType === 'percentage' ? `${outwardMakingPercent}%` : `₹${outwardMakingRate}/g`}):
-                </span>
-                <span className="text-emerald-300 font-semibold">
-                  ₹{Math.round(outwardMakingCharges || 0).toLocaleString('en-IN')}
-                </span>
+                <span>Making Charges ({storedMakingPercent}%):</span>
+                <span className="text-emerald-300 font-semibold">₹{Math.round(outwardMakingCharges || 0).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-emerald-300 font-bold border-t border-white/5 pt-1.5 text-sm">
                 <span>Total Price of New Jewellery:</span>
