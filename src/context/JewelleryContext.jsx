@@ -614,6 +614,37 @@ export function JewelleryProvider({ children }) {
     }
   };
 
+  // Delete Sales Tax Invoice / Exchange Record
+  const deleteInvoice = async (invoiceNo) => {
+    if (!invoiceNo) return;
+    const docId = String(invoiceNo).replace(/\//g, '_');
+
+    setInvoices(prev => {
+      const nextInv = prev.filter(i => i.invoiceNo !== invoiceNo);
+      try {
+        localStorage.setItem('kc_invoices', JSON.stringify(nextInv));
+      } catch (e) {
+        console.warn('Could not update kc_invoices in localStorage:', e);
+      }
+      return nextInv;
+    });
+
+    setCloudStatus(prev => ({ ...prev, isSyncing: true }));
+    try {
+      await deleteDoc(doc(db, 'invoices', docId));
+      triggerSyncNotification({
+        title: 'Bill Record Deleted',
+        message: `Bill/Voucher #${invoiceNo} removed from Firebase Cloud records.`,
+      });
+      setCloudStatus(prev => ({ ...prev, isSyncing: false, lastSynced: new Date().toLocaleTimeString() }));
+      return { success: true };
+    } catch (err) {
+      console.warn('[Firebase] Could not live delete invoice:', err.message);
+      setCloudStatus(prev => ({ ...prev, isSyncing: false, error: err.message }));
+      return { success: false, error: err.message };
+    }
+  };
+
   // 7. Add Karagir (Artisan) Account
   const addKaragir = async (karagir) => {
     setKaragirs(prev => [karagir, ...prev.filter(k => k.id !== karagir.id)]);
@@ -786,6 +817,7 @@ export function JewelleryProvider({ children }) {
       addRefineryBatch,
       invoices,
       addInvoice,
+      deleteInvoice,
       cloudStatus,
       liveSyncNotification,
       syncAllToCloud,

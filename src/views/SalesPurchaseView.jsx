@@ -2,19 +2,35 @@ import React, { useState } from 'react';
 import { useJewellery } from '../context/JewelleryContext';
 import { 
   Receipt, ShoppingCart, Users, Truck, ArrowUpRight, ArrowDownLeft, 
-  Printer, Plus, ArrowRightLeft, Sparkles, Scale, RefreshCw, Layers
+  Printer, Plus, ArrowRightLeft, Sparkles, Scale, RefreshCw, Layers,
+  Trash2, AlertTriangle, X
 } from 'lucide-react';
 import PrintModal from '../components/print/PrintModal';
 import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
 import MetalExchangeTemplate from '../components/print/MetalExchangeTemplate';
 
 export default function SalesPurchaseView({ onNavigate }) {
-  const { invoices = [], showroom } = useJewellery();
+  const { invoices = [], showroom, deleteInvoice } = useJewellery();
   const [activeTab, setActiveTab] = useState('sales');
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [printFormat, setPrintFormat] = useState('a4');
   const [purchaseFilter, setPurchaseFilter] = useState('all'); // 'all' | 'exchange' | 'supplier'
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirmDelete = async () => {
+    if (!deleteTarget) return;
+    setIsDeleting(true);
+    try {
+      await deleteInvoice(deleteTarget.invoiceNo);
+      setDeleteTarget(null);
+    } catch (err) {
+      console.error('Error deleting invoice:', err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const [supplierPurchases, setSupplierPurchases] = useState([
     {
@@ -158,7 +174,7 @@ export default function SalesPurchaseView({ onNavigate }) {
                   <th className="py-3 px-4 text-right">Subtotal</th>
                   <th className="py-3 px-4 text-right">GST / Old Gold Credit</th>
                   <th className="py-3 px-4 text-right text-gold-300">Net Payable (₹)</th>
-                  <th className="py-3 px-4 text-center">Print</th>
+                  <th className="py-3 px-4 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
@@ -248,21 +264,32 @@ export default function SalesPurchaseView({ onNavigate }) {
                         </td>
 
                         <td className="py-3 px-4 text-center">
-                          <button 
-                            type="button"
-                            onClick={() => {
-                              setSelectedInvoice(inv);
-                              setShowPrintModal(true);
-                            }}
-                            className={`p-1.5 rounded-lg glass-pill cursor-pointer transition-all ${
-                              isExch 
-                                ? 'text-purple-400 hover:text-white hover:border-purple-500/50' 
-                                : 'text-gold-400 hover:text-white hover:border-gold-500/40'
-                            }`}
-                            title={isExch ? "Print Old Gold Exchange Slip" : "Print Tax Invoice"}
-                          >
-                            <Printer className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                setSelectedInvoice(inv);
+                                setShowPrintModal(true);
+                              }}
+                              className={`p-1.5 rounded-lg glass-pill cursor-pointer transition-all ${
+                                isExch 
+                                  ? 'text-purple-400 hover:text-white hover:border-purple-500/50' 
+                                  : 'text-gold-400 hover:text-white hover:border-gold-500/40'
+                              }`}
+                              title={isExch ? "Print Old Gold Exchange Slip" : "Print Tax Invoice"}
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button 
+                              type="button"
+                              onClick={() => setDeleteTarget(inv)}
+                              className="p-1.5 rounded-lg glass-pill text-slate-500 hover:text-rose-400 hover:border-rose-500/40 cursor-pointer transition-all"
+                              title="Delete record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -400,17 +427,27 @@ export default function SalesPurchaseView({ onNavigate }) {
 
                       <td className="py-3 px-4 text-center">
                         {pur.isExchange ? (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedInvoice(pur.rawInvoice);
-                              setShowPrintModal(true);
-                            }}
-                            className="p-1.5 rounded-lg glass-pill text-purple-400 hover:text-white hover:border-purple-500/40 cursor-pointer"
-                            title="Print Old Gold Barter Slip"
-                          >
-                            <Printer className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center justify-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedInvoice(pur.rawInvoice);
+                                setShowPrintModal(true);
+                              }}
+                              className="p-1.5 rounded-lg glass-pill text-purple-400 hover:text-white hover:border-purple-500/40 cursor-pointer"
+                              title="Print Old Gold Barter Slip"
+                            >
+                              <Printer className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setDeleteTarget(pur.rawInvoice)}
+                              className="p-1.5 rounded-lg glass-pill text-slate-500 hover:text-rose-400 hover:border-rose-500/40 cursor-pointer"
+                              title="Delete exchange record"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         ) : (
                           <span className="text-slate-500 text-[10px]">—</span>
                         )}
@@ -449,6 +486,83 @@ export default function SalesPurchaseView({ onNavigate }) {
           />
         ) : null}
       </PrintModal>
+
+      {/* DELETE RECORD CONFIRMATION MODAL */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-md">
+          <div className="relative w-full max-w-md glass-panel p-6 sm:p-7 rounded-3xl border border-rose-500/40 shadow-2xl space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-white/10">
+              <div className="flex items-center gap-2 text-rose-400">
+                <AlertTriangle className="w-5 h-5 text-rose-400" />
+                <h3 className="font-serif font-bold text-white text-base">
+                  Delete {deleteTarget.isExchange || deleteTarget.invoiceType === 'exchange' ? 'Exchange Record' : 'Sales Invoice'}
+                </h3>
+              </div>
+              <button 
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs font-mono">
+              <p className="text-slate-300">
+                Are you sure you want to permanently delete this transaction record?
+              </p>
+              
+              <div className="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/10 space-y-1.5">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Voucher / Bill No:</span>
+                  <span className={`font-bold ${deleteTarget.isExchange || deleteTarget.invoiceType === 'exchange' ? 'text-purple-400' : 'text-gold-400'}`}>
+                    #{deleteTarget.invoiceNo}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Customer Name:</span>
+                  <span className="text-white font-medium">{deleteTarget.customerName || 'Walk-in Customer'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Date:</span>
+                  <span className="text-slate-300">{deleteTarget.date}</span>
+                </div>
+                <div className="flex justify-between pt-1 border-t border-white/5">
+                  <span className="text-slate-400">Settlement Amount:</span>
+                  <span className="text-emerald-300 font-bold">
+                    ₹{Number(deleteTarget.grandTotal || deleteTarget.cashSettlement || 0).toLocaleString('en-IN')}
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[11px] font-sans">
+                ⚠️ <strong>Permanent Action:</strong> This record will be permanently deleted from your Sales & Purchases register, inventory histories, and Firebase Cloud sync.
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-2.5 pt-3 border-t border-white/10">
+              <button 
+                type="button"
+                onClick={() => setDeleteTarget(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-xl glass-pill text-xs font-semibold text-slate-400 hover:text-white cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button 
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-5 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-lg active:scale-95 transition-transform disabled:opacity-50"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isDeleting ? 'Deleting...' : 'Delete Permanently'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
