@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useJewellery } from '../context/JewelleryContext';
 import { 
   IndianRupee, Printer, Plus, Trash2, CheckCircle2, 
@@ -26,10 +26,17 @@ export default function RupeesBillingView() {
   const [grossWeight, setGrossWeight] = useState(22.450);
   const [stoneWeight, setStoneWeight] = useState(0.450);
   const [ratePerGram, setRatePerGram] = useState(rates.gold22k);
-  const [makingType, setMakingType] = useState('perGram'); // 'perGram' | 'percentage'
-  const [makingValue, setMakingValue] = useState(480);
+  const [makingType, setMakingType] = useState('percentage'); // Default to given % from settings
+  const [makingValue, setMakingValue] = useState(() => (rates.makingChargePercent ?? 5));
   const [hallmarkFee, setHallmarkFee] = useState(45);
   const [discount, setDiscount] = useState(0);
+
+  // Auto-sync making charges % with Gold Rate Settings
+  useEffect(() => {
+    if (rates.makingChargePercent !== undefined && !selectedInventoryId && makingType === 'percentage') {
+      setMakingValue(rates.makingChargePercent);
+    }
+  }, [rates.makingChargePercent, selectedInventoryId, makingType]);
 
   // Success & Print State
   const [generatedInvoice, setGeneratedInvoice] = useState(null);
@@ -337,18 +344,6 @@ export default function RupeesBillingView() {
                   <button 
                     type="button"
                     onClick={() => {
-                      setMakingType('perGram');
-                      if (makingValue <= 20) {
-                        setMakingValue(480);
-                      }
-                    }}
-                    className={`px-2 py-0.5 rounded cursor-pointer ${makingType === 'perGram' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400'}`}
-                  >
-                    ₹ / g
-                  </button>
-                  <button 
-                    type="button"
-                    onClick={() => {
                       setMakingType('percentage');
                       if (makingValue > 100 || makingValue === 480) {
                         setMakingValue(rates.makingChargePercent ?? 5);
@@ -356,16 +351,86 @@ export default function RupeesBillingView() {
                     }}
                     className={`px-2 py-0.5 rounded cursor-pointer ${makingType === 'percentage' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400'}`}
                   >
-                    %
+                    % (Given Rate)
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      setMakingType('perGram');
+                      if (makingValue <= 20) {
+                        setMakingValue(Math.round((ratePerGram * (rates.makingChargePercent ?? 5)) / 100) || 480);
+                      }
+                    }}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${makingType === 'perGram' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400'}`}
+                  >
+                    ₹ / g
                   </button>
                 </div>
               </div>
-              <input 
-                type="number"
-                value={makingValue}
-                onChange={(e) => setMakingValue(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2.5 rounded-xl glass-input text-sm font-mono font-bold"
-              />
+
+              {makingType === 'percentage' ? (
+                <div className="space-y-1.5">
+                  <div className="relative">
+                    <input 
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      value={makingValue}
+                      onChange={(e) => setMakingValue(parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2.5 pr-8 rounded-xl glass-input text-sm font-mono font-bold text-gold-400"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs pointer-events-none">
+                      %
+                    </span>
+                  </div>
+
+                  {/* Preset Pills */}
+                  <div className="flex items-center gap-1 font-mono">
+                    {[3, 5, 8, 10, 12, 14].map(p => (
+                      <button
+                        key={p}
+                        type="button"
+                        onClick={() => setMakingValue(p)}
+                        className={`flex-1 py-0.5 text-[9px] rounded cursor-pointer transition-all border ${
+                          Number(makingValue) === p
+                            ? 'bg-gold-500/20 text-gold-300 border-gold-500/50 font-bold'
+                            : 'bg-white/[0.02] text-slate-400 border-white/5 hover:border-white/20'
+                        }`}
+                      >
+                        {p}%
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
+                    <span>Auto Per Gram:</span>
+                    <span className="text-white font-bold">
+                      ₹{Math.round((ratePerGram * Number(makingValue || 0)) / 100).toLocaleString('en-IN')} / g
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-1.5">
+                  <div className="relative">
+                    <input 
+                      type="number"
+                      value={makingValue}
+                      onChange={(e) => setMakingValue(parseFloat(e.target.value) || 0)}
+                      className="w-full px-3 py-2.5 pr-12 rounded-xl glass-input text-sm font-mono font-bold text-slate-200"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-[10px] pointer-events-none">
+                      ₹/g
+                    </span>
+                  </div>
+                  <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
+                    <span>Equivalent %:</span>
+                    <span className="text-gold-400 font-bold">
+                      {ratePerGram > 0 ? ((Number(makingValue || 0) / ratePerGram) * 100).toFixed(1) : 0}%
+                    </span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
