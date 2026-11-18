@@ -39,7 +39,8 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
   } = exchangeData;
 
   const safeCashSettlement = Number(cashSettlement) || 0;
-  const isCustomerOwed = safeCashSettlement < 0; // Negative means showroom refunds/credits customer
+  const isCustomerRefund = safeCashSettlement > 0; // Positive (inward > outward): Showroom refunds customer
+  const isCustomerPayable = safeCashSettlement < 0; // Negative (outward > inward): Customer pays remaining balance
   const absSettlement = Math.abs(safeCashSettlement);
 
   const safeInwardGross = Number(inwardGrossWeight) || 0;
@@ -209,14 +210,17 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
               Net Barter Settlement
             </div>
             <div className="font-serif text-lg font-black text-slate-900">
-              {isCustomerOwed 
+              {isCustomerRefund 
                 ? `REFUND DUE TO CUSTOMER: ₹${absSettlement.toLocaleString('en-IN')}`
-                : `NET PAYABLE BY CUSTOMER: ₹${absSettlement.toLocaleString('en-IN')}`
+                : (isCustomerPayable 
+                    ? `NET PAYABLE BY CUSTOMER: ₹${absSettlement.toLocaleString('en-IN')}`
+                    : `BALANCED TRADE (NIL BALANCE)`
+                  )
               }
             </div>
             <div className="text-[10px] text-slate-600 font-mono mt-0.5">
               {hasValidMetalDiff ? (
-                <>Net pure {inwardMetal} difference: <strong>{safeDiff.toFixed(3)}g</strong> ({isCustomerOwed ? 'Surplus metal credited' : 'Additional metal debited'})</>
+                <>Net pure {inwardMetal} difference: <strong>{safeDiff.toFixed(3)}g</strong> ({isCustomerRefund ? 'Surplus metal credited' : (isCustomerPayable ? 'Additional metal debited' : 'Balanced trade')})</>
               ) : (
                 <>Exchange of {inwardMetal} ({inwardKarat}) for {outwardMetal} ({outwardKarat})</>
               )}
@@ -225,9 +229,13 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
 
           <div className="text-right">
             <span className={`px-3 py-1 rounded text-xs font-mono font-bold uppercase ${
-              isCustomerOwed ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-amber-100 text-amber-900 border border-amber-300'
+              isCustomerRefund 
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                : (isCustomerPayable 
+                    ? 'bg-amber-100 text-amber-900 border border-amber-300' 
+                    : 'bg-slate-100 text-slate-700 border border-slate-300')
             }`}>
-              {isCustomerOwed ? 'Showroom Payable' : 'Customer Payable'}
+              {isCustomerRefund ? 'Showroom Payable (Refund)' : (isCustomerPayable ? 'Customer Payable' : 'Nil Balance')}
             </span>
           </div>
         </div>
