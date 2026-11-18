@@ -10,7 +10,7 @@ import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
 import MetalExchangeTemplate from '../components/print/MetalExchangeTemplate';
 
 export default function SalesPurchaseView({ onNavigate }) {
-  const { invoices = [], showroom, deleteInvoice } = useJewellery();
+  const { invoices = [], showroom, deleteInvoice, rates } = useJewellery();
   const [activeTab, setActiveTab] = useState('sales');
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -44,23 +44,35 @@ export default function SalesPurchaseView({ onNavigate }) {
   // Derive Customer Old Gold Purchases directly from live sync exchange invoices!
   const customerOldGoldPurchases = invoices
     .filter(inv => Boolean(inv.isExchange || inv.invoiceType === 'exchange'))
-    .map(inv => ({
-      purchaseId: `PUR-${inv.invoiceNo}`,
-      voucherNo: inv.invoiceNo,
-      date: inv.date || 'Recent',
-      supplierName: `${inv.customerName || 'Customer'} (Old Gold Exchange)`,
-      customerName: inv.customerName,
-      item: inv.inwardDescription || `Old ${inv.inwardMetal || 'Gold'} Scrap`,
-      metal: inv.inwardMetal || 'Gold',
-      grossWeight: Number(inv.inwardGrossWeight || 0),
-      netWeight: Number(inv.inwardNetWeight || inv.inwardGrossWeight || 0),
-      purity: inv.inwardKarat || '22K',
-      ratePerGram: Number(inv.inwardRate || 0),
-      totalAmount: Math.round(Number(inv.inwardValuation || 0)),
-      status: "In Vault (Old Gold)",
-      isExchange: true,
-      rawInvoice: inv
-    }));
+    .map(inv => {
+      const gross = Number(inv.inwardGrossWeight || 0);
+      const net = Number(inv.inwardNetWeight || gross);
+      const val = Math.round(Number(inv.inwardValuation || 0));
+      const fine = Number(inv.inwardFineEquivalent || 0);
+      
+      const ratePerGram = Number(inv.inwardRate || 0)
+        || (val > 0 && fine > 0 ? Math.round(val / fine) : 0)
+        || (val > 0 && net > 0 ? Math.round(val / (net * 0.916)) : 0)
+        || Number(rates?.gold24k || rates?.gold22k || 0);
+
+      return {
+        purchaseId: `PUR-${inv.invoiceNo}`,
+        voucherNo: inv.invoiceNo,
+        date: inv.date || 'Recent',
+        supplierName: `${inv.customerName || 'Customer'} (Old Gold Exchange)`,
+        customerName: inv.customerName,
+        item: inv.inwardDescription || `Old ${inv.inwardMetal || 'Gold'} Scrap`,
+        metal: inv.inwardMetal || 'Gold',
+        grossWeight: gross,
+        netWeight: net,
+        purity: inv.inwardKarat || '22K',
+        ratePerGram,
+        totalAmount: val,
+        status: "In Vault (Old Gold)",
+        isExchange: true,
+        rawInvoice: inv
+      };
+    });
 
   // Combined Purchases: Supplier Bullion + Inward Customer Old Gold
   const allPurchases = [...customerOldGoldPurchases, ...supplierPurchases];
@@ -205,14 +217,34 @@ export default function SalesPurchaseView({ onNavigate }) {
                               <div className="text-white font-medium">
                                 {inv.outwardDescription || inv.items?.[0]?.name || 'New Jewellery'}
                               </div>
-                              <div className="text-[10px] text-amber-400 font-mono mt-0.5 flex flex-wrap items-center gap-1">
+                              <div className="text-[10px] text-amber-400 font-mono mt-0.5 flex flex-wrap items-center gap-1.5">
                                 <span>🔄 Inward: <strong>{inv.inwardGrossWeight}g</strong> {inv.inwardMetal} ({inv.inwardKarat})</span>
+                                {(() => {
+                                  const r = Number(inv.inwardRate || 0)
+                                    || (inv.inwardValuation && inv.inwardFineEquivalent ? Math.round(inv.inwardValuation / inv.inwardFineEquivalent) : 0)
+                                    || (inv.inwardValuation && inv.inwardGrossWeight ? Math.round(inv.inwardValuation / (inv.inwardGrossWeight * 0.916)) : 0)
+                                    || Number(rates?.gold24k || 0);
+                                  return r > 0 ? (
+                                    <span className="px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 border border-amber-500/30 font-bold font-mono">
+                                      @ ₹{r.toLocaleString('en-IN')}/g
+                                    </span>
+                                  ) : null;
+                                })()}
                                 <span className="text-slate-400">• Val: ₹{Number(inv.inwardValuation || 0).toLocaleString('en-IN')}</span>
                               </div>
                             </div>
                           ) : (
-                            <div className="truncate">
-                              {inv.items?.map(i => i.name).join(', ') || 'Jewellery Article'}
+                            <div>
+                              <div className="text-white font-medium truncate">
+                                {inv.items?.map(i => i.name).join(', ') || 'Jewellery Article'}
+                              </div>
+                              {inv.items?.[0]?.rate > 0 && (
+                                <div className="text-[10px] text-gold-400 font-mono mt-0.5 flex items-center gap-1">
+                                  <span>Gold Rate:</span>
+                                  <span className="font-bold text-gold-300">₹{Number(inv.items[0].rate).toLocaleString('en-IN')}/g</span>
+                                  <span className="text-slate-400">({inv.items[0].karat || '22K'})</span>
+                                </div>
+                              )}
                             </div>
                           )}
                         </td>
@@ -400,8 +432,11 @@ export default function SalesPurchaseView({ onNavigate }) {
 
                       <td className="py-3 px-4 text-gold-300 font-bold">{pur.purity}</td>
 
-                      <td className="py-3 px-4 text-right text-slate-300">
-                        ₹{Number(pur.ratePerGram || 0).toLocaleString('en-IN')}
+                      <td className="py-3 px-4 text-right">
+                        <span className="font-bold text-gold-300 font-mono">
+                          ₹{Number(pur.ratePerGram || 0).toLocaleString('en-IN')}
+                        </span>
+                        <span className="text-[9px] text-slate-400 block font-mono">/ gram</span>
                       </td>
 
                       <td className="py-3 px-4 text-right font-serif font-bold text-white text-sm">

@@ -1,8 +1,17 @@
 import React from 'react';
 import { numberToIndianWords } from '../../utils/numberToWords';
+import { useJewellery } from '../../context/JewelleryContext';
 
 export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowroom }) {
   if (!exchangeData) return null;
+
+  let contextRates = null;
+  try {
+    const ctx = useJewellery();
+    contextRates = ctx?.rates;
+  } catch (e) {
+    // Rendered outside provider fallback
+  }
 
   const showroom = {
     name: 'KaratCraft Fine Jewellers',
@@ -49,13 +58,48 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
   const safeInwardNet = Number(inwardNetWeight) || 0;
   const safeMeltingLoss = Number(inwardMeltingLossPercent) || 0;
   const safeInwardFine = Number(inwardFineEquivalent) || 0;
-  const safeInwardRate = Number(inwardRate) || 0;
   const safeInwardValuation = Number(inwardValuation) || 0;
 
+  const PURITY_RATIOS = {
+    '24K': 0.999,
+    '22K': 0.916,
+    '20K': 0.833,
+    '18K': 0.750,
+    '14K': 0.585,
+    '9K': 0.375,
+    '999': 0.999,
+    '925': 0.925,
+    '800': 0.800,
+    '700': 0.700,
+  };
+
+  const getPurityRatio = (karat) => {
+    if (!karat) return 0.916;
+    for (const [k, ratio] of Object.entries(PURITY_RATIOS)) {
+      if (String(karat).toUpperCase().includes(k)) return ratio;
+    }
+    return 0.916;
+  };
+
+  const inwardRatio = getPurityRatio(inwardKarat);
+  const outwardRatio = getPurityRatio(outwardKarat);
+
+  // Safe benchmark 24K rate
+  const safeInwardRate = Number(inwardRate) 
+    || (safeInwardValuation > 0 && safeInwardFine > 0 ? Math.round(safeInwardValuation / safeInwardFine) : 0)
+    || (safeInwardValuation > 0 && safeInwardNet > 0 ? Math.round(safeInwardValuation / (safeInwardNet * inwardRatio)) : 0)
+    || Number(contextRates?.gold24k || 0);
+
   const safeOutwardGross = Number(outwardGrossWeight) || 0;
-  const safeOutwardRate = Number(outwardRate || inwardRate || 0);
-  const safeOutwardMaking = Number(outwardMakingCharges) || 0;
   const safeOutwardValuation = Number(outwardValuation) || 0;
+  const safeOutwardMaking = Number(outwardMakingCharges) || 0;
+  const safeOutwardRate = Number(outwardRate || inwardRate) 
+    || (safeOutwardValuation > 0 && safeOutwardGross > 0 ? Math.round((safeOutwardValuation - safeOutwardMaking) / (safeOutwardGross * outwardRatio)) : 0)
+    || safeInwardRate 
+    || Number(contextRates?.gold24k || 0);
+
+  const effectiveInwardRate = Math.round(safeInwardRate * inwardRatio);
+  const effectiveOutwardRate = Math.round(safeOutwardRate * outwardRatio);
 
   const hasValidMetalDiff = typeof metalDifferenceGrams === 'number' && !isNaN(metalDifferenceGrams);
   const safeDiff = hasValidMetalDiff ? Math.abs(metalDifferenceGrams) : 0;
@@ -134,11 +178,19 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 <td className="py-1 text-right font-bold">{inwardMetal} ({inwardKarat})</td>
               </tr>
               <tr className="border-b border-slate-200">
-                <td className="py-1 text-slate-600">Gold Rate (₹/g):</td>
-                <td className="py-1 text-right font-bold text-amber-900">
+                <td className="py-1 text-slate-600">Benchmark Rate (24K Pure):</td>
+                <td className="py-1 text-right font-bold text-amber-900 font-mono">
                   ₹{safeInwardRate.toLocaleString('en-IN')} / g
                 </td>
               </tr>
+              {inwardKarat && !inwardKarat.includes('24') && (
+                <tr className="border-b border-slate-200 bg-amber-50/70">
+                  <td className="py-1 text-amber-950 font-medium">Purchased Gold Rate ({inwardKarat} • {Math.round(inwardRatio * 1000) / 10}%):</td>
+                  <td className="py-1 text-right font-bold text-amber-900 font-mono">
+                    ₹{effectiveInwardRate.toLocaleString('en-IN')} / g
+                  </td>
+                </tr>
+              )}
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Scale Weight:</td>
                 <td className="py-1 text-right font-medium">{safeInwardGross.toFixed(3)}g</td>
@@ -189,11 +241,19 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 <td className="py-1 text-right font-bold">{outwardMetal} ({outwardKarat})</td>
               </tr>
               <tr className="border-b border-slate-200">
-                <td className="py-1 text-slate-600">Gold Rate (₹/g):</td>
-                <td className="py-1 text-right font-bold text-emerald-900">
+                <td className="py-1 text-slate-600">Benchmark Rate (24K Pure):</td>
+                <td className="py-1 text-right font-bold text-emerald-900 font-mono">
                   ₹{safeOutwardRate.toLocaleString('en-IN')} / g
                 </td>
               </tr>
+              {outwardKarat && !outwardKarat.includes('24') && (
+                <tr className="border-b border-slate-200 bg-emerald-50/70">
+                  <td className="py-1 text-emerald-950 font-medium">New Jewellery Rate ({outwardKarat} • {Math.round(outwardRatio * 1000) / 10}%):</td>
+                  <td className="py-1 text-right font-bold text-emerald-900 font-mono">
+                    ₹{effectiveOutwardRate.toLocaleString('en-IN')} / g
+                  </td>
+                </tr>
+              )}
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Weight:</td>
                 <td className="py-1 text-right font-medium">{safeOutwardGross.toFixed(3)}g</td>

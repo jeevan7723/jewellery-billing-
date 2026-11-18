@@ -13,6 +13,11 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
   const invoiceDate = invoice.date || new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   const invoiceNo = invoice.invoiceNo || 'KC-BILL-8801';
   const paymentMode = invoice.paymentMode || 'Cash / UPI';
+  const oldGoldCredit = Number(invoice.exchangeCredit || invoice.inwardValuation || 0);
+  const inwardWeight = Number(invoice.inwardGrossWeight || 0);
+  const inwardMetal = invoice.inwardMetal || 'Gold';
+  const inwardKarat = invoice.inwardKarat || '22K';
+  const inwardRate = Number(invoice.inwardRate || (inwardWeight > 0 && oldGoldCredit > 0 ? Math.round(oldGoldCredit / inwardWeight) : 0));
 
   // ================= THERMAL RECEIPT FORMAT (80mm) =================
   if (format === 'thermal') {
@@ -79,6 +84,12 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
             <span>SGST (1.5%):</span>
             <span>₹{sgstAmount.toLocaleString('en-IN')}</span>
           </div>
+          {oldGoldCredit > 0 && (
+            <div className="flex justify-between font-bold text-gray-900 border-t border-dashed border-gray-400 pt-0.5">
+              <span>Less Old Gold {inwardRate > 0 ? `(@₹${inwardRate}/g)` : ''}:</span>
+              <span>-₹{oldGoldCredit.toLocaleString('en-IN')}</span>
+            </div>
+          )}
           <div className="flex justify-between text-xs font-bold pt-1 border-t border-black">
             <span>NET PAYABLE:</span>
             <span>₹{grandTotal.toLocaleString('en-IN')}</span>
@@ -292,6 +303,19 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
                 <td className="py-1.5 px-3 text-slate-700 font-bold">Total GST (3%):</td>
                 <td className="py-1.5 px-3 text-right font-bold text-slate-900">₹{gstAmount.toLocaleString('en-IN')}</td>
               </tr>
+              {oldGoldCredit > 0 && (
+                <tr className="border-b border-slate-200 bg-amber-50 text-amber-900">
+                  <td className="py-1.5 px-3 font-bold">
+                    Less: Old Gold Credit:
+                    {inwardRate > 0 && (
+                      <span className="block text-[9px] text-amber-700 font-normal">
+                        ({inwardWeight}g {inwardMetal} {inwardKarat} @ ₹{inwardRate.toLocaleString('en-IN')}/g)
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-1.5 px-3 text-right font-bold text-amber-900">-₹{oldGoldCredit.toLocaleString('en-IN')}</td>
+                </tr>
+              )}
               <tr className="bg-slate-900 text-white">
                 <td className="py-2.5 px-3 font-serif font-bold text-sm uppercase">Grand Total:</td>
                 <td className="py-2.5 px-3 text-right font-serif font-bold text-base">

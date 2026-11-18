@@ -656,7 +656,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 <span>{Number(inwardFinePureWeight || 0).toFixed(3)}g</span>
               </div>
               <div className="flex justify-between items-center text-slate-400 text-xs pt-2 border-t border-amber-500/20">
-                <span>Value at today's rate:</span>
+                <span>Value at gold rate (@ ₹{inwardUnitRate.toLocaleString('en-IN')}/g):</span>
                 <span className="text-amber-300 font-extrabold text-sm">₹{Math.round(inwardValuation || 0).toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -872,7 +872,7 @@ export default function MetalExchangeView({ onNavigate }) {
             {/* Outward Total Box */}
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5 font-mono text-xs shadow-sm">
               <div className="flex justify-between text-slate-400">
-                <span>Pure {outwardMetal} needed:</span>
+                <span>Pure {outwardMetal} needed (@ ₹{outwardUnitRate.toLocaleString('en-IN')}/g):</span>
                 <span className="text-white font-bold">{Number(outwardFinePureRequired || 0).toFixed(3)}g</span>
               </div>
               <div className="flex justify-between text-slate-400">
@@ -880,7 +880,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 <span className="text-emerald-300 font-semibold">₹{Math.round(outwardMakingCharges || 0).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-emerald-300 font-bold border-t border-emerald-500/20 pt-2 text-sm">
-                <span>Total Price of New Jewellery:</span>
+                <span>Total Price of New Jewellery (@ ₹{outwardUnitRate.toLocaleString('en-IN')}/g):</span>
                 <span className="font-extrabold text-sm">₹{Math.round(outwardTotalPayable || 0).toLocaleString('en-IN')}</span>
               </div>
             </div>
