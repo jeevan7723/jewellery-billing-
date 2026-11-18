@@ -169,10 +169,10 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
             {invoice.customerName || 'Walk-in Customer'}
           </div>
           <div className="text-slate-700">
-            Contact: {invoice.phone || '+91 98200 99887'}
+            Contact: {invoice.phone || '—'}
           </div>
           <div className="text-slate-600 text-[10px]">
-            Address / City: {invoice.city || 'Mumbai, Maharashtra'}
+            Address / City: {invoice.city || '—'}
           </div>
         </div>
 

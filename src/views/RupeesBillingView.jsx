@@ -210,9 +210,27 @@ export default function RupeesBillingView() {
           
           {/* Customer Details */}
           <div className="p-4 rounded-2xl bg-obsidian-900/80 border border-white/5 space-y-3">
-            <span className="text-xs font-mono uppercase tracking-wider text-gold-400 font-bold flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5" /> Customer Details
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-mono uppercase tracking-wider text-gold-400 font-bold flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5" /> Customer Details
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setCustomerName('');
+                  setPhone('');
+                  setCity('');
+                  setSelectedInventoryId('');
+                  setItemName('');
+                  setGrossWeight('');
+                  setStoneWeight('');
+                }}
+                className="text-[11px] font-mono text-slate-400 hover:text-amber-400 cursor-pointer transition-colors underline"
+                title="Clear all fields"
+              >
+                Clear to Blank
+              </button>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
