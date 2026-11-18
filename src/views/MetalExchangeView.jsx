@@ -56,6 +56,7 @@ export default function MetalExchangeView() {
   const [exchangeMode, setExchangeMode] = useState('gold-to-gold');
 
   // Customer KYC
+  const [voucherNo, setVoucherNo] = useState(() => `EXCH-${Math.floor(1000 + Math.random() * 9000)}`);
   const [customerName, setCustomerName] = useState('Mr. Anandram Verma');
   const [phone, setPhone] = useState('+91 98220 88771');
   const [voucherDate, setVoucherDate] = useState('16-Nov-2026');
@@ -81,6 +82,7 @@ export default function MetalExchangeView() {
   const handleModeSwitch = (mode) => {
     setExchangeMode(mode);
     setSelectedStockId('');
+    setVoucherNo(`EXCH-${Math.floor(1000 + Math.random() * 9000)}`);
     if (mode === 'gold-to-gold') {
       setInwardMetal('Gold');
       setInwardPurityIndex(1); // 22K
@@ -682,7 +684,7 @@ export default function MetalExchangeView() {
       >
         <MetalExchangeTemplate 
           exchangeData={{
-            voucherNo: `EXCH-${Math.floor(1000 + Math.random() * 9000)}`,
+            voucherNo,
             date: voucherDate,
             customerName,
             phone,

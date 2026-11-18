@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { JewelleryProvider, useJewellery } from './context/JewelleryContext';
 import { Cloud, CheckCircle2 } from 'lucide-react';
 import Sidebar from './components/Sidebar';
@@ -22,15 +22,24 @@ function AppContent() {
   const [activeView, setActiveView] = useState('dashboard');
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 });
+  const spotlightRef = useRef(null);
 
-  // Ambient mouse spotlight across viewport for luxury feel
+  // High-performance ambient spotlight directly via ref (zero React re-renders on mousemove)
   useEffect(() => {
+    let rafId;
     const handleMouseMove = (e) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
+      cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(() => {
+        if (spotlightRef.current) {
+          spotlightRef.current.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, rgba(212, 175, 55, 0.04), transparent 80%)`;
+        }
+      });
     };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const renderActiveView = () => {
@@ -65,9 +74,10 @@ function AppContent() {
       
       {/* Luxury dynamic mouse spotlight */}
       <div 
+        ref={spotlightRef}
         className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300 opacity-60 hidden lg:block"
         style={{
-          background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(212, 175, 55, 0.04), transparent 80%)`,
+          background: 'radial-gradient(600px circle at -100px -100px, rgba(212, 175, 55, 0.04), transparent 80%)',
         }}
       />
 

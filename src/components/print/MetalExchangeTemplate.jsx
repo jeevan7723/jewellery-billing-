@@ -14,7 +14,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
   };
 
   const {
-    voucherNo = `EXCH-${Math.floor(1000 + Math.random() * 9000)}`,
+    voucherNo = 'EXCH-5845',
     date = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
     customerName = 'Mr. Anandram Verma',
     phone = '+91 98220 88771',
