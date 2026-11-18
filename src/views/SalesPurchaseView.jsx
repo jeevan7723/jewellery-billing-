@@ -32,34 +32,14 @@ export default function SalesPurchaseView({ onNavigate }) {
     }
   };
 
-  const [supplierPurchases, setSupplierPurchases] = useState([
-    {
-      purchaseId: "PUR-2026-044",
-      date: "14-Nov-2026",
-      supplierName: "MMTC-PAMP India Bullion Ltd",
-      item: "24K Fine Gold Bars",
-      metal: "Gold",
-      grossWeight: 500.000,
-      purity: "99.99%",
-      ratePerGram: 7390,
-      totalAmount: 3695000,
-      status: "In Vault",
-      isExchange: false
-    },
-    {
-      purchaseId: "PUR-2026-043",
-      date: "12-Nov-2026",
-      supplierName: "Gujarat Bullion Refineries",
-      item: "Fine Silver 999 Bullion",
-      metal: "Silver",
-      grossWeight: 5000.000,
-      purity: "99.9%",
-      ratePerGram: 88.0,
-      totalAmount: 440000,
-      status: "In Vault",
-      isExchange: false
+  const [supplierPurchases, setSupplierPurchases] = useState(() => {
+    try {
+      const saved = localStorage.getItem('kc_supplier_purchases');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
     }
-  ]);
+  });
 
   // Derive Customer Old Gold Purchases directly from live sync exchange invoices!
   const customerOldGoldPurchases = invoices

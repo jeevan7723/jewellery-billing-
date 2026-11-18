@@ -11,26 +11,28 @@ export default function RefineryView() {
   const [showPrintModal, setShowPrintModal] = useState(false);
 
   // New Batch State
-  const [refineryName, setRefineryName] = useState('Apex Gold Refinery & Assay');
+  const [refineryName, setRefineryName] = useState('');
   const [metalType, setMetalType] = useState('Old Gold Scrap Melt');
-  const [sentWeightGross, setSentWeightGross] = useState(120.500);
-  const [assayedPurityTested, setAssayedPurityTested] = useState('88.5% (approx 21.2K)');
-  const [postMeltWeight, setPostMeltWeight] = useState(118.200);
+  const [sentWeightGross, setSentWeightGross] = useState('');
+  const [assayedPurityTested, setAssayedPurityTested] = useState('');
+  const [postMeltWeight, setPostMeltWeight] = useState('');
 
-  const wastageDross = Math.max(0, sentWeightGross - postMeltWeight);
-  const wastagePercent = sentWeightGross > 0 ? ((wastageDross / sentWeightGross) * 100).toFixed(2) : '0';
-  const fineGoldRecovered = (postMeltWeight * 0.885).toFixed(3);
+  const numSent = parseFloat(sentWeightGross) || 0;
+  const numPostMelt = parseFloat(postMeltWeight) || 0;
+  const wastageDross = Math.max(0, numSent - numPostMelt);
+  const wastagePercent = numSent > 0 ? ((wastageDross / numSent) * 100).toFixed(2) : '0';
+  const fineGoldRecovered = (numPostMelt * 0.885).toFixed(3);
 
   const handleCreateBatch = (e) => {
     e.preventDefault();
     const newB = {
       id: `REF-${Math.floor(100 + Math.random() * 900)}`,
       date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
-      refineryName,
-      metalType,
-      sentWeightGross,
-      assayedPurityTested,
-      postMeltWeight,
+      refineryName: refineryName.trim() || 'Assay Refinery',
+      metalType: metalType.trim() || 'Old Gold Scrap Melt',
+      sentWeightGross: numSent,
+      assayedPurityTested: assayedPurityTested.trim() || 'Testing In Progress',
+      postMeltWeight: numPostMelt,
       wastageDrossWeight: wastageDross,
       wastagePercentage: parseFloat(wastagePercent),
       fineGoldRecovered: parseFloat(fineGoldRecovered),
@@ -38,6 +40,10 @@ export default function RefineryView() {
     };
 
     addRefineryBatch(newB);
+    setRefineryName('');
+    setSentWeightGross('');
+    setAssayedPurityTested('');
+    setPostMeltWeight('');
     setShowAddModal(false);
     confetti({ particleCount: 70, spread: 60 });
   };
@@ -149,6 +155,7 @@ export default function RefineryView() {
                 <input 
                   type="text"
                   required
+                  placeholder="e.g. Apex Assay Laboratories"
                   value={refineryName}
                   onChange={(e) => setRefineryName(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-xs"
@@ -159,6 +166,7 @@ export default function RefineryView() {
                 <label className="block text-xs font-mono text-slate-400 mb-1">Scrap Description</label>
                 <input 
                   type="text"
+                  placeholder="e.g. Old Gold Scrap Melt"
                   value={metalType}
                   onChange={(e) => setMetalType(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-xs"
@@ -172,8 +180,9 @@ export default function RefineryView() {
                     type="number"
                     step="0.001"
                     required
+                    placeholder="0.000"
                     value={sentWeightGross}
-                    onChange={(e) => setSentWeightGross(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setSentWeightGross(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold"
                   />
                 </div>
@@ -184,8 +193,9 @@ export default function RefineryView() {
                     type="number"
                     step="0.001"
                     required
+                    placeholder="0.000"
                     value={postMeltWeight}
-                    onChange={(e) => setPostMeltWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setPostMeltWeight(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold"
                   />
                 </div>

@@ -22,7 +22,7 @@ export default function JewelleryTagTemplate({ item, items = [], showroom, mode 
           const net = tagItem.netWeight || Math.max(0, gross - stone);
           const karat = tagItem.karat || '22K';
           const code = tagItem.barcode || `KC${Math.floor(100000 + Math.random() * 900000)}`;
-          const huid = tagItem.hallmarkNo || 'HUID-916-MH';
+          const huid = tagItem.hallmarkNo || '—';
 
           return (
             <div 

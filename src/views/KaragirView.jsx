@@ -18,28 +18,33 @@ export default function KaragirView() {
   const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Forms
-  const [issueGrams, setIssueGrams] = useState(25.000);
-  const [returnGrams, setReturnGrams] = useState(24.200);
-  const [scrapGrams, setScrapGrams] = useState(0.400);
+  const [issueGrams, setIssueGrams] = useState('');
+  const [returnGrams, setReturnGrams] = useState('');
+  const [scrapGrams, setScrapGrams] = useState('');
 
   // New Karagir
   const [newName, setNewName] = useState('');
   const [newSpeciality, setNewSpeciality] = useState('Kadas & Bangles');
-  const [newPhone, setNewPhone] = useState('+91 98200 77112');
+  const [newPhone, setNewPhone] = useState('');
 
   const selectedKaragir = karagirs.find(k => k.id === selectedKaragirId) || karagirs[0];
-  const totalBalanceAll = karagirs.reduce((sum, k) => sum + k.balanceMetal, 0);
+  const totalBalanceAll = karagirs.reduce((sum, k) => sum + (k.balanceMetal || 0), 0);
 
   const handleIssueMetal = (e) => {
     e.preventDefault();
-    issueMetalToKaragir(selectedKaragirId, issueGrams);
+    if (!selectedKaragirId) return;
+    issueMetalToKaragir(selectedKaragirId, parseFloat(issueGrams) || 0);
+    setIssueGrams('');
     setShowIssueModal(false);
     confetti({ particleCount: 60, spread: 50 });
   };
 
   const handleReturnMetal = (e) => {
     e.preventDefault();
-    returnMetalFromKaragir(selectedKaragirId, returnGrams, scrapGrams);
+    if (!selectedKaragirId) return;
+    returnMetalFromKaragir(selectedKaragirId, parseFloat(returnGrams) || 0, parseFloat(scrapGrams) || 0);
+    setReturnGrams('');
+    setScrapGrams('');
     setShowReturnModal(false);
     confetti({ particleCount: 70, spread: 60 });
   };
@@ -48,9 +53,9 @@ export default function KaragirView() {
     e.preventDefault();
     const newK = {
       id: `KAR-${String(karagirs.length + 1).padStart(2, '0')}`,
-      name: newName,
-      speciality: newSpeciality,
-      phone: newPhone,
+      name: newName.trim() || 'New Artisan',
+      speciality: newSpeciality.trim() || 'General Handcraft',
+      phone: newPhone.trim() || '—',
       address: "Workshop",
       metalIssued: 0,
       metalReturned: 0,
@@ -59,6 +64,8 @@ export default function KaragirView() {
       activeOrders: 0
     };
     addKaragir(newK);
+    setNewName('');
+    setNewPhone('');
     setShowAddKaragirModal(false);
   };
 
@@ -205,8 +212,9 @@ export default function KaragirView() {
                   type="number"
                   step="0.001"
                   required
+                  placeholder="0.000"
                   value={issueGrams}
-                  onChange={(e) => setIssueGrams(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setIssueGrams(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-sm font-mono font-bold"
                 />
               </div>
@@ -258,8 +266,9 @@ export default function KaragirView() {
                   type="number"
                   step="0.001"
                   required
+                  placeholder="0.000"
                   value={returnGrams}
-                  onChange={(e) => setReturnGrams(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setReturnGrams(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-sm font-mono font-bold"
                 />
               </div>
@@ -269,8 +278,9 @@ export default function KaragirView() {
                 <input 
                   type="number"
                   step="0.001"
+                  placeholder="0.000"
                   value={scrapGrams}
-                  onChange={(e) => setScrapGrams(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setScrapGrams(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-sm font-mono"
                 />
               </div>
@@ -329,6 +339,7 @@ export default function KaragirView() {
                 <label className="block text-xs font-mono text-slate-400 mb-1">Phone Number</label>
                 <input 
                   type="text"
+                  placeholder="+91..."
                   value={newPhone}
                   onChange={(e) => setNewPhone(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"

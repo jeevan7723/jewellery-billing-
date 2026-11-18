@@ -20,10 +20,10 @@ export default function InventoryView() {
   const [category, setCategory] = useState('Necklaces');
   const [metal, setMetal] = useState('Gold');
   const [karat, setKarat] = useState('22K');
-  const [grossWeight, setGrossWeight] = useState(15.000);
-  const [stoneWeight, setStoneWeight] = useState(0.500);
+  const [grossWeight, setGrossWeight] = useState('');
+  const [stoneWeight, setStoneWeight] = useState('');
   const [makingAmount, setMakingAmount] = useState('');
-  const [hallmarkNo, setHallmarkNo] = useState(`HUID-${Math.floor(1000 + Math.random() * 9000)}-MH`);
+  const [hallmarkNo, setHallmarkNo] = useState('');
 
   // Edit Item Form State
   const [editingItem, setEditingItem] = useState(null);
@@ -50,30 +50,36 @@ export default function InventoryView() {
 
   const handleAddItem = (e) => {
     e.preventDefault();
-    const netWeight = Math.max(0, grossWeight - stoneWeight);
+    const gross = parseFloat(grossWeight) || 0;
+    const stone = parseFloat(stoneWeight) || 0;
+    const netWeight = Math.max(0, gross - stone);
     const makingAmt = parseFloat(makingAmount) || 0;
     const newItem = {
       id: `KC-INV-${Math.floor(100 + Math.random() * 900)}`,
       barcode: `KC${Math.floor(100000 + Math.random() * 900000)}`,
-      name,
+      name: name.trim() || 'New Jewellery Item',
       category,
       metal,
       karat,
       purity: karat === '24K' ? 0.999 : (karat === '22K' ? 0.916 : 0.750),
-      grossWeight,
-      stoneWeight,
+      grossWeight: gross,
+      stoneWeight: stone,
       netWeight,
       makingChargeAmount: makingAmt,
       makingChargeRate: makingAmt,
       makingChargeType: 'fixed',
-      hallmarkNo,
+      hallmarkNo: hallmarkNo.trim(),
       quantity: 1,
       status: "In Showcase"
     };
 
     addInventoryItem(newItem);
     setShowAddModal(false);
+    setName('');
+    setGrossWeight('');
+    setStoneWeight('');
     setMakingAmount('');
+    setHallmarkNo('');
     confetti({
       particleCount: 70,
       spread: 60,
@@ -368,8 +374,9 @@ export default function InventoryView() {
                     type="number"
                     step="0.001"
                     required
+                    placeholder="0.000"
                     value={grossWeight}
-                    onChange={(e) => setGrossWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setGrossWeight(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold"
                   />
                 </div>
@@ -379,8 +386,9 @@ export default function InventoryView() {
                   <input 
                     type="number"
                     step="0.001"
+                    placeholder="0.000"
                     value={stoneWeight}
-                    onChange={(e) => setStoneWeight(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setStoneWeight(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"
                   />
                 </div>

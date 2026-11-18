@@ -192,19 +192,27 @@ export default function ReportsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {invoices.map((inv, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02]">
-                    <td className="py-3 px-4 font-bold text-gold-400">{inv.invoiceNo}</td>
-                    <td className="py-3 px-4 text-slate-400">{inv.date}</td>
-                    <td className="py-3 px-4 text-white font-medium">{inv.customerName}</td>
-                    <td className="py-3 px-4 text-slate-400">{inv.paymentMode}</td>
-                    <td className="py-3 px-4 text-right">₹{inv.subtotal.toLocaleString('en-IN')}</td>
-                    <td className="py-3 px-4 text-right text-gold-300">₹{inv.gst3Percent.toLocaleString('en-IN')}</td>
-                    <td className="py-3 px-4 text-right font-serif font-bold text-white text-sm">
-                      ₹{inv.grandTotal.toLocaleString('en-IN')}
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 text-center text-slate-400">
+                      No sales invoices recorded yet.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  invoices.map((inv, idx) => (
+                    <tr key={idx} className="hover:bg-white/[0.02]">
+                      <td className="py-3 px-4 font-bold text-gold-400">{inv.invoiceNo}</td>
+                      <td className="py-3 px-4 text-slate-400">{inv.date}</td>
+                      <td className="py-3 px-4 text-white font-medium">{inv.customerName}</td>
+                      <td className="py-3 px-4 text-slate-400">{inv.paymentMode}</td>
+                      <td className="py-3 px-4 text-right">₹{Number(inv.subtotal || 0).toLocaleString('en-IN')}</td>
+                      <td className="py-3 px-4 text-right text-gold-300">₹{Number(inv.gst3Percent || 0).toLocaleString('en-IN')}</td>
+                      <td className="py-3 px-4 text-right font-serif font-bold text-white text-sm">
+                        ₹{Number(inv.grandTotal || 0).toLocaleString('en-IN')}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -225,17 +233,25 @@ export default function ReportsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {inventory.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02]">
-                    <td className="py-3 px-4 font-bold text-sky-400">{item.barcode}</td>
-                    <td className="py-3 px-4 text-white font-medium">{item.name}</td>
-                    <td className="py-3 px-4 text-slate-400">{item.category}</td>
-                    <td className="py-3 px-4 font-bold text-gold-300">{item.karat}</td>
-                    <td className="py-3 px-4 text-right text-slate-200">{item.grossWeight.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-right font-bold text-gold-300">{item.netWeight.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-emerald-400">{item.status}</td>
+                {inventory.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 text-center text-slate-400">
+                      No inventory items in stock yet.
+                    </td>
                   </tr>
-                ))}
+                ) : (
+                  inventory.map((item, idx) => (
+                    <tr key={idx} className="hover:bg-white/[0.02]">
+                      <td className="py-3 px-4 font-bold text-sky-400">{item.barcode}</td>
+                      <td className="py-3 px-4 text-white font-medium">{item.name}</td>
+                      <td className="py-3 px-4 text-slate-400">{item.category}</td>
+                      <td className="py-3 px-4 font-bold text-gold-300">{item.karat}</td>
+                      <td className="py-3 px-4 text-right text-slate-200">{Number(item.grossWeight || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-right font-bold text-gold-300">{Number(item.netWeight || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-emerald-400">{item.status}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -256,19 +272,27 @@ export default function ReportsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {karagirs.map((k, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02]">
-                    <td className="py-3 px-4 font-bold text-amber-400">{k.id}</td>
-                    <td className="py-3 px-4 text-white font-medium">{k.name}</td>
-                    <td className="py-3 px-4 text-slate-400">{k.speciality}</td>
-                    <td className="py-3 px-4 text-right text-slate-200">{k.metalIssued.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-right text-emerald-300 font-bold">{k.metalReturned.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-right text-slate-400">{k.meltingScrap.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-right font-bold text-amber-400 text-sm">
-                      {k.balanceMetal.toFixed(3)}g
+                {karagirs.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="py-8 text-center text-slate-400">
+                      No karagir artisan records found.
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  karagirs.map((k, idx) => (
+                    <tr key={idx} className="hover:bg-white/[0.02]">
+                      <td className="py-3 px-4 font-bold text-amber-400">{k.id}</td>
+                      <td className="py-3 px-4 text-white font-medium">{k.name}</td>
+                      <td className="py-3 px-4 text-slate-400">{k.speciality}</td>
+                      <td className="py-3 px-4 text-right text-slate-200">{Number(k.metalIssued || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-right text-emerald-300 font-bold">{Number(k.metalReturned || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-right text-slate-400">{Number(k.meltingScrap || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-right font-bold text-amber-400 text-sm">
+                        {Number(k.balanceMetal || 0).toFixed(3)}g
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -290,20 +314,28 @@ export default function ReportsView() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {refineryBatches.map((b, idx) => (
-                  <tr key={idx} className="hover:bg-white/[0.02]">
-                    <td className="py-3 px-4 font-bold text-gold-400">{b.id}</td>
-                    <td className="py-3 px-4 text-slate-400">{b.date}</td>
-                    <td className="py-3 px-4 text-white font-medium">{b.refineryName}</td>
-                    <td className="py-3 px-4 text-right text-slate-200">{b.sentWeightGross.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-right text-slate-200">{b.postMeltWeight.toFixed(3)}g</td>
-                    <td className="py-3 px-4 text-right text-rose-400">{b.wastagePercentage}%</td>
-                    <td className="py-3 px-4 text-right font-bold text-emerald-400 text-sm">
-                      {b.fineGoldRecovered.toFixed(3)}g
+                {refineryBatches.length === 0 ? (
+                  <tr>
+                    <td colSpan="8" className="py-8 text-center text-slate-400">
+                      No refinery melting batches recorded.
                     </td>
-                    <td className="py-3 px-4 text-slate-300">{b.status}</td>
                   </tr>
-                ))}
+                ) : (
+                  refineryBatches.map((b, idx) => (
+                    <tr key={idx} className="hover:bg-white/[0.02]">
+                      <td className="py-3 px-4 font-bold text-gold-400">{b.id}</td>
+                      <td className="py-3 px-4 text-slate-400">{b.date}</td>
+                      <td className="py-3 px-4 text-white font-medium">{b.refineryName}</td>
+                      <td className="py-3 px-4 text-right text-slate-200">{Number(b.sentWeightGross || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-right text-slate-200">{Number(b.postMeltWeight || 0).toFixed(3)}g</td>
+                      <td className="py-3 px-4 text-right text-rose-400">{b.wastagePercentage}%</td>
+                      <td className="py-3 px-4 text-right font-bold text-emerald-400 text-sm">
+                        {Number(b.fineGoldRecovered || 0).toFixed(3)}g
+                      </td>
+                      <td className="py-3 px-4 text-slate-300">{b.status}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

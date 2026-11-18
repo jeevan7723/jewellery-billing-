@@ -202,26 +202,28 @@ export default function BarcodeBillingView() {
           </div>
 
           {/* Quick-Scan Buttons to Test */}
-          <div>
-            <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-2">
-              Click any sample tag to test:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {inventory.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => handleScan(item.barcode)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer border ${
-                    matchedItem?.barcode === item.barcode
-                      ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-inner font-bold'
-                      : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/20'
-                  }`}
-                >
-                  🏷️ {item.barcode} ({item.karat})
-                </button>
-              ))}
+          {inventory.length > 0 && (
+            <div>
+              <span className="text-xs font-mono uppercase tracking-wider text-slate-400 block mb-2">
+                Available In-Stock Tags:
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {inventory.map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => handleScan(item.barcode)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono transition-all cursor-pointer border ${
+                      matchedItem?.barcode === item.barcode
+                        ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-inner font-bold'
+                        : 'bg-white/5 text-slate-400 border-white/5 hover:border-white/20'
+                    }`}
+                  >
+                    🏷️ {item.barcode} ({item.karat})
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Customer Info */}
           <div className="pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-4">

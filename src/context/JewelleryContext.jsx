@@ -32,190 +32,15 @@ export const INITIAL_SHOWROOM = {
   hsnCode: "7113",
 };
 
-export const INITIAL_INVENTORY = [
-  {
-    id: "KC-INV-101",
-    barcode: "KC892101",
-    name: "Royal Heritage Floral Kada (22K)",
-    category: "Bangles & Kadas",
-    metal: "Gold",
-    karat: "22K",
-    purity: 0.916,
-    grossWeight: 24.850,
-    stoneWeight: 0.650,
-    netWeight: 24.200,
-    makingChargeType: "perGram",
-    makingChargeRate: 520,
-    hallmarkNo: "HUID-9924-MH",
-    quantity: 1,
-    status: "In Vault Showcase"
-  },
-  {
-    id: "KC-INV-102",
-    barcode: "KC892102",
-    name: "Temple Goddess Lakshmi Necklace (22K)",
-    category: "Necklaces",
-    metal: "Gold",
-    karat: "22K",
-    purity: 0.916,
-    grossWeight: 42.180,
-    stoneWeight: 2.100,
-    netWeight: 40.080,
-    makingChargeType: "percentage",
-    makingChargeRate: 14,
-    hallmarkNo: "HUID-8831-MH",
-    quantity: 1,
-    status: "In Vault Showcase"
-  },
-  {
-    id: "KC-INV-103",
-    barcode: "KC892103",
-    name: "Classic Solitaire Diamond Ring (18K)",
-    category: "Rings",
-    metal: "Gold",
-    karat: "18K",
-    purity: 0.750,
-    grossWeight: 4.520,
-    stoneWeight: 0.420,
-    netWeight: 4.100,
-    makingChargeType: "perGram",
-    makingChargeRate: 750,
-    hallmarkNo: "HUID-1249-MH",
-    quantity: 3,
-    status: "In Counter Tray 04"
-  },
-  {
-    id: "KC-INV-104",
-    barcode: "KC892104",
-    name: "999 Fine Bullion Investment Bar (24K)",
-    category: "Bullion",
-    metal: "Gold",
-    karat: "24K",
-    purity: 0.999,
-    grossWeight: 10.000,
-    stoneWeight: 0.000,
-    netWeight: 10.000,
-    makingChargeType: "perGram",
-    makingChargeRate: 150,
-    hallmarkNo: "MMTC-24K-881",
-    quantity: 8,
-    status: "Vault Locker #01"
-  },
-  {
-    id: "KC-INV-105",
-    barcode: "KC892105",
-    name: "Antique Handcrafted Silver Puja Thali Set (925)",
-    category: "Silver Articles",
-    metal: "Silver",
-    karat: "925",
-    purity: 0.925,
-    grossWeight: 345.500,
-    stoneWeight: 0.000,
-    netWeight: 345.500,
-    makingChargeType: "perGram",
-    makingChargeRate: 18,
-    hallmarkNo: "BIS-SIL-442",
-    quantity: 2,
-    status: "Silver Gallery"
-  }
-];
+export const INITIAL_INVENTORY = [];
+export const INITIAL_KARAGIRS = [];
+export const INITIAL_REFINERY_BATCHES = [];
+export const INITIAL_INVOICES = [];
 
-export const INITIAL_KARAGIRS = [
-  {
-    id: "KAR-01",
-    name: "Rameshwar Sutar (Senior Artisan)",
-    speciality: "Kadas & Heavy Handcraft",
-    phone: "+91 98210 55432",
-    address: "Workshop Lane 3, Zaveri Bazaar",
-    metalIssued: 150.000,
-    metalReturned: 112.450,
-    meltingScrap: 1.250,
-    balanceMetal: 36.300,
-    activeOrders: 2
-  },
-  {
-    id: "KAR-02",
-    name: "Babulal Goldsmith",
-    speciality: "Filigree & Lightweight Chains",
-    phone: "+91 98450 11982",
-    address: "Goldsmith Hub, Kalbadevi",
-    metalIssued: 85.000,
-    metalReturned: 72.800,
-    meltingScrap: 0.850,
-    balanceMetal: 11.350,
-    activeOrders: 1
-  },
-  {
-    id: "KAR-03",
-    name: "Dilipkumar Patwa",
-    speciality: "Stone Setting & Polishing",
-    phone: "+91 97654 33210",
-    address: "Diamond District, Opera House",
-    metalIssued: 40.000,
-    metalReturned: 39.800,
-    meltingScrap: 0.200,
-    balanceMetal: 0.000,
-    activeOrders: 0
-  }
-];
-
-export const INITIAL_REFINERY_BATCHES = [
-  {
-    id: "REF-2026-081",
-    date: "14-Nov-2026",
-    refineryName: "Sovereign Bullion Assay & Refinery",
-    metalType: "Old Ornaments Melt (Gold)",
-    sentWeightGross: 245.500,
-    assayedPurityTested: "84.2% (approx 20.2K)",
-    postMeltWeight: 241.100,
-    wastageDrossWeight: 4.400,
-    wastagePercentage: 1.79,
-    fineGoldRecovered: 203.006,
-    status: "Completed & Bullion Received"
-  },
-  {
-    id: "REF-2026-082",
-    date: "16-Nov-2026",
-    refineryName: "Apex Assay Laboratories",
-    metalType: "Workshop Scrap & Floor Sweepings",
-    sentWeightGross: 82.200,
-    assayedPurityTested: "Testing In Progress",
-    postMeltWeight: 80.500,
-    wastageDrossWeight: 1.700,
-    wastagePercentage: 2.06,
-    fineGoldRecovered: 64.400,
-    status: "In Furnace"
-  }
-];
-
-export const INITIAL_INVOICES = [
-  {
-    invoiceNo: "KC-INV-9921",
-    date: "16-Nov-2026",
-    customerName: "Mrs. Ananya Kulkarni",
-    phone: "+91 98200 44321",
-    items: [
-      { name: "Royal Heritage Floral Kada (22K)", netWeight: 24.200, rate: 6806, makingCharges: 12584, total: 177289 }
-    ],
-    subtotal: 177289,
-    gst3Percent: 5319,
-    grandTotal: 182608,
-    paymentMode: "NEFT / RTGS"
-  },
-  {
-    invoiceNo: "KC-INV-9920",
-    date: "15-Nov-2026",
-    customerName: "Dr. Vikram Singhania",
-    phone: "+91 98199 88776",
-    items: [
-      { name: "999 Fine Bullion Investment Bar (24K)", netWeight: 10.000, rate: 7425, makingCharges: 1500, total: 75750 }
-    ],
-    subtotal: 75750,
-    gst3Percent: 2273,
-    grandTotal: 78023,
-    paymentMode: "Credit Card"
-  }
-];
+export const DEMO_INVENTORY_IDS = ['KC-INV-101', 'KC-INV-102', 'KC-INV-103', 'KC-INV-104', 'KC-INV-105'];
+export const DEMO_KARAGIR_IDS = ['KAR-01', 'KAR-02', 'KAR-03'];
+export const DEMO_REFINERY_IDS = ['REF-2026-081', 'REF-2026-082'];
+export const DEMO_INVOICE_NOS = ['KC-INV-9921', 'KC-INV-9920'];
 
 // Helper to remove undefined fields and ensure Firestore compatibility
 function sanitizeForFirestore(data) {
@@ -244,23 +69,59 @@ export function JewelleryProvider({ children }) {
   });
 
   const [inventory, setInventory] = useState(() => {
-    const saved = localStorage.getItem('kc_inventory');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('kc_inventory');
+      const items = saved ? JSON.parse(saved) : [];
+      const clean = items.filter(i => !DEMO_INVENTORY_IDS.includes(i.id));
+      if (clean.length !== items.length) {
+        localStorage.setItem('kc_inventory', JSON.stringify(clean));
+      }
+      return clean;
+    } catch (e) {
+      return [];
+    }
   });
 
   const [karagirs, setKaragirs] = useState(() => {
-    const saved = localStorage.getItem('kc_karagirs');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('kc_karagirs');
+      const items = saved ? JSON.parse(saved) : [];
+      const clean = items.filter(k => !DEMO_KARAGIR_IDS.includes(k.id));
+      if (clean.length !== items.length) {
+        localStorage.setItem('kc_karagirs', JSON.stringify(clean));
+      }
+      return clean;
+    } catch (e) {
+      return [];
+    }
   });
 
   const [refineryBatches, setRefineryBatches] = useState(() => {
-    const saved = localStorage.getItem('kc_refinery');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('kc_refinery');
+      const items = saved ? JSON.parse(saved) : [];
+      const clean = items.filter(b => !DEMO_REFINERY_IDS.includes(b.id));
+      if (clean.length !== items.length) {
+        localStorage.setItem('kc_refinery', JSON.stringify(clean));
+      }
+      return clean;
+    } catch (e) {
+      return [];
+    }
   });
 
   const [invoices, setInvoices] = useState(() => {
-    const saved = localStorage.getItem('kc_invoices');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('kc_invoices');
+      const items = saved ? JSON.parse(saved) : [];
+      const clean = items.filter(i => !DEMO_INVOICE_NOS.includes(i.invoiceNo));
+      if (clean.length !== items.length) {
+        localStorage.setItem('kc_invoices', JSON.stringify(clean));
+      }
+      return clean;
+    } catch (e) {
+      return [];
+    }
   });
 
   // Cloud status state
@@ -410,11 +271,19 @@ export function JewelleryProvider({ children }) {
       (err) => handleSyncError(err, 'showroom')
     );
 
+    // Purge demo records from Firestore if they were previously pushed
+    DEMO_INVENTORY_IDS.forEach(id => deleteDoc(doc(db, 'inventory', id)).catch(() => {}));
+    DEMO_KARAGIR_IDS.forEach(id => deleteDoc(doc(db, 'karagirs', id)).catch(() => {}));
+    DEMO_REFINERY_IDS.forEach(id => deleteDoc(doc(db, 'refinery', id)).catch(() => {}));
+    DEMO_INVOICE_NOS.forEach(invNo => deleteDoc(doc(db, 'invoices', invNo)).catch(() => {}));
+
     // 3. Inventory Listener - Live sync with Cloud Firestore
     const unsubInventory = onSnapshot(
       collection(db, 'inventory'),
       (snapshot) => {
-        const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        const items = snapshot.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(i => !DEMO_INVENTORY_IDS.includes(i.id));
         setInventory(items);
         localStorage.setItem('kc_inventory', JSON.stringify(items));
         handleSuccessSync('Inventory updated');
@@ -426,7 +295,9 @@ export function JewelleryProvider({ children }) {
     const unsubKaragirs = onSnapshot(
       collection(db, 'karagirs'),
       (snapshot) => {
-        const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        const items = snapshot.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(k => !DEMO_KARAGIR_IDS.includes(k.id));
         setKaragirs(items);
         localStorage.setItem('kc_karagirs', JSON.stringify(items));
         handleSuccessSync('Karagir ledger updated');
@@ -438,7 +309,9 @@ export function JewelleryProvider({ children }) {
     const unsubRefinery = onSnapshot(
       collection(db, 'refinery'),
       (snapshot) => {
-        const items = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        const items = snapshot.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .filter(b => !DEMO_REFINERY_IDS.includes(b.id));
         setRefineryBatches(items);
         localStorage.setItem('kc_refinery', JSON.stringify(items));
         handleSuccessSync('Refinery batches updated');
@@ -450,10 +323,12 @@ export function JewelleryProvider({ children }) {
     const unsubInvoices = onSnapshot(
       collection(db, 'invoices'),
       (snapshot) => {
-        const items = snapshot.docs.map(d => ({
-          ...d.data(),
-          invoiceNo: d.data().invoiceNo || d.id
-        }));
+        const items = snapshot.docs
+          .map(d => ({
+            ...d.data(),
+            invoiceNo: d.data().invoiceNo || d.id
+          }))
+          .filter(i => !DEMO_INVOICE_NOS.includes(i.invoiceNo));
         setInvoices(items);
         localStorage.setItem('kc_invoices', JSON.stringify(items));
         handleSuccessSync('Invoices updated');

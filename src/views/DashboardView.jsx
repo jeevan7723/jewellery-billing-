@@ -238,35 +238,43 @@ export default function DashboardView({ onNavigate }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
-              {invoices.map((inv, idx) => (
-                <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3 px-3 font-bold text-gold-300">{inv.invoiceNo}</td>
-                  <td className="py-3 px-3 text-slate-400">{inv.date}</td>
-                  <td className="py-3 px-3 text-white font-medium">{inv.customerName}</td>
-                  <td className="py-3 px-3 text-slate-300">
-                    {inv.items.map(i => i.name).join(', ')}
-                  </td>
-                  <td className="py-3 px-3 text-right font-bold text-slate-200">
-                    {inv.items.reduce((s, i) => s + (i.netWeight || 0), 0).toFixed(3)}g
-                  </td>
-                  <td className="py-3 px-3 text-right font-serif font-bold text-white text-sm">
-                    ₹{inv.grandTotal.toLocaleString('en-IN')}
-                  </td>
-                  <td className="py-3 px-3 text-center">
-                    <button 
-                      type="button"
-                      onClick={() => {
-                        setSelectedInvoice(inv);
-                        setShowPrintModal(true);
-                      }}
-                      className="p-1.5 rounded-lg glass-pill text-gold-400 hover:text-white hover:border-gold-500/40 cursor-pointer"
-                      title="Print Tax Invoice"
-                    >
-                      <Printer className="w-3.5 h-3.5" />
-                    </button>
+              {invoices.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="py-8 text-center text-slate-400">
+                    No bills generated yet. Create a bill from the billing counter to see it here.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                invoices.map((inv, idx) => (
+                  <tr key={idx} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 px-3 font-bold text-gold-300">{inv.invoiceNo}</td>
+                    <td className="py-3 px-3 text-slate-400">{inv.date}</td>
+                    <td className="py-3 px-3 text-white font-medium">{inv.customerName}</td>
+                    <td className="py-3 px-3 text-slate-300">
+                      {inv.items?.map(i => i.name).join(', ') || 'Jewellery Article'}
+                    </td>
+                    <td className="py-3 px-3 text-right font-bold text-slate-200">
+                      {inv.items?.reduce((s, i) => s + (i.netWeight || 0), 0).toFixed(3)}g
+                    </td>
+                    <td className="py-3 px-3 text-right font-serif font-bold text-white text-sm">
+                      ₹{Number(inv.grandTotal || 0).toLocaleString('en-IN')}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      <button 
+                        type="button"
+                        onClick={() => {
+                          setSelectedInvoice(inv);
+                          setShowPrintModal(true);
+                        }}
+                        className="p-1.5 rounded-lg glass-pill text-gold-400 hover:text-white hover:border-gold-500/40 cursor-pointer"
+                        title="Print Tax Invoice"
+                      >
+                        <Printer className="w-3.5 h-3.5" />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
