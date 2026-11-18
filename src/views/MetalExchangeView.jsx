@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useJewellery } from '../context/JewelleryContext';
 import { 
   RefreshCw, Scale, ArrowRightLeft, 
-  Printer, CheckCircle2, Sparkles, Coins, FileText 
+  Printer, CheckCircle2, Sparkles, Coins, FileText,
+  Boxes, PackageCheck
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import PrintModal from '../components/print/PrintModal';
@@ -30,7 +31,7 @@ const METAL_PURITY_OPTIONS = {
 };
 
 export default function MetalExchangeView() {
-  const { rates: contextRates, showroom: contextShowroom } = useJewellery();
+  const { rates: contextRates, showroom: contextShowroom, inventory = [] } = useJewellery();
 
   const rates = {
     gold24k: 7425,
@@ -68,6 +69,7 @@ export default function MetalExchangeView() {
   const [inwardMeltingLossPercent, setInwardMeltingLossPercent] = useState(1.5); // %
 
   // Outward Metal State
+  const [selectedStockId, setSelectedStockId] = useState('');
   const [outwardMetal, setOutwardMetal] = useState('Gold');
   const [outwardPurityIndex, setOutwardPurityIndex] = useState(1); // 22K default
   const [outwardDescription, setOutwardDescription] = useState('New 22K Bridal Necklace');
@@ -78,6 +80,7 @@ export default function MetalExchangeView() {
   // Switch conversion modes helper
   const handleModeSwitch = (mode) => {
     setExchangeMode(mode);
+    setSelectedStockId('');
     if (mode === 'gold-to-gold') {
       setInwardMetal('Gold');
       setInwardPurityIndex(1); // 22K
@@ -121,6 +124,55 @@ export default function MetalExchangeView() {
     }
   };
 
+  // Helper to match stock item karat / purity to METAL_PURITY_OPTIONS
+  const findPurityIndex = (metal, karat, purity) => {
+    const list = METAL_PURITY_OPTIONS[metal] || METAL_PURITY_OPTIONS.Gold;
+    if (!karat && !purity) return 0;
+    
+    const cleanKarat = String(karat || '').trim().toLowerCase();
+    let idx = list.findIndex(opt => opt.karat.toLowerCase() === cleanKarat);
+    if (idx !== -1) return idx;
+
+    idx = list.findIndex(opt => opt.label.toLowerCase().includes(cleanKarat));
+    if (idx !== -1) return idx;
+
+    if (purity) {
+      const numPurity = Number(purity) > 1 ? Number(purity) / 100 : Number(purity);
+      idx = list.findIndex(opt => Math.abs(opt.ratio - numPurity) < 0.02);
+      if (idx !== -1) return idx;
+    }
+
+    return 0;
+  };
+
+  // Handler when selecting an item from Showroom Stock dropdown
+  const handlePickStockItem = (itemId) => {
+    setSelectedStockId(itemId);
+    if (!itemId) return; // User chose custom / manual piece
+
+    const item = inventory.find(i => i.id === itemId);
+    if (!item) return;
+
+    // 1. Outward Metal
+    const targetMetal = item.metal === 'Silver' ? 'Silver' : item.metal === 'Platinum' ? 'Platinum' : 'Gold';
+    setOutwardMetal(targetMetal);
+
+    // 2. Karat Index
+    const purityIdx = findPurityIndex(targetMetal, item.karat, item.purity);
+    setOutwardPurityIndex(purityIdx);
+
+    // 3. Name / Description
+    setOutwardDescription(item.name || 'Showroom Stock Jewellery');
+
+    // 4. Weight
+    const wt = parseFloat(item.grossWeight || item.netWeight) || 0;
+    if (wt > 0) setOutwardGrossWeight(wt);
+
+    // 5. Making rate
+    const makingRate = parseFloat(item.makingChargeRate) || 0;
+    if (makingRate > 0) setOutwardMakingRate(makingRate);
+  };
+
   // Metal Rates
   const getRate = (metalType) => {
     if (metalType === 'Gold') return Number(rates?.gold24k || 7425);
@@ -150,6 +202,15 @@ export default function MetalExchangeView() {
   const outwardMetalValue = outwardFinePureRequired * outwardUnitRate;
   const outwardMakingCharges = safeOutwardGross * safeOutwardMakingRate;
   const outwardTotalPayable = outwardMetalValue + outwardMakingCharges;
+
+  // Selected Stock Item details & grouped inventory
+  const selectedItemDetails = inventory.find(i => i.id === selectedStockId);
+  const matchingStock = inventory.filter(item => 
+    (item.metal || 'Gold').toLowerCase() === outwardMetal.toLowerCase()
+  );
+  const otherStock = inventory.filter(item => 
+    (item.metal || 'Gold').toLowerCase() !== outwardMetal.toLowerCase()
+  );
 
   // Balance calculation
   const cashBalanceDifference = inwardValuation - outwardTotalPayable;
@@ -377,6 +438,83 @@ export default function MetalExchangeView() {
               </span>
             </div>
 
+            {/* 1-Click Pick Item from Showroom Stock Dropdown */}
+            <div className="p-3.5 rounded-xl bg-obsidian-950/70 border border-emerald-500/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <label htmlFor="stock-item-picker" className="text-[11px] font-mono text-emerald-400 uppercase font-bold flex items-center gap-1.5">
+                  <Boxes className="w-3.5 h-3.5" />
+                  <span>Pick Item from Stock</span>
+                </label>
+                {selectedStockId && (
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStockId('')}
+                    className="text-[10px] font-mono text-slate-400 hover:text-amber-400 cursor-pointer underline flex items-center gap-1"
+                  >
+                    Custom Piece
+                  </button>
+                )}
+              </div>
+
+              <select 
+                id="stock-item-picker"
+                value={selectedStockId}
+                onChange={(e) => handlePickStockItem(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl glass-input text-xs font-semibold cursor-pointer border-emerald-500/30 focus:border-emerald-400"
+              >
+                <option value="" className="bg-obsidian-900 text-slate-300">
+                  {inventory && inventory.length > 0 
+                    ? `-- Select Showroom Stock Item (${inventory.length} items available) --` 
+                    : '-- No Stock Items in Vault (Manual Entry) --'}
+                </option>
+
+                {matchingStock.length > 0 && (
+                  <optgroup label={`✨ Available ${outwardMetal} Stock (${matchingStock.length})`} className="bg-obsidian-900 font-bold text-emerald-400">
+                    {matchingStock.map((item) => (
+                      <option key={item.id} value={item.id} className="bg-obsidian-900 text-slate-100 font-mono">
+                        {item.name} • {item.grossWeight || item.netWeight}g • {item.karat || ''} • ₹{item.makingChargeRate || 0}/g making [{item.barcode || item.id}]
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+
+                {otherStock.length > 0 && (
+                  <optgroup label={`📦 Other Metals Stock (${otherStock.length})`} className="bg-obsidian-900 font-bold text-slate-400">
+                    {otherStock.map((item) => (
+                      <option key={item.id} value={item.id} className="bg-obsidian-900 text-slate-300 font-mono">
+                        [{item.metal}] {item.name} • {item.grossWeight || item.netWeight}g • [{item.barcode || item.id}]
+                      </option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+
+              {selectedItemDetails ? (
+                <div className="flex flex-wrap items-center gap-1.5 pt-1 text-[10px] font-mono">
+                  <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1 font-bold">
+                    <CheckCircle2 className="w-3 h-3" /> Vault Stock Linked
+                  </span>
+                  <span className="px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
+                    Tag: <strong>{selectedItemDetails.barcode}</strong>
+                  </span>
+                  {selectedItemDetails.hallmarkNo && (
+                    <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                      HUID: <strong>{selectedItemDetails.hallmarkNo}</strong>
+                    </span>
+                  )}
+                  {selectedItemDetails.category && (
+                    <span className="px-2 py-0.5 rounded bg-white/5 text-slate-400">
+                      {selectedItemDetails.category}
+                    </span>
+                  )}
+                </div>
+              ) : (
+                <p className="text-[10px] font-mono text-slate-400">
+                  Select an ornament from your inventory to auto-populate weight, karat, and making rate, or type custom values below.
+                </p>
+              )}
+            </div>
+
             {/* Outward Metal & Karat */}
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -560,7 +698,7 @@ export default function MetalExchangeView() {
             inwardValuation: Math.round(inwardValuation || 0),
             outwardMetal,
             outwardKarat: outwardPurityObj?.karat || '22K',
-            outwardDescription,
+            outwardDescription: selectedItemDetails ? `${outwardDescription} [SKU: ${selectedItemDetails.barcode}]` : outwardDescription,
             outwardGrossWeight: safeOutwardGross,
             outwardMakingCharges: Math.round(outwardMakingCharges || 0),
             outwardValuation: Math.round(outwardTotalPayable || 0),
