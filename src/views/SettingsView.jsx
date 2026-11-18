@@ -207,28 +207,54 @@ export default function SettingsView() {
               Showroom owner option to set the default percentage (%) for making charges on new jewellery bills and valuations.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-              <div className="relative flex-1 max-w-xs">
-                <input 
-                  id="making-charge-percent"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.1"
-                  required
-                  value={makingChargePercent}
-                  onChange={(e) => setMakingChargePercent(e.target.value)}
-                  className="w-full pl-3.5 pr-10 py-2.5 rounded-xl glass-input text-sm font-mono font-bold text-gold-200"
-                  placeholder="5.0"
-                />
-                <span className="absolute right-3.5 top-2.5 text-gold-400 font-mono font-bold text-sm">%</span>
+            <div className="space-y-3 pt-1">
+              {/* Stepper + Spacious Input Row */}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMakingChargePercent(prev => Math.max(0, +(parseFloat(prev || 0) - 0.5).toFixed(1)))}
+                  className="w-10 h-10 rounded-xl bg-obsidian-900 hover:bg-gold-500/20 text-gold-400 font-bold text-lg flex items-center justify-center border border-white/10 hover:border-gold-500/40 cursor-pointer active:scale-95 transition select-none"
+                  title="Decrease by 0.5%"
+                >
+                  −
+                </button>
+
+                <div className="relative w-36 sm:w-44">
+                  <input 
+                    id="making-charge-percent"
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.1"
+                    required
+                    value={makingChargePercent}
+                    onChange={(e) => setMakingChargePercent(e.target.value)}
+                    className="w-full pl-4 pr-10 py-2.5 rounded-xl glass-input text-base sm:text-lg font-mono font-extrabold text-gold-300 text-center tracking-wider"
+                    placeholder="5.0"
+                  />
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gold-400 font-mono font-bold text-sm pointer-events-none select-none">
+                    %
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setMakingChargePercent(prev => Math.min(100, +(parseFloat(prev || 0) + 0.5).toFixed(1)))}
+                  className="w-10 h-10 rounded-xl bg-obsidian-900 hover:bg-gold-500/20 text-gold-400 font-bold text-lg flex items-center justify-center border border-white/10 hover:border-gold-500/40 cursor-pointer active:scale-95 transition select-none"
+                  title="Increase by 0.5%"
+                >
+                  +
+                </button>
               </div>
 
               {/* Quick Presets for Showroom Owner */}
-              <div className="flex items-center gap-1.5 flex-wrap">
+              <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                <span className="text-[10px] font-mono text-slate-400 uppercase font-bold mr-1">
+                  Presets:
+                </span>
                 {[
                   { label: '3%', val: 3 },
-                  { label: '5% (Standard)', val: 5 },
+                  { label: '5% (Standard Default)', val: 5 },
                   { label: '8%', val: 8 },
                   { label: '10%', val: 10 },
                   { label: '12%', val: 12 },
@@ -238,9 +264,9 @@ export default function SettingsView() {
                     key={preset.val}
                     type="button"
                     onClick={() => setMakingChargePercent(preset.val)}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer border ${
+                    className={`px-3 py-1.5 rounded-xl text-xs font-mono font-semibold transition-all cursor-pointer border ${
                       parseFloat(makingChargePercent) === preset.val
-                        ? 'bg-gold-500 text-obsidian-950 border-gold-400 font-bold shadow-sm'
+                        ? 'bg-gold-500 text-obsidian-950 border-gold-400 font-bold shadow-gold-glow'
                         : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10 hover:border-gold-500/30'
                     }`}
                   >

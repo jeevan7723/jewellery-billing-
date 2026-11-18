@@ -31,6 +31,17 @@
     color: #0F172A;
   }
 
+  /* Remove browser default stepper arrows on number inputs */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
   /* Laser sweep animation for barcode viewfinder */
 @keyframes laserSweep {
   0% {
