@@ -32,6 +32,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
     outwardKarat = '22K',
     outwardDescription = 'Jewellery Article',
     outwardGrossWeight = 0,
+    outwardRate = 0,
     outwardMakingCharges = 0,
     outwardValuation = 0,
     metalDifferenceGrams = null,
@@ -52,6 +53,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
   const safeInwardValuation = Number(inwardValuation) || 0;
 
   const safeOutwardGross = Number(outwardGrossWeight) || 0;
+  const safeOutwardRate = Number(outwardRate || inwardRate || 0);
   const safeOutwardMaking = Number(outwardMakingCharges) || 0;
   const safeOutwardValuation = Number(outwardValuation) || 0;
 
@@ -95,13 +97,19 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
       </div>
 
       {/* Customer Info & Mode Bar */}
-      <div className="flex justify-between items-center bg-slate-50 border border-slate-300 rounded p-3 mb-4 text-[11px]">
-        <div>
+      <div className="grid grid-cols-12 gap-3 bg-slate-50 border border-slate-300 rounded p-3 mb-4 text-[11px] items-center">
+        <div className="col-span-5">
           <span className="text-slate-500 uppercase text-[10px] font-mono block">Customer Particulars:</span>
           <span className="font-bold text-sm text-slate-900">{customerName}</span>
-          <span className="text-slate-600 ml-2 font-mono">({phone})</span>
+          {phone && phone !== '—' && <span className="text-slate-600 ml-2 font-mono">({phone})</span>}
         </div>
-        <div className="text-right">
+        <div className="col-span-4 text-center border-l border-slate-200">
+          <span className="text-slate-500 uppercase text-[10px] font-mono block">Gold Rate (Benchmark):</span>
+          <span className="font-bold font-mono text-xs text-amber-900">
+            ₹{(safeInwardRate || safeOutwardRate).toLocaleString('en-IN')} / g
+          </span>
+        </div>
+        <div className="col-span-3 text-right border-l border-slate-200">
           <span className="text-slate-500 uppercase text-[10px] font-mono block">Exchange Mode:</span>
           <span className="font-bold font-mono text-xs uppercase px-2 py-0.5 bg-purple-100 text-purple-900 rounded border border-purple-300">
             {exchangeMode.replace(/-/g, ' ')}
@@ -124,6 +132,12 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Metal & Purity Karat:</td>
                 <td className="py-1 text-right font-bold">{inwardMetal} ({inwardKarat})</td>
+              </tr>
+              <tr className="border-b border-slate-200">
+                <td className="py-1 text-slate-600">Gold Rate (₹/g):</td>
+                <td className="py-1 text-right font-bold text-amber-900">
+                  ₹{safeInwardRate.toLocaleString('en-IN')} / g
+                </td>
               </tr>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Scale Weight:</td>
@@ -173,6 +187,12 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Metal & Hallmark Karat:</td>
                 <td className="py-1 text-right font-bold">{outwardMetal} ({outwardKarat})</td>
+              </tr>
+              <tr className="border-b border-slate-200">
+                <td className="py-1 text-slate-600">Gold Rate (₹/g):</td>
+                <td className="py-1 text-right font-bold text-emerald-900">
+                  ₹{safeOutwardRate.toLocaleString('en-IN')} / g
+                </td>
               </tr>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Weight:</td>

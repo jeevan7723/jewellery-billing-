@@ -50,7 +50,9 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
                 <tr key={idx}>
                   <td className="py-1">
                     <div>{item.name}</div>
-                    <div className="text-[9px] text-gray-700">{item.karat || '22K 916'}</div>
+                    <div className="text-[9px] text-gray-700">
+                      {item.karat || '22K 916'} {item.rate ? `• Gold Rate: ₹${Number(item.rate).toLocaleString('en-IN')}/g` : ''}
+                    </div>
                   </td>
                   <td className="py-1 text-right font-bold">
                     {(item.netWeight || 0).toFixed(3)}g
@@ -190,7 +192,7 @@ export default function TaxInvoiceTemplate({ invoice, showroom, format = 'a4' })
               <th className="py-2 px-2.5 text-right">Gross Wt</th>
               <th className="py-2 px-2.5 text-right">Stone Wt</th>
               <th className="py-2 px-2.5 text-right">Net Wt</th>
-              <th className="py-2 px-2.5 text-right">Rate (₹/g)</th>
+              <th className="py-2 px-2.5 text-right">Gold Rate (₹/g)</th>
               <th className="py-2 px-2.5 text-right">Making (₹)</th>
               <th className="py-2 px-3 text-right">Total (₹)</th>
             </tr>
