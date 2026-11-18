@@ -14,8 +14,8 @@ export default function BarcodeBillingView() {
   const { rates, inventory, showroom, addInvoice, updateInventoryItem } = useJewellery();
   const [scannedCode, setScannedCode] = useState('');
   const [matchedItem, setMatchedItem] = useState(() => inventory[0] || null);
-  const [customerName, setCustomerName] = useState('Walk-in Customer');
-  const [phone, setPhone] = useState('+91 98000 00000');
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
 
   // Auto-select first item when inventory updates if nothing selected
   React.useEffect(() => {
@@ -229,6 +229,7 @@ export default function BarcodeBillingView() {
               <label className="block text-xs font-mono text-slate-400 mb-1">Customer Name</label>
               <input 
                 type="text"
+                placeholder="Walk-in Customer"
                 value={customerName}
                 onChange={(e) => setCustomerName(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl glass-input text-xs"
@@ -238,6 +239,7 @@ export default function BarcodeBillingView() {
               <label className="block text-xs font-mono text-slate-400 mb-1">Phone Number</label>
               <input 
                 type="text"
+                placeholder="+91..."
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"

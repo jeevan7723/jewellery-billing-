@@ -13,18 +13,18 @@ export default function RupeesBillingView() {
   const { rates, showroom, inventory, addInvoice, updateInventoryItem } = useJewellery();
 
   // Customer KYC
-  const [customerName, setCustomerName] = useState('Mrs. Sunita Verma');
-  const [phone, setPhone] = useState('+91 98200 99887');
-  const [city, setCity] = useState('Mumbai');
+  const [customerName, setCustomerName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [city, setCity] = useState('');
   const [paymentMode, setPaymentMode] = useState('Cash');
 
   // Item Line
   const [selectedInventoryId, setSelectedInventoryId] = useState('');
-  const [itemName, setItemName] = useState('Gold Floral Kada (22K 916)');
+  const [itemName, setItemName] = useState('');
   const [metal, setMetal] = useState('Gold');
   const [karat, setKarat] = useState('22K');
-  const [grossWeight, setGrossWeight] = useState(22.450);
-  const [stoneWeight, setStoneWeight] = useState(0.450);
+  const [grossWeight, setGrossWeight] = useState('');
+  const [stoneWeight, setStoneWeight] = useState('');
   const [ratePerGram, setRatePerGram] = useState(rates.gold22k);
   const [makingType, setMakingType] = useState('percentage'); // Default to given % from settings
   const [makingValue, setMakingValue] = useState(() => (rates.makingChargePercent ?? 5));
@@ -61,13 +61,19 @@ export default function RupeesBillingView() {
   const handleInventorySelect = (e) => {
     const id = e.target.value;
     setSelectedInventoryId(id);
+    if (!id) {
+      setItemName('');
+      setGrossWeight('');
+      setStoneWeight('');
+      return;
+    }
     const item = inventory.find(i => i.id === id);
     if (item) {
-      setItemName(item.name);
-      setMetal(item.metal);
-      setKarat(item.karat);
-      setGrossWeight(item.grossWeight);
-      setStoneWeight(item.stoneWeight);
+      setItemName(item.name || '');
+      setMetal(item.metal || 'Gold');
+      setKarat(item.karat || '22K');
+      setGrossWeight(item.grossWeight ?? '');
+      setStoneWeight(item.stoneWeight ?? '');
       if (item.makingChargeType === 'fixed' || item.makingChargeAmount !== undefined) {
         setMakingType('fixed');
         setMakingValue(item.makingChargeAmount ?? item.makingChargeRate ?? 0);
@@ -95,15 +101,20 @@ export default function RupeesBillingView() {
   };
 
   // Calculations
-  const netWeight = Math.max(0, grossWeight - stoneWeight);
-  const metalValue = netWeight * ratePerGram;
+  const numGross = parseFloat(grossWeight) || 0;
+  const numStone = parseFloat(stoneWeight) || 0;
+  const numRate = parseFloat(ratePerGram) || 0;
+  const netWeight = Math.max(0, numGross - numStone);
+  const metalValue = netWeight * numRate;
   const makingTotal = makingType === 'fixed'
     ? Number(makingValue || 0)
     : (makingType === 'perGram' 
         ? (netWeight * Number(makingValue || 0))
         : (metalValue * (Number(makingValue || 0) / 100)));
 
-  const taxableAmount = Math.max(0, metalValue + makingTotal + hallmarkFee - discount);
+  const hasItem = numGross > 0 || Boolean(itemName.trim());
+  const activeHallmark = hasItem ? Number(hallmarkFee || 0) : 0;
+  const taxableAmount = hasItem ? Math.max(0, metalValue + makingTotal + activeHallmark - Number(discount || 0)) : 0;
   const gstAmount = taxableAmount * 0.03; // 3% Jewellery GST
   const grandTotal = Math.round(taxableAmount + gstAmount);
 
@@ -117,22 +128,22 @@ export default function RupeesBillingView() {
       invoiceNo: `KC-BILL-${Math.floor(1000 + Math.random() * 9000)}`,
       date: new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }),
       customerName: customerName.trim() || 'Walk-in Customer',
-      phone: phone.trim() || '+91 00000 00000',
-      city: city.trim() || 'Mumbai',
+      phone: phone.trim() || '—',
+      city: city.trim() || '',
       paymentMode: paymentMode || 'Cash',
       items: [
         {
-          name: itemName || 'Jewellery Article',
+          name: itemName.trim() || 'Jewellery Article',
           karat: karat || '22K',
-          grossWeight: Number(grossWeight) || 0,
-          stoneWeight: Number(stoneWeight) || 0,
-          netWeight: Number(netWeight) || 0,
-          rate: Number(ratePerGram) || 0,
-          makingTotal: Number(makingTotal) || 0,
-          total: Math.round(Number(metalValue + makingTotal)) || 0
+          grossWeight: numGross,
+          stoneWeight: numStone,
+          netWeight: Number(netWeight.toFixed(3)),
+          rate: numRate,
+          makingTotal: Math.round(Number(makingTotal)),
+          total: Math.round(Number(metalValue + makingTotal))
         }
       ],
-      hallmarkFee: Number(hallmarkFee) || 0,
+      hallmarkFee: activeHallmark,
       discount: Number(discount) || 0,
       subtotal: cleanSubtotal,
       gst3Percent: cleanGst,
@@ -156,6 +167,15 @@ export default function RupeesBillingView() {
         status: `Sold (${newInv.invoiceNo})`
       });
     }
+
+    // Reset form for next transaction
+    setSelectedInventoryId('');
+    setItemName('');
+    setGrossWeight('');
+    setStoneWeight('');
+    setCustomerName('');
+    setPhone('');
+    setCity('');
   };
 
   return (
@@ -200,6 +220,7 @@ export default function RupeesBillingView() {
                 <input 
                   type="text"
                   required
+                  placeholder="Enter customer name..."
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-xs"
@@ -211,6 +232,7 @@ export default function RupeesBillingView() {
                 <input 
                   type="text"
                   required
+                  placeholder="+91..."
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"
@@ -221,6 +243,7 @@ export default function RupeesBillingView() {
                 <label className="block text-[11px] font-mono text-slate-400 mb-1">City</label>
                 <input 
                   type="text"
+                  placeholder="e.g. Mumbai"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-xs"
@@ -267,6 +290,7 @@ export default function RupeesBillingView() {
               <input 
                 type="text"
                 required
+                placeholder="Enter jewellery item name..."
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-semibold"
@@ -302,8 +326,9 @@ export default function RupeesBillingView() {
                 <input 
                   type="number"
                   step="0.001"
+                  placeholder="0.000"
                   value={grossWeight}
-                  onChange={(e) => setGrossWeight(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setGrossWeight(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-sm font-mono font-bold"
                 />
               </div>
@@ -313,8 +338,9 @@ export default function RupeesBillingView() {
                 <input 
                   type="number"
                   step="0.001"
+                  placeholder="0.000"
                   value={stoneWeight}
-                  onChange={(e) => setStoneWeight(parseFloat(e.target.value) || 0)}
+                  onChange={(e) => setStoneWeight(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl glass-input text-sm font-mono font-bold"
                 />
               </div>
@@ -337,7 +363,7 @@ export default function RupeesBillingView() {
               <input 
                 type="number"
                 value={ratePerGram}
-                onChange={(e) => setRatePerGram(parseFloat(e.target.value) || 0)}
+                onChange={(e) => setRatePerGram(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-sm font-mono font-bold"
               />
             </div>
@@ -502,8 +528,10 @@ export default function RupeesBillingView() {
             {/* Customer Box */}
             <div className="bg-obsidian-900/60 p-3 rounded-xl border border-white/5 mb-4 text-xs font-mono">
               <div className="text-slate-400 text-[10px] uppercase">Customer:</div>
-              <div className="text-white font-bold">{customerName || 'Walk-in Customer'}</div>
-              <div className="text-slate-400 text-[11px]">{phone} • {city}</div>
+              <div className="text-white font-bold">{customerName.trim() || 'Walk-in Customer'}</div>
+              <div className="text-slate-400 text-[11px]">
+                {(phone || city) ? [phone, city].filter(Boolean).join(' • ') : 'Walk-in / Counter Sale'}
+              </div>
             </div>
 
             {/* Itemized Calculation */}
@@ -515,9 +543,9 @@ export default function RupeesBillingView() {
               
               <div className="flex justify-between text-slate-300">
                 <div>
-                  <div className="text-white font-medium">{itemName}</div>
+                  <div className="text-white font-medium">{itemName.trim() || 'New Jewellery Item'}</div>
                   <div className="text-[10px] text-slate-400">
-                    Net: {netWeight.toFixed(3)}g @ ₹{ratePerGram}/g ({karat})
+                    Net: {netWeight.toFixed(3)}g @ ₹{numRate}/g ({karat})
                   </div>
                 </div>
                 <div className="text-right font-semibold">
