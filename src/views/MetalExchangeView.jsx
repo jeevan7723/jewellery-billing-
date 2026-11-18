@@ -78,7 +78,9 @@ export default function MetalExchangeView({ onNavigate }) {
   const [outwardPurityIndex, setOutwardPurityIndex] = useState(1); // 22K default
   const [outwardDescription, setOutwardDescription] = useState('');
   const [outwardGrossWeight, setOutwardGrossWeight] = useState(''); // g
-  const [userCustomMakingCharges, setUserCustomMakingCharges] = useState(null); // null = automatically as per stored % by owner
+  const [isCustomMaking, setIsCustomMaking] = useState(false);
+  const [customMakingInput, setCustomMakingInput] = useState('');
+  const [customRateLabel, setCustomRateLabel] = useState(null);
   const [showVoucherModal, setShowVoucherModal] = useState(false);
 
   // Persistence & Save States
@@ -90,7 +92,9 @@ export default function MetalExchangeView({ onNavigate }) {
   const handleModeSwitch = (mode) => {
     setExchangeMode(mode);
     setSelectedStockId('');
-    setUserCustomMakingCharges(null);
+    setIsCustomMaking(false);
+    setCustomMakingInput('');
+    setCustomRateLabel(null);
     setVoucherNo(`EXCH-${Math.floor(1000 + Math.random() * 9000)}`);
     setInwardDescription('');
     setOutwardDescription('');
@@ -145,7 +149,9 @@ export default function MetalExchangeView({ onNavigate }) {
   // Handler when selecting an item from Showroom Stock dropdown
   const handlePickStockItem = (itemId) => {
     setSelectedStockId(itemId);
-    setUserCustomMakingCharges(null);
+    setIsCustomMaking(false);
+    setCustomMakingInput('');
+    setCustomRateLabel(null);
     if (!itemId) {
       setOutwardDescription('');
       setOutwardGrossWeight('');
@@ -172,10 +178,16 @@ export default function MetalExchangeView({ onNavigate }) {
 
     // 5. Making charges if item explicitly specifies it
     if (item.makingChargeType === 'perGram' && item.makingChargeRate) {
-      setUserCustomMakingCharges(Math.round(wt * parseFloat(item.makingChargeRate)));
+      const charge = Math.round(wt * parseFloat(item.makingChargeRate));
+      setIsCustomMaking(true);
+      setCustomMakingInput(String(charge));
+      setCustomRateLabel(`₹${item.makingChargeRate}/g Stock Rate`);
     } else if (item.makingChargeType === 'percentage' && item.makingChargeRate) {
       const metalVal = (wt * (item.purity || 0.916)) * getRate(targetMetal);
-      setUserCustomMakingCharges(Math.round(metalVal * (parseFloat(item.makingChargeRate) / 100)));
+      const charge = Math.round(metalVal * (parseFloat(item.makingChargeRate) / 100));
+      setIsCustomMaking(true);
+      setCustomMakingInput(String(charge));
+      setCustomRateLabel(`${item.makingChargeRate}% Stock Rate`);
     }
   };
 
@@ -209,7 +221,9 @@ export default function MetalExchangeView({ onNavigate }) {
 
   // Making charges automatically calculated as per stored making charges by owner (e.g. 5%)
   const autoMakingCharges = safeOutwardGross > 0 ? Math.round(outwardMetalValue * (storedMakingPercent / 100)) : 0;
-  const outwardMakingCharges = userCustomMakingCharges !== null ? Number(userCustomMakingCharges) : autoMakingCharges;
+  const outwardMakingCharges = isCustomMaking 
+    ? (customMakingInput === '' ? 0 : (parseFloat(customMakingInput) || 0)) 
+    : autoMakingCharges;
   const safeOutwardMakingRate = safeOutwardGross > 0 ? (outwardMakingCharges / safeOutwardGross) : 0;
   const outwardTotalPayable = outwardMetalValue + outwardMakingCharges;
 
@@ -352,7 +366,9 @@ export default function MetalExchangeView({ onNavigate }) {
     setInwardMeltingLossPercent('');
     setOutwardDescription('');
     setOutwardGrossWeight('');
-    setUserCustomMakingCharges(null);
+    setIsCustomMaking(false);
+    setCustomMakingInput('');
+    setCustomRateLabel(null);
   };
 
   return (
@@ -758,29 +774,56 @@ export default function MetalExchangeView({ onNavigate }) {
                     type="number"
                     step="0.001"
                     value={outwardGrossWeight}
-                    onChange={(e) => {
-                      setOutwardGrossWeight(e.target.value);
-                      setUserCustomMakingCharges(null);
-                    }}
+                    onChange={(e) => setOutwardGrossWeight(e.target.value)}
                     placeholder="0.000"
                     className="w-full px-2.5 py-1.5 rounded-lg glass-input font-bold"
                   />
                 </div>
 
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-[10px] text-slate-400">Making Charges (₹)</label>
-                    <span className="text-[10px] text-emerald-400 font-mono">
-                      ({storedMakingPercent}% as per Settings)
-                    </span>
+                  <div className="flex items-center justify-between gap-1 mb-1.5 flex-wrap">
+                    <label className="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                      Making Charges (₹)
+                    </label>
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-[10px] text-emerald-400 font-mono font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20">
+                        {isCustomMaking 
+                          ? (customRateLabel || 'Custom') 
+                          : `${storedMakingPercent}% as per Settings`}
+                      </span>
+                      {isCustomMaking && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCustomMaking(false);
+                            setCustomMakingInput('');
+                            setCustomRateLabel(null);
+                          }}
+                          className="text-[9px] font-mono text-amber-300 hover:text-white px-1.5 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/30 cursor-pointer transition-colors"
+                          title="Reset to store default percentage calculation"
+                        >
+                          ↺ Auto ({storedMakingPercent}%)
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <input 
                     type="number"
-                    value={userCustomMakingCharges !== null ? userCustomMakingCharges : (autoMakingCharges > 0 ? autoMakingCharges : '')}
-                    onChange={(e) => setUserCustomMakingCharges(e.target.value === '' ? null : (parseFloat(e.target.value) || 0))}
+                    value={isCustomMaking ? customMakingInput : (autoMakingCharges > 0 ? autoMakingCharges : '')}
+                    onChange={(e) => {
+                      setIsCustomMaking(true);
+                      setCustomMakingInput(e.target.value);
+                      setCustomRateLabel(null);
+                    }}
                     placeholder="0"
-                    className="w-full px-2.5 py-1.5 rounded-lg glass-input text-emerald-300 font-bold"
+                    className="w-full px-2.5 py-1.5 rounded-lg glass-input text-emerald-300 font-bold focus:ring-1 focus:ring-emerald-400"
                   />
+                  {safeOutwardGross > 0 && outwardMakingCharges > 0 && (
+                    <div className="text-[9px] font-mono text-slate-500 mt-1 flex justify-between">
+                      <span>Rate: ₹{Math.round(outwardMakingCharges / safeOutwardGross)}/g</span>
+                      <span>{outwardMetalValue > 0 ? ((outwardMakingCharges / outwardMetalValue) * 100).toFixed(1) : storedMakingPercent}% of metal</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -792,7 +835,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 <span className="text-white font-bold">{Number(outwardFinePureRequired || 0).toFixed(3)}g</span>
               </div>
               <div className="flex justify-between text-slate-400">
-                <span>Making Charges ({storedMakingPercent}%):</span>
+                <span>Making Charges ({isCustomMaking ? (customRateLabel ? customRateLabel : 'Custom') : `${storedMakingPercent}%`}):</span>
                 <span className="text-emerald-300 font-semibold">₹{Math.round(outwardMakingCharges || 0).toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-emerald-300 font-bold border-t border-white/5 pt-1.5 text-sm">
