@@ -302,29 +302,68 @@ html.light .bg-white\/\[0\.02\] {
 
 /* Maintain light text on dark accent buttons & badges */
 html.light .keep-white,
-html.light .keep-white *,
-html.light [class*="bg-black"],
-html.light [class*="bg-black"] *,
-html.light [class*="bg-purple-950"],
-html.light [class*="bg-purple-950"] *,
-html.light [class*="bg-purple-900"],
-html.light [class*="bg-purple-900"] *,
-html.light [class*="bg-slate-900"],
-html.light [class*="bg-slate-900"] *,
-html.light [class*="bg-slate-950"],
-html.light [class*="bg-slate-950"] *,
-html.light [class*="bg-emerald-600"],
-html.light [class*="bg-emerald-600"] *,
-html.light [class*="bg-purple-600"],
-html.light [class*="bg-purple-600"] *,
-html.light [class*="bg-rose-600"],
-html.light [class*="bg-rose-600"] *,
-html.light [class*="bg-blue-600"],
-html.light [class*="bg-blue-600"] *,
-html.light [class*="bg-sky-600"],
-html.light [class*="bg-sky-600"] *,
-html.light [class*="bg-amber-600"],
-html.light [class*="bg-amber-600"] * {
+html.light .keep-white * {
+  color: #FFFFFF !important;
+}
+
+/* Specific solid buttons in light mode keep white text */
+html.light button.bg-emerald-600,
+html.light button.bg-purple-600,
+html.light button.bg-rose-600,
+html.light button.bg-blue-600,
+html.light button.bg-sky-600,
+html.light button.bg-amber-600 {
+  color: #FFFFFF !important;
+}
+
+/* ========================================================
+   PAPER DOCUMENT PREVIEW & PRINT ENGINE ISOLATION
+   Ensures invoices, barter slips, and reports ALWAYS render 
+   with sharp dark typography on paper in both Light & Dark modes.
+   ======================================================== */
+#printable-area {
+  color: #0F172A;
+}
+
+#printable-area td,
+#printable-area th,
+#printable-area p,
+#printable-area span,
+#printable-area div,
+#printable-area h1,
+#printable-area h2,
+#printable-area h3 {
+  color: inherit;
+}
+
+#printable-area .text-slate-900 { color: #0F172A !important; }
+#printable-area .text-slate-800 { color: #1E293B !important; }
+#printable-area .text-slate-700 { color: #334155 !important; }
+#printable-area .text-slate-600 { color: #475569 !important; }
+#printable-area .text-slate-500 { color: #64748B !important; }
+#printable-area .text-slate-400 { color: #94A3B8 !important; }
+
+#printable-area .text-amber-950 { color: #451A03 !important; }
+#printable-area .text-amber-900 { color: #78350F !important; }
+#printable-area .text-amber-800 { color: #92400E !important; }
+#printable-area .text-amber-700 { color: #B45309 !important; }
+
+#printable-area .text-rose-950  { color: #4C0519 !important; }
+#printable-area .text-rose-900  { color: #881337 !important; }
+#printable-area .text-rose-800  { color: #9F1239 !important; }
+#printable-area .text-rose-700  { color: #BE123C !important; }
+
+#printable-area .text-emerald-950 { color: #022C22 !important; }
+#printable-area .text-emerald-900 { color: #064E3B !important; }
+#printable-area .text-emerald-800 { color: #065F46 !important; }
+#printable-area .text-emerald-700 { color: #047857 !important; }
+
+#printable-area .text-purple-950  { color: #3B0764 !important; }
+#printable-area .text-purple-900  { color: #581C87 !important; }
+#printable-area .text-purple-800  { color: #6B21A8 !important; }
+
+#printable-area .keep-white,
+#printable-area .keep-white * {
   color: #FFFFFF !important;
 }
 

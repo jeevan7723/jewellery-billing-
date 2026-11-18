@@ -178,7 +178,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
             <tbody>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Metal & Purity Karat:</td>
-                <td className="py-1 text-right font-bold">{inwardMetal} ({inwardKarat})</td>
+                <td className="py-1 text-right font-bold text-slate-900">{inwardMetal} ({inwardKarat})</td>
               </tr>
               <tr className="border-b border-slate-200 bg-amber-50/70">
                 <td className="py-1.5 text-amber-950 font-bold">Purchased Gold Rate ({inwardKarat}):</td>
@@ -188,7 +188,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
               </tr>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Scale Weight:</td>
-                <td className="py-1 text-right font-medium">{safeInwardGross.toFixed(3)}g</td>
+                <td className="py-1 text-right font-medium text-slate-900">{safeInwardGross.toFixed(3)}g</td>
               </tr>
               <tr className="border-b border-slate-200 text-rose-700">
                 <td className="py-1">Less: Stones / Wax / Dirt:</td>
@@ -229,11 +229,11 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
             <tbody>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Article Description:</td>
-                <td className="py-1 text-right font-bold truncate max-w-[130px]">{outwardDescription}</td>
+                <td className="py-1 text-right font-bold truncate max-w-[130px] text-slate-900">{outwardDescription}</td>
               </tr>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Metal & Hallmark Karat:</td>
-                <td className="py-1 text-right font-bold">{outwardMetal} ({outwardKarat})</td>
+                <td className="py-1 text-right font-bold text-slate-900">{outwardMetal} ({outwardKarat})</td>
               </tr>
               <tr className="border-b border-slate-200 bg-emerald-50/70">
                 <td className="py-1.5 text-emerald-950 font-bold">Gold Rate ({outwardKarat}):</td>
@@ -243,7 +243,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
               </tr>
               <tr className="border-b border-slate-200">
                 <td className="py-1 text-slate-600">Gross Weight:</td>
-                <td className="py-1 text-right font-medium">{safeOutwardGross.toFixed(3)}g</td>
+                <td className="py-1 text-right font-medium text-slate-900">{safeOutwardGross.toFixed(3)}g</td>
               </tr>
               <tr className="border-b border-slate-200 font-bold bg-white/60">
                 <td className="py-1 text-slate-900">Net Metal Weight:</td>
@@ -251,11 +251,11 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
               </tr>
               <tr className="border-b border-slate-200 text-slate-600">
                 <td className="py-1">Making Charges:</td>
-                <td className="py-1 text-right font-medium">₹{safeOutwardMaking.toLocaleString('en-IN')}</td>
+                <td className="py-1 text-right font-medium text-slate-900">₹{safeOutwardMaking.toLocaleString('en-IN')}</td>
               </tr>
               <tr className="border-b border-slate-200 text-slate-600">
                 <td className="py-1">Hallmarking Fee (BIS):</td>
-                <td className="py-1 text-right font-medium">₹45.00</td>
+                <td className="py-1 text-right font-medium text-slate-900">₹45.00</td>
               </tr>
               <tr className="pt-2 text-slate-900">
                 <td className="py-1 font-bold">New Jewellery Valuation:</td>
