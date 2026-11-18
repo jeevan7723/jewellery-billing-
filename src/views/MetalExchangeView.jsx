@@ -454,7 +454,7 @@ export default function MetalExchangeView({ onNavigate }) {
 
       {/* SUCCESS CONFIRMATION BANNER */}
       {savedSuccessVoucher && (
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-obsidian-900 to-emerald-950/80 border border-emerald-500/50 shadow-glass-lg flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-3 duration-300">
+        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/40 shadow-glass-lg flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-3 duration-300">
           <div className="flex items-start gap-3">
             <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shrink-0">
               <CheckCircle2 className="w-5 h-5" />
@@ -646,18 +646,18 @@ export default function MetalExchangeView({ onNavigate }) {
             </div>
 
             {/* Inward Value Box */}
-            <div className="p-4 rounded-xl bg-gradient-to-br from-amber-500/10 to-obsidian-900 border border-amber-500/30 space-y-2 font-mono text-xs">
+            <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2.5 font-mono text-xs shadow-sm">
               <div className="flex justify-between text-slate-400">
                 <span>Net Weight after melting:</span>
                 <span className="text-white font-bold">{Number(inwardPostMeltWeight || 0).toFixed(3)}g</span>
               </div>
-              <div className="flex justify-between text-amber-300 font-bold border-t border-white/5 pt-1.5 text-sm">
+              <div className="flex justify-between text-amber-300 font-bold border-t border-amber-500/20 pt-2 text-sm">
                 <span>Pure Fine {inwardMetal} Weight:</span>
                 <span>{Number(inwardFinePureWeight || 0).toFixed(3)}g</span>
               </div>
-              <div className="flex justify-between text-slate-400 text-[11px] pt-1">
+              <div className="flex justify-between items-center text-slate-400 text-xs pt-2 border-t border-amber-500/20">
                 <span>Value at today's rate:</span>
-                <span className="text-white font-bold">₹{Math.round(inwardValuation || 0).toLocaleString('en-IN')}</span>
+                <span className="text-amber-300 font-extrabold text-sm">₹{Math.round(inwardValuation || 0).toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>
@@ -870,7 +870,7 @@ export default function MetalExchangeView({ onNavigate }) {
             </div>
 
             {/* Outward Total Box */}
-            <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500/10 to-obsidian-900 border border-emerald-500/30 space-y-2 font-mono text-xs">
+            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 space-y-2.5 font-mono text-xs shadow-sm">
               <div className="flex justify-between text-slate-400">
                 <span>Pure {outwardMetal} needed:</span>
                 <span className="text-white font-bold">{Number(outwardFinePureRequired || 0).toFixed(3)}g</span>
@@ -879,9 +879,9 @@ export default function MetalExchangeView({ onNavigate }) {
                 <span>Making Charges ({isCustomMaking ? (customRateLabel ? customRateLabel : 'Custom') : `${storedMakingPercent}%`}):</span>
                 <span className="text-emerald-300 font-semibold">₹{Math.round(outwardMakingCharges || 0).toLocaleString('en-IN')}</span>
               </div>
-              <div className="flex justify-between text-emerald-300 font-bold border-t border-white/5 pt-1.5 text-sm">
+              <div className="flex justify-between text-emerald-300 font-bold border-t border-emerald-500/20 pt-2 text-sm">
                 <span>Total Price of New Jewellery:</span>
-                <span>₹{Math.round(outwardTotalPayable || 0).toLocaleString('en-IN')}</span>
+                <span className="font-extrabold text-sm">₹{Math.round(outwardTotalPayable || 0).toLocaleString('en-IN')}</span>
               </div>
             </div>
           </div>
@@ -889,7 +889,7 @@ export default function MetalExchangeView({ onNavigate }) {
         </div>
 
         {/* BOTTOM: SIMPLE SETTLEMENT RESULT */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-obsidian-900 via-obsidian-850 to-obsidian-900 border border-purple-500/40 space-y-5">
+        <div className="p-6 sm:p-8 rounded-3xl bg-obsidian-900 border border-purple-500/40 space-y-5 shadow-glass">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-white/10">
             <div>
               <div className="flex items-center gap-2 mb-1">

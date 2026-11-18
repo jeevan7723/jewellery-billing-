@@ -333,6 +333,34 @@ html.light .gold-gradient-text {
   -webkit-text-fill-color: transparent !important;
 }
 
+/* Enhanced Amber/Emerald/Purple text contrast in Light mode */
+html.light .text-amber-300,
+html.light .text-amber-400 {
+  color: #B45309 !important;
+}
+html.light .text-emerald-300,
+html.light .text-emerald-400 {
+  color: #047857 !important;
+}
+html.light .text-purple-300,
+html.light .text-purple-400 {
+  color: #7E22CE !important;
+}
+
+/* Fix Tailwind gradient stop variables in Light mode for obsidian */
+html.light .to-obsidian-900,
+html.light .to-obsidian-950 {
+  --tw-gradient-to: rgba(255, 255, 255, 0.95) !important;
+}
+html.light .from-obsidian-900,
+html.light .from-obsidian-950 {
+  --tw-gradient-from: rgba(255, 255, 255, 0.95) !important;
+}
+html.light .via-obsidian-900,
+html.light .via-obsidian-850 {
+  --tw-gradient-stops: var(--tw-gradient-from), rgba(255, 255, 255, 0.95), var(--tw-gradient-to) !important;
+}
+
 /* ========================================================
    PRINT ENGINE STYLES (A4 Tax Invoice, Thermal POS, Tags, Reports)
    ======================================================== */
