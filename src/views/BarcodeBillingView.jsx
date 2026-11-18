@@ -46,7 +46,9 @@ export default function BarcodeBillingView() {
     if (!matchedItem) return;
     const rate = matchedItem.karat === '24K' ? rates.gold24k : (matchedItem.karat === '22K' ? rates.gold22k : rates.gold18k);
     const metalVal = matchedItem.netWeight * rate;
-    const making = matchedItem.makingChargeType === 'perGram' ? matchedItem.netWeight * matchedItem.makingChargeRate : metalVal * (matchedItem.makingChargeRate / 100);
+    const making = matchedItem.makingChargeType === 'fixed' || matchedItem.makingChargeAmount !== undefined
+      ? Number(matchedItem.makingChargeAmount ?? matchedItem.makingChargeRate ?? 0)
+      : (matchedItem.makingChargeType === 'perGram' ? matchedItem.netWeight * matchedItem.makingChargeRate : metalVal * (matchedItem.makingChargeRate / 100));
     const subtotal = Math.round(metalVal + making + 45);
     const gst = Math.round(subtotal * 0.03);
 

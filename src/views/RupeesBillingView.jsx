@@ -68,8 +68,13 @@ export default function RupeesBillingView() {
       setKarat(item.karat);
       setGrossWeight(item.grossWeight);
       setStoneWeight(item.stoneWeight);
-      setMakingType(item.makingChargeType);
-      setMakingValue(item.makingChargeRate);
+      if (item.makingChargeType === 'fixed' || item.makingChargeAmount !== undefined) {
+        setMakingType('fixed');
+        setMakingValue(item.makingChargeAmount ?? item.makingChargeRate ?? 0);
+      } else {
+        setMakingType(item.makingChargeType || 'percentage');
+        setMakingValue(item.makingChargeRate || rates.makingChargePercent || 5);
+      }
       if (item.karat === '24K') setRatePerGram(rates.gold24k);
       else if (item.karat === '22K') setRatePerGram(rates.gold22k);
       else if (item.karat === '18K') setRatePerGram(rates.gold18k);
@@ -92,9 +97,11 @@ export default function RupeesBillingView() {
   // Calculations
   const netWeight = Math.max(0, grossWeight - stoneWeight);
   const metalValue = netWeight * ratePerGram;
-  const makingTotal = makingType === 'perGram' 
-    ? (netWeight * makingValue)
-    : (metalValue * (makingValue / 100));
+  const makingTotal = makingType === 'fixed'
+    ? Number(makingValue || 0)
+    : (makingType === 'perGram' 
+        ? (netWeight * Number(makingValue || 0))
+        : (metalValue * (Number(makingValue || 0) / 100)));
 
   const taxableAmount = Math.max(0, metalValue + makingTotal + hallmarkFee - discount);
   const gstAmount = taxableAmount * 0.03; // 3% Jewellery GST

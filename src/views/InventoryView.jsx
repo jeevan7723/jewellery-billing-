@@ -22,8 +22,7 @@ export default function InventoryView() {
   const [karat, setKarat] = useState('22K');
   const [grossWeight, setGrossWeight] = useState(15.000);
   const [stoneWeight, setStoneWeight] = useState(0.500);
-  const [makingType, setMakingType] = useState('perGram');
-  const [makingRate, setMakingRate] = useState(500);
+  const [makingAmount, setMakingAmount] = useState('');
   const [hallmarkNo, setHallmarkNo] = useState(`HUID-${Math.floor(1000 + Math.random() * 9000)}-MH`);
 
   // Edit Item Form State
@@ -34,8 +33,7 @@ export default function InventoryView() {
   const [editKarat, setEditKarat] = useState('22K');
   const [editGrossWeight, setEditGrossWeight] = useState('');
   const [editStoneWeight, setEditStoneWeight] = useState('');
-  const [editMakingType, setEditMakingType] = useState('perGram');
-  const [editMakingRate, setEditMakingRate] = useState('');
+  const [editMakingAmount, setEditMakingAmount] = useState('');
   const [editHallmarkNo, setEditHallmarkNo] = useState('');
   const [editStatus, setEditStatus] = useState('In Showcase');
   const [editBarcode, setEditBarcode] = useState('');
@@ -53,6 +51,7 @@ export default function InventoryView() {
   const handleAddItem = (e) => {
     e.preventDefault();
     const netWeight = Math.max(0, grossWeight - stoneWeight);
+    const makingAmt = parseFloat(makingAmount) || 0;
     const newItem = {
       id: `KC-INV-${Math.floor(100 + Math.random() * 900)}`,
       barcode: `KC${Math.floor(100000 + Math.random() * 900000)}`,
@@ -64,8 +63,9 @@ export default function InventoryView() {
       grossWeight,
       stoneWeight,
       netWeight,
-      makingChargeType: makingType,
-      makingChargeRate: makingRate,
+      makingChargeAmount: makingAmt,
+      makingChargeRate: makingAmt,
+      makingChargeType: 'fixed',
       hallmarkNo,
       quantity: 1,
       status: "In Showcase"
@@ -73,6 +73,7 @@ export default function InventoryView() {
 
     addInventoryItem(newItem);
     setShowAddModal(false);
+    setMakingAmount('');
     confetti({
       particleCount: 70,
       spread: 60,
@@ -89,8 +90,24 @@ export default function InventoryView() {
     setEditKarat(item.karat || '22K');
     setEditGrossWeight(item.grossWeight !== undefined ? item.grossWeight : '');
     setEditStoneWeight(item.stoneWeight !== undefined ? item.stoneWeight : 0);
-    setEditMakingType(item.makingChargeType || 'perGram');
-    setEditMakingRate(item.makingChargeRate !== undefined ? item.makingChargeRate : 500);
+    
+    // Total Making Charge Amount (₹) set by owner
+    let initialMaking = '';
+    if (item.makingChargeAmount !== undefined) {
+      initialMaking = item.makingChargeAmount;
+    } else if (item.makingChargeType === 'fixed') {
+      initialMaking = item.makingChargeRate ?? '';
+    } else if (item.makingChargeType === 'perGram' && item.makingChargeRate) {
+      initialMaking = Math.round((parseFloat(item.grossWeight) || 0) * parseFloat(item.makingChargeRate));
+    } else if (item.makingChargeType === 'percentage' && item.makingChargeRate) {
+      initialMaking = Math.round(((parseFloat(item.grossWeight) || 0) * (item.purity || 0.916)) * 7425 * (parseFloat(item.makingChargeRate) / 100));
+    } else if (item.makingCharges !== undefined) {
+      initialMaking = item.makingCharges;
+    } else if (item.makingChargeRate !== undefined) {
+      initialMaking = item.makingChargeRate;
+    }
+    setEditMakingAmount(initialMaking);
+
     setEditHallmarkNo(item.hallmarkNo || '');
     setEditStatus(item.status || 'In Showcase');
     setEditBarcode(item.barcode || '');
@@ -112,6 +129,7 @@ export default function InventoryView() {
     else if (editKarat === '999') purityRatio = 0.999;
     else if (editKarat === '925') purityRatio = 0.925;
 
+    const makingAmt = parseFloat(editMakingAmount) || 0;
     const updates = {
       name: editName.trim() || editingItem.name,
       category: editCategory,
@@ -121,8 +139,9 @@ export default function InventoryView() {
       grossWeight: gross,
       stoneWeight: stone,
       netWeight: net,
-      makingChargeType: editMakingType,
-      makingChargeRate: parseFloat(editMakingRate) || 0,
+      makingChargeAmount: makingAmt,
+      makingChargeRate: makingAmt,
+      makingChargeType: 'fixed',
       hallmarkNo: editHallmarkNo.trim(),
       status: editStatus,
       barcode: editBarcode.trim() || editingItem.barcode,
@@ -367,6 +386,23 @@ export default function InventoryView() {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1">
+                  Making Charges (₹) <span className="text-emerald-400 font-normal">• Total making charge amount set by owner</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-2.5 text-xs font-mono text-emerald-400 font-bold">₹</span>
+                  <input 
+                    type="number"
+                    step="1"
+                    value={makingAmount}
+                    onChange={(e) => setMakingAmount(e.target.value)}
+                    placeholder="e.g. 2500"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl glass-input text-xs font-mono font-bold text-emerald-300"
+                  />
+                </div>
+              </div>
+
               <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
                 <button 
                   type="button"
@@ -504,30 +540,19 @@ export default function InventoryView() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Making Charge Type</label>
-                  <select 
-                    value={editMakingType}
-                    onChange={(e) => setEditMakingType(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl glass-input text-xs"
-                  >
-                    <option value="perGram" className="bg-obsidian-900">Per Gram (₹ / g)</option>
-                    <option value="percentage" className="bg-obsidian-900">Percentage (%)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">
-                    Making Rate {editMakingType === 'perGram' ? '(₹/g)' : '(%)'}
-                  </label>
+              <div>
+                <label className="block text-xs font-mono text-slate-400 mb-1">
+                  Making Charges (₹) <span className="text-emerald-400 font-normal">• Total making charge amount set by owner</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-2.5 text-xs font-mono text-emerald-400 font-bold">₹</span>
                   <input 
                     type="number"
-                    step="0.01"
-                    value={editMakingRate}
-                    onChange={(e) => setEditMakingRate(e.target.value)}
-                    placeholder={editMakingType === 'perGram' ? '500' : '10'}
-                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"
+                    step="1"
+                    value={editMakingAmount}
+                    onChange={(e) => setEditMakingAmount(e.target.value)}
+                    placeholder="e.g. 3500"
+                    className="w-full pl-8 pr-3 py-2 rounded-xl glass-input text-xs font-mono font-bold text-emerald-300 focus:ring-1 focus:ring-emerald-400"
                   />
                 </div>
               </div>
