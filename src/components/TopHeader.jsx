@@ -100,10 +100,20 @@ export default function TopHeader({
         <div 
           onClick={() => onSelectView('settings')}
           className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-obsidian-900/90 border border-white/10 text-slate-300 hover:border-gold-500/40 cursor-pointer transition-colors"
-          title="Click to change daily rates"
+          title="Click to change daily rates & making charges"
         >
           <span className="text-slate-400">Silver:</span>
           <span className="text-slate-100 font-bold">₹{rates.silver999}/g</span>
+        </div>
+
+        {/* Live Making Charge */}
+        <div 
+          onClick={() => onSelectView('settings')}
+          className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-obsidian-900/90 border border-white/10 text-slate-300 hover:border-gold-500/40 cursor-pointer transition-colors"
+          title="Owner default making charges rate (Click to change)"
+        >
+          <span className="text-slate-400">Making:</span>
+          <span className="text-gold-400 font-bold">{rates.makingChargePercent ?? 5}%</span>
         </div>
 
         {/* Theme Mode Toggle (Dark / Light) */}

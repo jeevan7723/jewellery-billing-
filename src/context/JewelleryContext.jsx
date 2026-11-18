@@ -19,6 +19,7 @@ export const INITIAL_RATES = {
   gold18k: 5569, // ₹ / gram (750 Fine)
   silver999: 88.5, // ₹ / gram
   silver925: 81.8, // ₹ / gram
+  makingChargePercent: 5, // Default 5% making charge
 };
 
 export const INITIAL_SHOWROOM = {
@@ -233,7 +234,8 @@ function sanitizeForFirestore(data) {
 export function JewelleryProvider({ children }) {
   const [rates, setRates] = useState(() => {
     const saved = localStorage.getItem('kc_rates');
-    return saved ? JSON.parse(saved) : INITIAL_RATES;
+    const parsed = saved ? JSON.parse(saved) : {};
+    return { ...INITIAL_RATES, ...parsed };
   });
 
   const [showroom, setShowroom] = useState(() => {
@@ -484,8 +486,8 @@ export function JewelleryProvider({ children }) {
     try {
       await setDoc(doc(db, 'settings', 'rates'), sanitizeForFirestore(updated), { merge: true });
       triggerSyncNotification({
-        title: 'Daily Rates Synced',
-        message: `Gold 22K (₹${updated.gold22k}/g) & Silver (₹${updated.silver999}/g) live updated in Firebase Cloud.`,
+        title: 'Daily Rates & Making Synced',
+        message: `Gold 22K: ₹${updated.gold22k}/g • Silver: ₹${updated.silver999}/g • Default Making: ${updated.makingChargePercent ?? 5}%`,
       });
     } catch (err) {
       console.warn('[Firebase] Could not live sync rates:', err.message);

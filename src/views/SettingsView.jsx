@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useJewellery, INITIAL_RATES, INITIAL_INVENTORY, INITIAL_KARAGIRS, INITIAL_REFINERY_BATCHES, INITIAL_INVOICES, INITIAL_SHOWROOM } from '../context/JewelleryContext';
-import { Settings, Save, RotateCcw, Building2, TrendingUp, CheckCircle2, Shield, Wrench, Sparkles, Cloud, Database, RefreshCw, Palette, Sun, Moon } from 'lucide-react';
+import { Settings, Save, RotateCcw, Building2, TrendingUp, CheckCircle2, Shield, Wrench, Sparkles, Cloud, Database, RefreshCw, Palette, Sun, Moon, Hammer, Percent } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function SettingsView() {
@@ -13,6 +13,18 @@ export default function SettingsView() {
   const [gold22k, setGold22k] = useState(rates.gold22k);
   const [gold18k, setGold18k] = useState(rates.gold18k);
   const [silver999, setSilver999] = useState(rates.silver999);
+  const [makingChargePercent, setMakingChargePercent] = useState(
+    rates.makingChargePercent !== undefined ? rates.makingChargePercent : 5
+  );
+
+  // Keep local state synchronized if rates update from cloud
+  useEffect(() => {
+    if (rates.gold24k) setGold24k(rates.gold24k);
+    if (rates.gold22k) setGold22k(rates.gold22k);
+    if (rates.gold18k) setGold18k(rates.gold18k);
+    if (rates.silver999) setSilver999(rates.silver999);
+    if (rates.makingChargePercent !== undefined) setMakingChargePercent(rates.makingChargePercent);
+  }, [rates.gold24k, rates.gold22k, rates.gold18k, rates.silver999, rates.makingChargePercent]);
 
   const [name, setName] = useState(showroom.name);
   const [tagline, setTagline] = useState(showroom.tagline);
@@ -31,6 +43,7 @@ export default function SettingsView() {
       gold22k: parseFloat(gold22k) || 0,
       gold18k: parseFloat(gold18k) || 0,
       silver999: parseFloat(silver999) || 0,
+      makingChargePercent: parseFloat(makingChargePercent) >= 0 ? parseFloat(makingChargePercent) : 5,
     });
     setSavedSuccess(true);
     setTimeout(() => setSavedSuccess(false), 3000);
@@ -178,13 +191,83 @@ export default function SettingsView() {
             </div>
           </div>
 
+          {/* Owner Making Charges Management Option */}
+          <div className="pt-4 border-t border-white/10 space-y-3">
+            <div className="flex items-center justify-between">
+              <label htmlFor="making-charge-percent" className="text-xs font-mono font-bold text-gold-300 uppercase tracking-wider flex items-center gap-1.5">
+                <Hammer className="w-4 h-4 text-gold-400" />
+                <span>Default Making Charges (%)</span>
+              </label>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gold-500/10 text-gold-300 border border-gold-500/30 font-bold">
+                Default: 5%
+              </span>
+            </div>
+
+            <p className="text-[11px] text-slate-400 font-mono">
+              Showroom owner option to set the default percentage (%) for making charges on new jewellery bills and valuations.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <div className="relative flex-1 max-w-xs">
+                <input 
+                  id="making-charge-percent"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  required
+                  value={makingChargePercent}
+                  onChange={(e) => setMakingChargePercent(e.target.value)}
+                  className="w-full pl-3.5 pr-10 py-2.5 rounded-xl glass-input text-sm font-mono font-bold text-gold-200"
+                  placeholder="5.0"
+                />
+                <span className="absolute right-3.5 top-2.5 text-gold-400 font-mono font-bold text-sm">%</span>
+              </div>
+
+              {/* Quick Presets for Showroom Owner */}
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { label: '3%', val: 3 },
+                  { label: '5% (Standard)', val: 5 },
+                  { label: '8%', val: 8 },
+                  { label: '10%', val: 10 },
+                  { label: '12%', val: 12 },
+                  { label: '14%', val: 14 }
+                ].map((preset) => (
+                  <button
+                    key={preset.val}
+                    type="button"
+                    onClick={() => setMakingChargePercent(preset.val)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all cursor-pointer border ${
+                      parseFloat(makingChargePercent) === preset.val
+                        ? 'bg-gold-500 text-obsidian-950 border-gold-400 font-bold shadow-sm'
+                        : 'bg-white/5 hover:bg-white/10 text-slate-300 border-white/10 hover:border-gold-500/30'
+                    }`}
+                  >
+                    {preset.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Live Calculation Preview for Owner */}
+            <div className="p-3 rounded-xl bg-obsidian-950/70 border border-white/5 flex items-center justify-between text-[11px] font-mono">
+              <span className="text-slate-400">
+                Live Preview (10g 22K Gold @ ₹{gold22k}/g):
+              </span>
+              <span className="text-emerald-400 font-bold">
+                Making Fee = ₹{Math.round((parseFloat(gold22k) || 0) * 10 * ((parseFloat(makingChargePercent) || 0) / 100)).toLocaleString('en-IN')}
+              </span>
+            </div>
+          </div>
+
           <div className="pt-2">
             <button 
               type="submit"
               className="px-6 py-2.5 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
             >
               <Save className="w-4 h-4" />
-              <span>Save Today's Rates</span>
+              <span>Save Today's Rates & Making Charges</span>
             </button>
           </div>
         </form>

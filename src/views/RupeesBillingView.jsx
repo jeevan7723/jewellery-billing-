@@ -336,14 +336,24 @@ export default function RupeesBillingView() {
                 <div className="flex gap-1 text-[10px] font-mono">
                   <button 
                     type="button"
-                    onClick={() => setMakingType('perGram')}
+                    onClick={() => {
+                      setMakingType('perGram');
+                      if (makingValue <= 20) {
+                        setMakingValue(480);
+                      }
+                    }}
                     className={`px-2 py-0.5 rounded cursor-pointer ${makingType === 'perGram' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400'}`}
                   >
                     ₹ / g
                   </button>
                   <button 
                     type="button"
-                    onClick={() => setMakingType('percentage')}
+                    onClick={() => {
+                      setMakingType('percentage');
+                      if (makingValue > 100 || makingValue === 480) {
+                        setMakingValue(rates.makingChargePercent ?? 5);
+                      }
+                    }}
                     className={`px-2 py-0.5 rounded cursor-pointer ${makingType === 'percentage' ? 'bg-gold-500 text-obsidian-950 font-bold' : 'text-slate-400'}`}
                   >
                     %
