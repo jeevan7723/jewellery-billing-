@@ -189,17 +189,17 @@ export default function InventoryView() {
       {/* Summary Metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 rounded-2xl glass-card border border-white/10">
-          <span className="text-slate-400 text-[10px] font-mono uppercase block">Total Items in Stock</span>
-          <span className="font-serif text-2xl font-bold text-white">{inventory.length} Pieces</span>
+          <span className="text-slate-400 text-[10px] font-mono uppercase block">{t('totalItemsStock', 'Total Items in Stock')}</span>
+          <span className="font-serif text-2xl font-bold text-white">{inventory.length} {t('pieces', 'Pieces')}</span>
         </div>
 
         <div className="p-4 rounded-2xl glass-card border border-white/10">
-          <span className="text-slate-400 text-[10px] font-mono uppercase block">Total Gross Weight</span>
+          <span className="text-slate-400 text-[10px] font-mono uppercase block">{t('totalGrossWeight', 'Total Gross Weight')}</span>
           <span className="font-serif text-2xl font-bold text-slate-200">{totalGross.toFixed(3)}g</span>
         </div>
 
         <div className="p-4 rounded-2xl glass-card border border-gold-500/30">
-          <span className="text-gold-400 text-[10px] font-mono uppercase block">Total Net Gold Weight</span>
+          <span className="text-gold-400 text-[10px] font-mono uppercase block">{t('totalNetGoldWeight', 'Total Net Gold Weight')}</span>
           <span className="font-serif text-2xl font-bold text-gold-300">{totalNet.toFixed(3)}g</span>
         </div>
       </div>
@@ -213,7 +213,7 @@ export default function InventoryView() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by name or barcode..."
+              placeholder={t('searchInventoryPlaceholder', 'Search by name or barcode...')}
               className="w-full pl-9 pr-3 py-2 rounded-xl glass-input text-xs font-mono"
             />
           </div>
@@ -224,22 +224,29 @@ export default function InventoryView() {
             title="Scan physical jewellery tag to find item"
           >
             <Camera className="w-3.5 h-3.5" />
-            <span>Scan Tag</span>
+            <span>{t('scanTag', 'Scan Tag')}</span>
           </button>
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto no-scrollbar">
-          {['All', 'Bangles & Kadas', 'Necklaces', 'Rings', 'Bullion', 'Silver Articles'].map(cat => (
+          {[
+            { id: 'All', label: t('allCategory', 'All') },
+            { id: 'Bangles & Kadas', label: t('banglesKadas', 'Bangles & Kadas') },
+            { id: 'Necklaces', label: t('necklaces', 'Necklaces') },
+            { id: 'Rings', label: t('rings', 'Rings') },
+            { id: 'Bullion', label: t('goldCoinsBars', 'Gold Coins & Bars') },
+            { id: 'Silver Articles', label: t('silverArticles', 'Silver Articles') }
+          ].map(cat => (
             <button
-              key={cat}
-              onClick={() => setCategoryFilter(cat)}
+              key={cat.id}
+              onClick={() => setCategoryFilter(cat.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer whitespace-nowrap ${
-                categoryFilter === cat 
+                categoryFilter === cat.id 
                   ? 'bg-gold-500 text-obsidian-950 font-bold shadow-gold-glow' 
                   : 'bg-white/5 text-slate-400 hover:text-white'
               }`}
             >
-              {cat}
+              {cat.label}
             </button>
           ))}
         </div>
@@ -251,16 +258,16 @@ export default function InventoryView() {
           <table className="w-full text-xs font-mono">
             <thead>
               <tr className="border-b border-white/10 text-slate-400 bg-white/[0.02] text-left">
-                <th className="py-3 px-4">Barcode Tag</th>
-                <th className="py-3 px-4">Item Name</th>
-                <th className="py-3 px-4">Category</th>
-                <th className="py-3 px-4">Purity</th>
-                <th className="py-3 px-4 text-right">Gross Wt</th>
-                <th className="py-3 px-4 text-right">Stone Wt</th>
-                <th className="py-3 px-4 text-right text-gold-300">Net Wt</th>
-                <th className="py-3 px-4">Hallmark HUID</th>
-                <th className="py-3 px-4">Location</th>
-                <th className="py-3 px-4 text-center">Action</th>
+                <th className="py-3 px-4">{t('barcodeTag', 'Barcode Tag')}</th>
+                <th className="py-3 px-4">{t('itemName', 'Item Name')}</th>
+                <th className="py-3 px-4">{t('category', 'Category')}</th>
+                <th className="py-3 px-4">{t('purityKarat', 'Purity')}</th>
+                <th className="py-3 px-4 text-right">{t('grossWt', 'Gross Wt')}</th>
+                <th className="py-3 px-4 text-right">{t('stoneWt', 'Stone Wt')}</th>
+                <th className="py-3 px-4 text-right text-gold-300">{t('netWt', 'Net Wt')}</th>
+                <th className="py-3 px-4">{t('hallmarkHuid', 'Hallmark HUID')}</th>
+                <th className="py-3 px-4">{t('location', 'Location')}</th>
+                <th className="py-3 px-4 text-center">{t('action', 'Action')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
@@ -319,12 +326,12 @@ export default function InventoryView() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-obsidian-950/80 backdrop-blur-md">
           <div className="relative w-full max-w-xl glass-panel p-6 sm:p-8 rounded-3xl border border-gold-500/40 shadow-2xl">
             <h3 className="font-serif text-xl font-bold text-white mb-4">
-              Add New Jewellery Item to Stock
+              {t('addNewItemModalTitle', 'Add New Jewellery Item to Stock')}
             </h3>
 
             <form onSubmit={handleAddItem} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">Item Name *</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('itemName', 'Item Name')} *</label>
                 <input 
                   type="text"
                   required
@@ -337,23 +344,23 @@ export default function InventoryView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Category</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('category', 'Category')}</label>
                   <select 
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl glass-input text-xs"
                   >
-                    <option value="Bangles & Kadas">Bangles & Kadas</option>
-                    <option value="Necklaces">Necklaces</option>
-                    <option value="Rings">Rings</option>
-                    <option value="Chains & Mangalsutra">Chains & Mangalsutra</option>
-                    <option value="Bullion">Gold Coins & Bars</option>
-                    <option value="Silver Articles">Silver Articles</option>
+                    <option value="Bangles & Kadas">{t('banglesKadas', 'Bangles & Kadas')}</option>
+                    <option value="Necklaces">{t('necklaces', 'Necklaces')}</option>
+                    <option value="Rings">{t('rings', 'Rings')}</option>
+                    <option value="Chains & Mangalsutra">{t('chainsMangalsutra', 'Chains & Mangalsutra')}</option>
+                    <option value="Bullion">{t('goldCoinsBars', 'Gold Coins & Bars')}</option>
+                    <option value="Silver Articles">{t('silverArticles', 'Silver Articles')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Purity / Karat</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('purityKarat', 'Purity / Karat')}</label>
                   <select 
                     value={karat}
                     onChange={(e) => setKarat(e.target.value)}
@@ -369,7 +376,7 @@ export default function InventoryView() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Gross Weight (g) *</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('grossWeight', 'Gross Weight (g)')} *</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -382,7 +389,7 @@ export default function InventoryView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Stone / Wax Weight (g)</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('stoneWeight', 'Stone / Wax Weight (g)')}</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -396,7 +403,7 @@ export default function InventoryView() {
 
               <div>
                 <label className="block text-xs font-mono text-slate-400 mb-1">
-                  Making Charges (₹) <span className="text-emerald-400 font-normal">• Total making charge amount set by owner</span>
+                  {t('makingCharges', 'Making Charges')} (₹) <span className="text-emerald-400 font-normal">• Total making charge amount set by owner</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-2.5 text-xs font-mono text-emerald-400 font-bold">₹</span>
@@ -417,13 +424,13 @@ export default function InventoryView() {
                   onClick={() => setShowAddModal(false)}
                   className="px-4 py-2 rounded-xl glass-pill text-xs font-semibold text-slate-400 hover:text-white"
                 >
-                  Cancel
+                  {t('cancel', 'Cancel')}
                 </button>
                 <button 
                   type="submit"
                   className="px-6 py-2 rounded-xl gold-gradient-btn text-xs font-bold"
                 >
-                  Save Item & Make Barcode
+                  {t('saveItemBarcode', 'Save Item & Make Barcode')}
                 </button>
               </div>
             </form>
@@ -439,7 +446,7 @@ export default function InventoryView() {
               <div>
                 <h3 className="font-serif text-xl font-bold text-white flex items-center gap-2">
                   <Pencil className="w-4 h-4 text-amber-400" />
-                  <span>Edit Jewellery Item</span>
+                  <span>{t('editJewelleryItem', 'Edit Jewellery Item')}</span>
                 </h3>
                 <span className="text-[11px] font-mono text-sky-400">
                   Tag: #{editingItem.barcode} • ID: {editingItem.id}
@@ -456,7 +463,7 @@ export default function InventoryView() {
 
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">Item Name *</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('itemName', 'Item Name')} *</label>
                 <input 
                   type="text"
                   required
@@ -469,23 +476,23 @@ export default function InventoryView() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Category</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('category', 'Category')}</label>
                   <select 
                     value={editCategory}
                     onChange={(e) => setEditCategory(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl glass-input text-xs"
                   >
-                    <option value="Bangles & Kadas" className="bg-obsidian-900">Bangles & Kadas</option>
-                    <option value="Necklaces" className="bg-obsidian-900">Necklaces</option>
-                    <option value="Rings" className="bg-obsidian-900">Rings</option>
-                    <option value="Chains & Mangalsutra" className="bg-obsidian-900">Chains & Mangalsutra</option>
-                    <option value="Bullion" className="bg-obsidian-900">Gold Coins & Bars</option>
-                    <option value="Silver Articles" className="bg-obsidian-900">Silver Articles</option>
+                    <option value="Bangles & Kadas" className="bg-obsidian-900">{t('banglesKadas', 'Bangles & Kadas')}</option>
+                    <option value="Necklaces" className="bg-obsidian-900">{t('necklaces', 'Necklaces')}</option>
+                    <option value="Rings" className="bg-obsidian-900">{t('rings', 'Rings')}</option>
+                    <option value="Chains & Mangalsutra" className="bg-obsidian-900">{t('chainsMangalsutra', 'Chains & Mangalsutra')}</option>
+                    <option value="Bullion" className="bg-obsidian-900">{t('goldCoinsBars', 'Gold Coins & Bars')}</option>
+                    <option value="Silver Articles" className="bg-obsidian-900">{t('silverArticles', 'Silver Articles')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Metal</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('metal', 'Metal')}</label>
                   <select 
                     value={editMetal}
                     onChange={(e) => setEditMetal(e.target.value)}
@@ -498,7 +505,7 @@ export default function InventoryView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Purity / Karat</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('purityKarat', 'Purity / Karat')}</label>
                   <select 
                     value={editKarat}
                     onChange={(e) => setEditKarat(e.target.value)}
@@ -516,7 +523,7 @@ export default function InventoryView() {
 
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Gross Wt (g) *</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('grossWeight', 'Gross Wt (g)')} *</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -529,7 +536,7 @@ export default function InventoryView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Stone/Wax (g)</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('stoneWeight', 'Stone/Wax (g)')}</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -541,7 +548,7 @@ export default function InventoryView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-amber-400 mb-1">Net Metal (g)</label>
+                  <label className="block text-xs font-mono text-amber-400 mb-1">{t('netWeight', 'Net Metal (g)')}</label>
                   <div className="w-full px-3 py-2 rounded-xl bg-obsidian-950/80 border border-amber-500/30 text-xs font-mono font-bold text-amber-300 flex items-center">
                     {Math.max(0, (parseFloat(editGrossWeight) || 0) - (parseFloat(editStoneWeight) || 0)).toFixed(3)}g
                   </div>
@@ -550,7 +557,7 @@ export default function InventoryView() {
 
               <div>
                 <label className="block text-xs font-mono text-slate-400 mb-1">
-                  Making Charges (₹) <span className="text-emerald-400 font-normal">• Total making charge amount set by owner</span>
+                  {t('makingCharges', 'Making Charges')} (₹) <span className="text-emerald-400 font-normal">• Total making charge amount set by owner</span>
                 </label>
                 <div className="relative">
                   <span className="absolute left-3.5 top-2.5 text-xs font-mono text-emerald-400 font-bold">₹</span>
@@ -567,7 +574,7 @@ export default function InventoryView() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Hallmark HUID</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('hallmarkHuid', 'Hallmark HUID')}</label>
                   <input 
                     type="text"
                     value={editHallmarkNo}
@@ -578,7 +585,7 @@ export default function InventoryView() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-mono text-slate-400 mb-1">Location / Status</label>
+                  <label className="block text-xs font-mono text-slate-400 mb-1">{t('location', 'Location / Status')}</label>
                   <select 
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
@@ -594,7 +601,7 @@ export default function InventoryView() {
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">Barcode Tag</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('barcodeTag', 'Barcode Tag')}</label>
                 <div className="flex items-center gap-2">
                   <input 
                     type="text"
@@ -620,14 +627,14 @@ export default function InventoryView() {
                   onClick={() => setEditingItem(null)}
                   className="px-4 py-2 rounded-xl glass-pill text-xs font-semibold text-slate-400 hover:text-white cursor-pointer"
                 >
-                  Cancel
+                  {t('cancel', 'Cancel')}
                 </button>
                 <button 
                   type="submit"
                   className="px-6 py-2 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
                 >
                   <CheckCircle2 className="w-4 h-4" />
-                  <span>Update Stock Item</span>
+                  <span>{t('saveChanges', 'Update Stock Item')}</span>
                 </button>
               </div>
             </form>

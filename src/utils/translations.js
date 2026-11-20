@@ -322,7 +322,31 @@ export const translations = {
     refinerySubtitle: 'Track old gold sent to refinery for melting, dross loss, and pure 24K bullion recovery.',
     salesPurchaseTitle: 'Sales &',
     salesPurchaseTitleAccent: 'Purchases',
-    salesPurchaseSubtitle: 'Complete register of GST sales tax invoices, customer receipts, and old gold purchase entries.'
+    salesPurchaseSubtitle: 'Complete register of GST sales tax invoices, customer receipts, and old gold purchase entries.',
+
+    // Detailed Inventory
+    totalItemsStock: 'Total Items in Stock',
+    totalGrossWeight: 'Total Gross Weight',
+    totalNetGoldWeight: 'Total Net Gold Weight',
+    searchInventoryPlaceholder: 'Search by name or barcode...',
+    scanTag: 'Scan Tag',
+    barcodeTag: 'Barcode Tag',
+    grossWt: 'Gross Wt',
+    stoneWt: 'Stone Wt',
+    hallmarkHuid: 'Hallmark HUID',
+    location: 'Status / Location',
+    action: 'Action',
+    addNewItemModalTitle: 'Add New Jewellery Item to Stock',
+    editJewelleryItem: 'Edit Jewellery Item',
+    saveItemBarcode: 'Save Item & Make Barcode',
+    saveChanges: 'Save Changes',
+    allCategory: 'All',
+    banglesKadas: 'Bangles & Kadas',
+    necklaces: 'Necklaces',
+    rings: 'Rings',
+    chainsMangalsutra: 'Chains & Mangalsutra',
+    goldCoinsBars: 'Gold Coins & Bars',
+    silverArticles: 'Silver Articles'
   },
 
   mr: {
@@ -646,6 +670,30 @@ export const translations = {
     refinerySubtitle: 'गाळणीसाठी पाठवलेले जुने सोने, घट व कचरा (Dross) आणि परत मिळालेले शुद्ध २४K सोने यांची नोंद ठेवा.',
     salesPurchaseTitle: 'विक्री आणि',
     salesPurchaseTitleAccent: 'खरेदी नोंदी',
-    salesPurchaseSubtitle: 'जीएसटी विक्री इनव्हॉइस, ग्राहकांच्या पावत्या आणि जुने सोने खरेदी नोंदींचे संपूर्ण रजिस्टर.'
+    salesPurchaseSubtitle: 'जीएसटी विक्री इनव्हॉइस, ग्राहकांच्या पावत्या आणि जुने सोने खरेदी नोंदींचे संपूर्ण रजिस्टर.',
+
+    // Detailed Inventory
+    totalItemsStock: 'स्टॉकमधील एकूण दागिने',
+    totalGrossWeight: 'एकूण वजन (Gross Weight)',
+    totalNetGoldWeight: 'एकूण निव्वळ सोन्याचे वजन (Net Wt)',
+    searchInventoryPlaceholder: 'नाव किंवा बारकोडने शोधा...',
+    scanTag: 'टॅग स्कॅन करा',
+    barcodeTag: 'बारकोड टॅग',
+    grossWt: 'एकूण वजन (Gross)',
+    stoneWt: 'खडे वजन (Stone)',
+    hallmarkHuid: 'हॉलमार्क HUID',
+    location: 'स्थिती / जागा',
+    action: 'क्रिया (Action)',
+    addNewItemModalTitle: 'स्टॉकमध्ये नवीन दागिना जोडा',
+    editJewelleryItem: 'दागिना माहिती बदला (Edit)',
+    saveItemBarcode: 'दागिना सेव्ह करा व बारकोड बनवा',
+    saveChanges: 'बदल सेव्ह करा',
+    allCategory: 'सर्व दागिने',
+    banglesKadas: 'बांगड्या व कडे',
+    necklaces: 'हार व नेकलेस',
+    rings: 'अंगठ्या (Rings)',
+    chainsMangalsutra: 'चेन व मंगळसूत्र',
+    goldCoinsBars: 'सोन्याची नाणी व बिस्किटे',
+    silverArticles: 'चांदीच्या वस्तू'
   }
 };
