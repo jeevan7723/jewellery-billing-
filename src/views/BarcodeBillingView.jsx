@@ -345,7 +345,7 @@ export default function BarcodeBillingView() {
       <PrintModal
         isOpen={showBillModal}
         onClose={() => setShowBillModal(false)}
-        title="POS Retail Bill Preview"
+        title={t('posRetailBillPreview', 'POS Retail Bill Preview')}
         formatToggle={true}
         format={billFormat}
         onFormatChange={setBillFormat}

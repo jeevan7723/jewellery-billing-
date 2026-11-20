@@ -1,6 +1,26 @@
 import React from 'react';
+import { useJewellery } from '../../context/JewelleryContext';
 
-export default function ReportTemplate({ reportType, data, showroom }) {
+export default function ReportTemplate({ reportType, data, showroom: rawShowroom }) {
+  let isMarathi = false;
+  try {
+    const ctx = useJewellery();
+    isMarathi = ctx?.language === 'mr';
+  } catch (e) {
+    if (typeof window !== 'undefined') {
+      isMarathi = localStorage.getItem('language') === 'mr';
+    }
+  }
+
+  const showroom = {
+    name: 'KaratCraft Fine Jewellers',
+    tagline: isMarathi ? 'प्रमाणित उच्च दर्जाचे दागिने आणि बुलियन व्यापारी' : 'Certified High Jewellery & Bullion Merchants',
+    address: 'Plot 42, Gold Souk, Zaveri Bazaar, Mumbai 400002',
+    phone: '+91 98200 12345',
+    gstin: '27AADCB2230M1Z2',
+    ...(rawShowroom || {})
+  };
+
   const dateStr = new Date().toLocaleDateString('en-IN', { 
     day: '2-digit', 
     month: 'short', 
@@ -12,6 +32,15 @@ export default function ReportTemplate({ reportType, data, showroom }) {
   });
 
   const getReportTitle = () => {
+    if (isMarathi) {
+      switch (reportType) {
+        case 'sales': return 'जीएसटी विक्री नोंदवही व ग्राहक इनव्हॉइस स्टेटमेंट';
+        case 'inventory': return 'शोरूम तिजोरी शिल्लक स्टॉक व मूल्यांकन स्टेटमेंट';
+        case 'karagir': return 'कारागीर सोने ताबा व शिल्लक हिशोब स्टेटमेंट';
+        case 'refinery': return 'रिफायनरी जुने सोने गाळणी, चाचणी व शुद्ध सोने पुनर्प्राप्ती नोंद';
+        default: return 'दागिने शोरूम ऑडिट अहवाल';
+      }
+    }
     switch (reportType) {
       case 'sales': return 'GST Sales Register & Customer Invoices Statement';
       case 'inventory': return 'Showroom Vault Stock & Inventory Valuation Statement';
@@ -40,13 +69,13 @@ export default function ReportTemplate({ reportType, data, showroom }) {
             {showroom.name}
           </h1>
           <p className="text-xs text-slate-600 font-serif italic mt-0.5">
-            {showroom.tagline || 'Certified High Jewellery & Bullion Merchants'}
+            {showroom.tagline}
           </p>
           <p className="text-[11px] text-slate-700 mt-1 max-w-md">
             {showroom.address}
           </p>
           <div className="text-[10px] text-slate-600 mt-1 font-mono">
-            GSTIN: <strong>{showroom.gstin}</strong> • Phone: <strong>{showroom.phone}</strong>
+            {isMarathi ? 'जीएसटी:' : 'GSTIN:'} <strong>{showroom.gstin}</strong> • {isMarathi ? 'फोन:' : 'Phone:'} <strong>{showroom.phone}</strong>
           </div>
         </div>
 
@@ -55,13 +84,13 @@ export default function ReportTemplate({ reportType, data, showroom }) {
             className="inline-block bg-slate-900 text-white keep-white font-mono font-bold text-xs px-3 py-1 uppercase tracking-wider rounded"
             style={{ color: '#ffffff' }}
           >
-            AUDIT STATEMENT
+            {isMarathi ? 'ऑडिट स्टेटमेंट' : 'AUDIT STATEMENT'}
           </div>
           <div className="font-mono text-xs pt-1 font-bold text-slate-900">
-            Generated: {dateStr}
+            {isMarathi ? 'तयार केले:' : 'Generated:'} {dateStr}
           </div>
           <div className="font-mono text-[10px] text-slate-500">
-            Time: {timeStr}
+            {isMarathi ? 'वेळ:' : 'Time:'} {timeStr}
           </div>
         </div>
       </div>
@@ -69,16 +98,18 @@ export default function ReportTemplate({ reportType, data, showroom }) {
       {/* Statement Header */}
       <div className="p-3 bg-slate-50 border border-slate-300 rounded mb-4 flex justify-between items-center">
         <div>
-          <span className="text-[10px] uppercase font-mono text-slate-500 block">Statement Type:</span>
+          <span className="text-[10px] uppercase font-mono text-slate-500 block">
+            {isMarathi ? 'स्टेटमेंट प्रकार:' : 'Statement Type:'}
+          </span>
           <span className="font-serif font-bold text-sm text-slate-900">{getReportTitle()}</span>
         </div>
         <div className="text-right font-mono text-[11px]">
-          <span className="text-slate-500">Total Records: </span>
+          <span className="text-slate-500">{isMarathi ? 'एकूण नोंदी:' : 'Total Records:'} </span>
           <strong className="text-slate-900">
-            {reportType === 'sales' && `${invoices.length} Invoices`}
-            {reportType === 'inventory' && `${inventory.length} Stock Pieces`}
-            {reportType === 'karagir' && `${karagirs.length} Artisans`}
-            {reportType === 'refinery' && `${refineryBatches.length} Melts`}
+            {reportType === 'sales' && `${invoices.length} ${isMarathi ? 'बिले' : 'Invoices'}`}
+            {reportType === 'inventory' && `${inventory.length} ${isMarathi ? 'दागिने' : 'Stock Pieces'}`}
+            {reportType === 'karagir' && `${karagirs.length} ${isMarathi ? 'कारागीर' : 'Artisans'}`}
+            {reportType === 'refinery' && `${refineryBatches.length} ${isMarathi ? 'बॅचेस' : 'Melts'}`}
           </strong>
         </div>
       </div>
@@ -86,19 +117,27 @@ export default function ReportTemplate({ reportType, data, showroom }) {
       {/* KPI Cards Box */}
       <div className="grid grid-cols-4 gap-3 mb-4 font-mono text-[11px]">
         <div className="p-2.5 border border-slate-300 rounded bg-slate-50">
-          <div className="text-[9px] uppercase text-slate-500">Total Sales Value</div>
+          <div className="text-[9px] uppercase text-slate-500">
+            {isMarathi ? 'एकूण विक्री मूल्य' : 'Total Sales Value'}
+          </div>
           <div className="font-bold text-sm text-slate-900">₹{totalSalesVal.toLocaleString('en-IN')}</div>
         </div>
         <div className="p-2.5 border border-slate-300 rounded bg-slate-50">
-          <div className="text-[9px] uppercase text-slate-500">Total GST (3%)</div>
+          <div className="text-[9px] uppercase text-slate-500">
+            {isMarathi ? 'एकूण जीएसटी (३%)' : 'Total GST (3%)'}
+          </div>
           <div className="font-bold text-sm text-amber-900">₹{totalGstVal.toLocaleString('en-IN')}</div>
         </div>
         <div className="p-2.5 border border-slate-300 rounded bg-slate-50">
-          <div className="text-[9px] uppercase text-slate-500">Net Stock Weight</div>
+          <div className="text-[9px] uppercase text-slate-500">
+            {isMarathi ? 'निव्वळ स्टॉक वजन' : 'Net Stock Weight'}
+          </div>
           <div className="font-bold text-sm text-slate-900">{totalStockNet.toFixed(3)}g</div>
         </div>
         <div className="p-2.5 border border-slate-300 rounded bg-slate-50">
-          <div className="text-[9px] uppercase text-slate-500">Karagir Gold Holding</div>
+          <div className="text-[9px] uppercase text-slate-500">
+            {isMarathi ? 'कारागिरांकडील सोने' : 'Karagir Gold Holding'}
+          </div>
           <div className="font-bold text-sm text-purple-900">{totalKaragirMetal.toFixed(3)}g</div>
         </div>
       </div>
@@ -113,13 +152,13 @@ export default function ReportTemplate({ reportType, data, showroom }) {
                 style={{ color: '#ffffff' }}
               >
                 <th className="py-2 px-2 text-center">#</th>
-                <th className="py-2 px-2.5">Invoice No</th>
-                <th className="py-2 px-2.5">Date</th>
-                <th className="py-2 px-3">Customer Name</th>
-                <th className="py-2 px-2">Payment</th>
-                <th className="py-2 px-2.5 text-right">Taxable Subtotal</th>
-                <th className="py-2 px-2.5 text-right">GST (3%)</th>
-                <th className="py-2 px-3 text-right">Grand Total (₹)</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'इनव्हॉइस क्र' : 'Invoice No'}</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'दिनांक' : 'Date'}</th>
+                <th className="py-2 px-3">{isMarathi ? 'ग्राहकाचे नाव' : 'Customer Name'}</th>
+                <th className="py-2 px-2">{isMarathi ? 'पेमेंट' : 'Payment'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'करपात्र रक्कम' : 'Taxable Subtotal'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'जीएसटी (३%)' : 'GST (3%)'}</th>
+                <th className="py-2 px-3 text-right">{isMarathi ? 'एकूण रक्कम (₹)' : 'Grand Total (₹)'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -140,7 +179,9 @@ export default function ReportTemplate({ reportType, data, showroom }) {
             </tbody>
             <tfoot>
               <tr className="bg-slate-100 font-bold border-t-2 border-slate-900 text-[11px]">
-                <td colSpan={5} className="py-2 px-3 text-right uppercase">Consolidated Totals:</td>
+                <td colSpan={5} className="py-2 px-3 text-right uppercase">
+                  {isMarathi ? 'एकूण गोषवारा:' : 'Consolidated Totals:'}
+                </td>
                 <td className="py-2 px-2.5 text-right">
                   ₹{invoices.reduce((s, i) => s + i.subtotal, 0).toLocaleString('en-IN')}
                 </td>
@@ -163,14 +204,14 @@ export default function ReportTemplate({ reportType, data, showroom }) {
                 style={{ color: '#ffffff' }}
               >
                 <th className="py-2 px-2 text-center">#</th>
-                <th className="py-2 px-2.5">Tag / Barcode</th>
-                <th className="py-2 px-3">Jewellery Description</th>
-                <th className="py-2 px-2">Category</th>
-                <th className="py-2 px-2 text-center">Karat</th>
-                <th className="py-2 px-2.5 text-right">Gross Wt</th>
-                <th className="py-2 px-2.5 text-right">Stone Wt</th>
-                <th className="py-2 px-2.5 text-right">Net Wt</th>
-                <th className="py-2 px-2.5 text-center">HUID / Status</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'टॅग / बारकोड' : 'Tag / Barcode'}</th>
+                <th className="py-2 px-3">{isMarathi ? 'दागिन्यांचे वर्णन' : 'Jewellery Description'}</th>
+                <th className="py-2 px-2">{isMarathi ? 'प्रकार' : 'Category'}</th>
+                <th className="py-2 px-2 text-center">{isMarathi ? 'कॅरेट' : 'Karat'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'एकूण वजन' : 'Gross Wt'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'खड्यांचे वजन' : 'Stone Wt'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'निव्वळ वजन' : 'Net Wt'}</th>
+                <th className="py-2 px-2.5 text-center">{isMarathi ? 'HUID / स्थिती' : 'HUID / Status'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -190,7 +231,9 @@ export default function ReportTemplate({ reportType, data, showroom }) {
             </tbody>
             <tfoot>
               <tr className="bg-slate-100 font-bold border-t-2 border-slate-900 text-[11px]">
-                <td colSpan={5} className="py-2 px-3 text-right uppercase">Total Vault Weight:</td>
+                <td colSpan={5} className="py-2 px-3 text-right uppercase">
+                  {isMarathi ? 'एकूण तिजोरी वजन:' : 'Total Vault Weight:'}
+                </td>
                 <td className="py-2 px-2.5 text-right">{totalStockGross.toFixed(3)}g</td>
                 <td className="py-2 px-2.5 text-right text-slate-500">
                   {(totalStockGross - totalStockNet).toFixed(3)}g
@@ -210,13 +253,13 @@ export default function ReportTemplate({ reportType, data, showroom }) {
                 style={{ color: '#ffffff' }}
               >
                 <th className="py-2 px-2 text-center">#</th>
-                <th className="py-2 px-2.5">Karagir ID</th>
-                <th className="py-2 px-3">Artisan Name</th>
-                <th className="py-2 px-2.5">Speciality</th>
-                <th className="py-2 px-2.5 text-right">Metal Issued</th>
-                <th className="py-2 px-2.5 text-right">Finished Work</th>
-                <th className="py-2 px-2.5 text-right">Scrap Received</th>
-                <th className="py-2 px-3 text-right">Balance Holding</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'कारागीर आयडी' : 'Karagir ID'}</th>
+                <th className="py-2 px-3">{isMarathi ? 'कारागिराचे नाव' : 'Artisan Name'}</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'कौशल्य' : 'Speciality'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'दिलेले सोने' : 'Metal Issued'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'तयार काम' : 'Finished Work'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'गाळणी स्क्रॅप' : 'Scrap Received'}</th>
+                <th className="py-2 px-3 text-right">{isMarathi ? 'शिल्लक ताबा' : 'Balance Holding'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -237,7 +280,9 @@ export default function ReportTemplate({ reportType, data, showroom }) {
             </tbody>
             <tfoot>
               <tr className="bg-slate-100 font-bold border-t-2 border-slate-900 text-[11px]">
-                <td colSpan={4} className="py-2 px-3 text-right uppercase">Total Karagir Metal Holding:</td>
+                <td colSpan={4} className="py-2 px-3 text-right uppercase">
+                  {isMarathi ? 'एकूण कारागीर सोने ताबा:' : 'Total Karagir Metal Holding:'}
+                </td>
                 <td className="py-2 px-2.5 text-right">
                   {karagirs.reduce((s, k) => s + k.metalIssued, 0).toFixed(3)}g
                 </td>
@@ -263,13 +308,13 @@ export default function ReportTemplate({ reportType, data, showroom }) {
                 style={{ color: '#ffffff' }}
               >
                 <th className="py-2 px-2 text-center">#</th>
-                <th className="py-2 px-2.5">Batch ID</th>
-                <th className="py-2 px-2.5">Date</th>
-                <th className="py-2 px-3">Refinery Name</th>
-                <th className="py-2 px-2.5 text-right">Sent Weight</th>
-                <th className="py-2 px-2.5 text-right">Post-Melt Wt</th>
-                <th className="py-2 px-2.5 text-right">Melt Loss %</th>
-                <th className="py-2 px-3 text-right">Fine 24K Recovered</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'बॅच आयडी' : 'Batch ID'}</th>
+                <th className="py-2 px-2.5">{isMarathi ? 'दिनांक' : 'Date'}</th>
+                <th className="py-2 px-3">{isMarathi ? 'रिफायनरीचे नाव' : 'Refinery Name'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'पाठवलेले वजन' : 'Sent Weight'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'गाळणीनंतर वजन' : 'Post-Melt Wt'}</th>
+                <th className="py-2 px-2.5 text-right">{isMarathi ? 'घट %' : 'Melt Loss %'}</th>
+                <th className="py-2 px-3 text-right">{isMarathi ? 'शुद्ध २४K प्राप्त' : 'Fine 24K Recovered'}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200">
@@ -290,7 +335,9 @@ export default function ReportTemplate({ reportType, data, showroom }) {
             </tbody>
             <tfoot>
               <tr className="bg-slate-100 font-bold border-t-2 border-slate-900 text-[11px]">
-                <td colSpan={4} className="py-2 px-3 text-right uppercase">Consolidated Pure Gold Recovered:</td>
+                <td colSpan={4} className="py-2 px-3 text-right uppercase">
+                  {isMarathi ? 'एकूण शुद्ध सोने पुनर्प्राप्ती:' : 'Consolidated Pure Gold Recovered:'}
+                </td>
                 <td className="py-2 px-2.5 text-right">
                   {refineryBatches.reduce((s, b) => s + b.sentWeightGross, 0).toFixed(3)}g
                 </td>
@@ -311,13 +358,19 @@ export default function ReportTemplate({ reportType, data, showroom }) {
       <div className="grid grid-cols-2 gap-8 pt-8 border-t border-slate-300 text-[10px]">
         <div>
           <div className="border-b border-slate-400 w-48 mb-1 h-8" />
-          <div className="font-bold text-slate-800">Showroom Accountant / Prepared By</div>
-          <div className="text-slate-500 text-[9px]">(Data verified from counter ledger)</div>
+          <div className="font-bold text-slate-800">
+            {isMarathi ? 'शोरूम हिशोबनीस / तयार करणारा' : 'Showroom Accountant / Prepared By'}
+          </div>
+          <div className="text-slate-500 text-[9px]">
+            {isMarathi ? '(काउंटर खात्यावरून तपासणी केली)' : '(Data verified from counter ledger)'}
+          </div>
         </div>
 
         <div className="text-right">
           <div className="border-b border-slate-400 w-48 ml-auto mb-1 h-8" />
-          <div className="font-bold text-slate-900">Showroom Manager / Proprietor</div>
+          <div className="font-bold text-slate-900">
+            {isMarathi ? 'शोरूम व्यवस्थापक / मालक' : 'Showroom Manager / Proprietor'}
+          </div>
           <div className="text-slate-500 text-[9px]">{showroom.name}</div>
         </div>
       </div>

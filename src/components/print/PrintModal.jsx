@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Printer, X, FileText, CheckCircle2, Sliders } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import { useJewellery } from '../../context/JewelleryContext';
 
 export default function PrintModal({ 
   isOpen, 
@@ -13,6 +14,16 @@ export default function PrintModal({
 }) {
   const [printed, setPrinted] = useState(false);
 
+  let isMarathi = false;
+  try {
+    const ctx = useJewellery();
+    isMarathi = ctx?.language === 'mr';
+  } catch (e) {
+    if (typeof window !== 'undefined') {
+      isMarathi = localStorage.getItem('language') === 'mr';
+    }
+  }
+
   if (!isOpen) return null;
 
   const handlePrint = () => {
@@ -21,6 +32,16 @@ export default function PrintModal({
     setTimeout(() => {
       window.print();
     }, 150);
+  };
+
+  const getTranslatedTitle = () => {
+    if (!isMarathi) return title;
+    if (title === 'Print Document') return 'दस्तऐवज प्रिंट पूर्वावलोकन';
+    if (title.includes('Invoice')) return 'टॅक्स इनव्हॉइस बिल प्रिंट';
+    if (title.includes('Exchange') || title.includes('Barter')) return 'मेटल बार्टर स्लिप प्रिंट';
+    if (title.includes('Tag')) return 'दागिने टॅग प्रिंट';
+    if (title.includes('Report')) return 'अहवाल स्टेटमेंट प्रिंट';
+    return title;
   };
 
   return (
@@ -37,10 +58,12 @@ export default function PrintModal({
             </div>
             <div>
               <h3 className="font-serif font-bold text-white text-base leading-tight">
-                {title}
+                {getTranslatedTitle()}
               </h3>
               <p className="text-[10px] text-slate-400 font-mono">
-                Official Document Preview • Ready for A4 Laser & Thermal Printing
+                {isMarathi 
+                  ? 'अधिकृत दस्तऐवज पूर्वावलोकन • A4 लेझर आणि थर्मल प्रिंटसाठी सज्ज' 
+                  : 'Official Document Preview • Ready for A4 Laser & Thermal Printing'}
               </p>
             </div>
           </div>
@@ -58,7 +81,7 @@ export default function PrintModal({
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  📄 A4 Invoice
+                  {isMarathi ? '📄 A4 इनव्हॉइस' : '📄 A4 Invoice'}
                 </button>
                 <button
                   type="button"
@@ -69,7 +92,7 @@ export default function PrintModal({
                       : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  🧾 80mm Thermal
+                  {isMarathi ? '🧾 ८० मिमी थर्मल' : '🧾 80mm Thermal'}
                 </button>
               </div>
             )}
@@ -81,7 +104,7 @@ export default function PrintModal({
               className="px-4 py-2 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-gold-glow"
             >
               <Printer className="w-4 h-4" />
-              <span>Print / Save PDF</span>
+              <span>{isMarathi ? 'प्रिंट / PDF सेव्ह करा' : 'Print / Save PDF'}</span>
             </button>
 
             {/* Close Button */}
@@ -89,7 +112,7 @@ export default function PrintModal({
               type="button"
               onClick={onClose}
               className="p-2 rounded-xl glass-pill text-slate-400 hover:text-white cursor-pointer"
-              title="Close Preview"
+              title={isMarathi ? 'पूर्वावलोकन बंद करा' : 'Close Preview'}
             >
               <X className="w-4 h-4" />
             </button>

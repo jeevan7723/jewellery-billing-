@@ -1,6 +1,22 @@
 import React from 'react';
+import { useJewellery } from '../../context/JewelleryContext';
 
-export default function JewelleryTagTemplate({ item, items = [], showroom, mode = 'single' }) {
+export default function JewelleryTagTemplate({ item, items = [], showroom: rawShowroom, mode = 'single' }) {
+  let isMarathi = false;
+  try {
+    const ctx = useJewellery();
+    isMarathi = ctx?.language === 'mr';
+  } catch (e) {
+    if (typeof window !== 'undefined') {
+      isMarathi = localStorage.getItem('language') === 'mr';
+    }
+  }
+
+  const showroom = {
+    name: 'KARATCRAFT',
+    ...(rawShowroom || {})
+  };
+
   const tagList = mode === 'batch' && items.length > 0 ? items : (item ? [item] : []);
 
   return (
@@ -8,10 +24,12 @@ export default function JewelleryTagTemplate({ item, items = [], showroom, mode 
       
       <div className="no-print mb-4 pb-3 border-b border-gray-200 flex justify-between items-center text-xs">
         <span className="font-bold text-gray-700">
-          🏷️ Standard Jewellery Rat-Tail Thermal Tags ({tagList.length} Tag{tagList.length > 1 ? 's' : ''})
+          🏷️ {isMarathi ? `प्रमाणित दागिने थर्मल टॅग्स (${tagList.length} टॅग्स)` : `Standard Jewellery Rat-Tail Thermal Tags (${tagList.length} Tag${tagList.length > 1 ? 's' : ''})`}
         </span>
         <span className="text-[10px] text-gray-500">
-          Compatible with Zebra / TSC / Citizen Thermal Tag Printers (100mm × 25mm)
+          {isMarathi 
+            ? 'झिब्रा / टीएससी / सिटिझन थर्मल टॅग प्रिंटरशी सुसंगत (१००मिमी × २५मिमी)' 
+            : 'Compatible with Zebra / TSC / Citizen Thermal Tag Printers (100mm × 25mm)'}
         </span>
       </div>
 
@@ -61,21 +79,21 @@ export default function JewelleryTagTemplate({ item, items = [], showroom, mode 
               {/* Right Side: Weights & HUID Breakdown */}
               <div className="w-[48%] pl-2 flex flex-col justify-between h-full text-[9px] leading-tight">
                 <div className="flex justify-between items-center border-b border-gray-300 pb-0.5">
-                  <span className="text-[8px] text-gray-600">PURITY:</span>
+                  <span className="text-[8px] text-gray-600">{isMarathi ? 'शुद्धता:' : 'PURITY:'}</span>
                   <span className="font-extrabold text-xs">{karat} 916</span>
                 </div>
 
                 <div className="space-y-0.5 py-0.5 font-bold">
                   <div className="flex justify-between">
-                    <span className="text-gray-600 font-normal">GR.WT:</span>
+                    <span className="text-gray-600 font-normal">{isMarathi ? 'एकूण:' : 'GR.WT:'}</span>
                     <span>{gross.toFixed(3)}g</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600 font-normal">ST.WT:</span>
+                    <span className="text-gray-600 font-normal">{isMarathi ? 'खडे:' : 'ST.WT:'}</span>
                     <span>{stone.toFixed(3)}g</span>
                   </div>
                   <div className="flex justify-between border-t border-gray-300 pt-0.5 text-black">
-                    <span className="font-bold">NT.WT:</span>
+                    <span className="font-bold">{isMarathi ? 'निव्वळ:' : 'NT.WT:'}</span>
                     <span className="text-xs font-black">{net.toFixed(3)}g</span>
                   </div>
                 </div>
@@ -91,7 +109,9 @@ export default function JewelleryTagTemplate({ item, items = [], showroom, mode 
       </div>
 
       <div className="no-print text-center text-[10px] text-gray-400 mt-6 font-mono">
-        💡 Tip: Select "Custom Scale: 100%" and "Paper Size: 100mm × 25mm" in printer settings for direct roll thermal printing.
+        💡 {isMarathi 
+          ? 'टीप: थेट रोल थर्मल प्रिंटिंगसाठी प्रिंटर सेटिंग्जमध्ये "कस्टम स्केल: १००%" आणि "कागदाचा आकार: १००मिमी × २५मिमी" निवडा.' 
+          : 'Tip: Select "Custom Scale: 100%" and "Paper Size: 100mm × 25mm" in printer settings for direct roll thermal printing.'}
       </div>
     </div>
   );

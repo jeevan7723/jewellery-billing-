@@ -304,7 +304,7 @@ export default function DashboardView({ onNavigate }) {
       <PrintModal
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
-        title={`Tax Invoice: ${selectedInvoice?.invoiceNo || ''}`}
+        title={language === 'mr' ? `टॅक्स इनव्हॉइस: ${selectedInvoice?.invoiceNo || ''}` : `Tax Invoice: ${selectedInvoice?.invoiceNo || ''}`}
         formatToggle={true}
         format={printFormat}
         onFormatChange={setPrintFormat}
