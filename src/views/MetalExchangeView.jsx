@@ -489,7 +489,7 @@ export default function MetalExchangeView({ onNavigate }) {
               className="px-3.5 py-2 rounded-xl glass-card hover:border-purple-400 text-purple-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Print Slip</span>
+              <span>{t('printSlip', 'Print Slip')}</span>
             </button>
             {onNavigate && (
               <button
@@ -497,7 +497,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 onClick={() => onNavigate('sales-purchase')}
                 className="px-3.5 py-2 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-700 dark:text-purple-200 border border-purple-500/40 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm"
               >
-                <span>View in Sales & Purchases</span>
+                <span>{t('viewInSalesPurchase', 'View in Sales & Purchases')}</span>
                 <ArrowRight className="w-3.5 h-3.5 flex-shrink-0" />
               </button>
             )}
@@ -507,7 +507,7 @@ export default function MetalExchangeView({ onNavigate }) {
               className="px-3.5 py-2 rounded-xl glass-card hover:border-gold-500 text-gold-400 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              <span>New Exchange (+)</span>
+              <span>{t('newExchangeBtn', 'New Exchange (+)')}</span>
             </button>
           </div>
         </div>
@@ -519,7 +519,7 @@ export default function MetalExchangeView({ onNavigate }) {
         {/* Customer Details */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pb-6 border-b border-white/10">
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Customer Name *</label>
+            <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">{t('customerName', 'Customer Name')} *</label>
             <input 
               type="text"
               value={customerName}
@@ -529,7 +529,7 @@ export default function MetalExchangeView({ onNavigate }) {
             />
           </div>
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Phone Number *</label>
+            <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">{t('phone', 'Phone Number')} *</label>
             <input 
               type="text"
               value={phone}
@@ -539,7 +539,7 @@ export default function MetalExchangeView({ onNavigate }) {
             />
           </div>
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">Date</label>
+            <label className="block text-xs font-mono text-slate-400 mb-1 uppercase">{t('date', 'Date')}</label>
             <input 
               type="text"
               value={voucherDate}
@@ -558,7 +558,7 @@ export default function MetalExchangeView({ onNavigate }) {
             <div className="flex items-center justify-between pb-3 border-b border-white/5">
               <span className="text-xs uppercase font-mono tracking-wider text-amber-400 font-bold flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
-                1. Old Metal (Received from Customer)
+                {t('oldMetalReceived', '1. Old Metal (Received from Customer)')}
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 font-bold border border-amber-500/20">
                 {inwardMetal.toUpperCase()}
@@ -568,7 +568,7 @@ export default function MetalExchangeView({ onNavigate }) {
             {/* Select Metal & Purity */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">Metal</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('metal', 'Metal')}</label>
                 <select 
                   value={inwardMetal}
                   onChange={(e) => {
@@ -584,7 +584,7 @@ export default function MetalExchangeView({ onNavigate }) {
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">Old Metal Purity / Karat</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('oldMetalPurityKarat', 'Old Metal Purity / Karat')}</label>
                 <select 
                   value={inwardPurityIndex}
                   onChange={(e) => setInwardPurityIndex(parseInt(e.target.value))}
@@ -600,7 +600,7 @@ export default function MetalExchangeView({ onNavigate }) {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">Item Description</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('itemDescription', 'Item Description')}</label>
               <input 
                 type="text"
                 value={inwardDescription}
@@ -613,12 +613,12 @@ export default function MetalExchangeView({ onNavigate }) {
             {/* Weights */}
             <div className="p-3.5 rounded-xl bg-obsidian-950/70 border border-white/5 space-y-3">
               <span className="text-[11px] font-mono text-amber-400 uppercase font-bold block">
-                Scale Weights & Deductions
+                {t('scaleWeightsAndDeductions', 'Scale Weights & Deductions')}
               </span>
 
               <div className="grid grid-cols-3 gap-2 text-xs font-mono">
                 <div>
-                  <label className="block text-[10px] text-slate-400 mb-1">Gross Wt (g)</label>
+                  <label className="block text-[10px] text-slate-400 mb-1">{t('grossWtGrams', 'Gross Wt (g)')}</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -630,7 +630,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-slate-400 mb-1">Stone/Wax (g)</label>
+                  <label className="block text-[10px] text-slate-400 mb-1">{t('stoneWaxGrams', 'Stone/Wax (g)')}</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -642,7 +642,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 </div>
 
                 <div>
-                  <label className="block text-[10px] text-slate-400 mb-1">Melting Loss (%)</label>
+                  <label className="block text-[10px] text-slate-400 mb-1">{t('meltingLossPercent', 'Melting Loss (%)')}</label>
                   <input 
                     type="number"
                     step="0.1"
@@ -658,15 +658,15 @@ export default function MetalExchangeView({ onNavigate }) {
             {/* Inward Value Box */}
             <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 space-y-2.5 font-mono text-xs shadow-sm">
               <div className="flex justify-between text-slate-400">
-                <span>Net Weight after melting:</span>
+                <span>{t('netWeightAfterMelting', 'Net Weight after melting:')}</span>
                 <span className="text-white font-bold">{Number(inwardPostMeltWeight || 0).toFixed(3)}g</span>
               </div>
               <div className="flex justify-between text-amber-300 font-bold border-t border-amber-500/20 pt-2 text-sm">
-                <span>Pure Fine {inwardMetal} Weight:</span>
+                <span>{t('pureFineMetalWeight', 'Pure Fine Metal Weight:')}</span>
                 <span>{Number(inwardFinePureWeight || 0).toFixed(3)}g</span>
               </div>
               <div className="flex justify-between items-center text-slate-400 text-xs pt-2 border-t border-amber-500/20">
-                <span>Value at gold rate (@ ₹{inwardUnitRate.toLocaleString('en-IN')}/g):</span>
+                <span>{t('valueAtMetalRate', 'Value at rate:')} (@ ₹{inwardUnitRate.toLocaleString('en-IN')}/g):</span>
                 <span className="text-amber-300 font-extrabold text-sm">₹{Math.round(inwardValuation || 0).toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -677,7 +677,7 @@ export default function MetalExchangeView({ onNavigate }) {
             <div className="flex items-center justify-between pb-3 border-b border-white/5">
               <span className="text-xs uppercase font-mono tracking-wider text-emerald-400 font-bold flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                2. New Jewellery (Selected by Customer)
+                {t('newJewellerySelected', '2. New Jewellery (Selected by Customer)')}
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-300 font-bold border border-emerald-500/20">
                 {outwardMetal.toUpperCase()}
@@ -689,7 +689,7 @@ export default function MetalExchangeView({ onNavigate }) {
               <div className="flex items-center justify-between">
                 <label htmlFor="stock-item-picker" className="text-[11px] font-mono text-emerald-400 uppercase font-bold flex items-center gap-1.5">
                   <Boxes className="w-3.5 h-3.5" />
-                  <span>Pick Item from Stock</span>
+                  <span>{t('pickItemFromStock', 'Pick Item from Stock')}</span>
                 </label>
                 {selectedStockId && (
                   <button
@@ -697,7 +697,7 @@ export default function MetalExchangeView({ onNavigate }) {
                     onClick={() => setSelectedStockId('')}
                     className="text-[10px] font-mono text-slate-400 hover:text-amber-400 cursor-pointer underline flex items-center gap-1"
                   >
-                    Custom Piece
+                    {t('customPiece', 'Custom Piece')}
                   </button>
                 )}
               </div>
@@ -710,7 +710,7 @@ export default function MetalExchangeView({ onNavigate }) {
               >
                 <option value="" className="bg-obsidian-900 text-slate-300">
                   {inventory && inventory.length > 0 
-                    ? `-- Select Showroom Stock Item (${inventory.length} items available) --` 
+                    ? `-- ${t('pickItemFromStock', 'Select Showroom Stock Item')} (${inventory.length}) --` 
                     : '-- No Stock Items in Vault (Manual Entry) --'}
                 </option>
 
@@ -770,7 +770,7 @@ export default function MetalExchangeView({ onNavigate }) {
             {/* Outward Metal & Karat */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">Metal</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('metal', 'Metal')}</label>
                 <select 
                   value={outwardMetal}
                   onChange={(e) => {
@@ -786,7 +786,7 @@ export default function MetalExchangeView({ onNavigate }) {
               </div>
 
               <div>
-                <label className="block text-xs font-mono text-slate-400 mb-1">New Jewellery Karat</label>
+                <label className="block text-xs font-mono text-slate-400 mb-1">{t('newJewelleryKarat', 'New Jewellery Karat')}</label>
                 <select 
                   value={outwardPurityIndex}
                   onChange={(e) => setOutwardPurityIndex(parseInt(e.target.value))}
@@ -802,7 +802,7 @@ export default function MetalExchangeView({ onNavigate }) {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">New Jewellery Name</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('newJewelleryName', 'New Jewellery Name')}</label>
               <input 
                 type="text"
                 value={outwardDescription}
@@ -815,12 +815,12 @@ export default function MetalExchangeView({ onNavigate }) {
             {/* Outward Weight & Making charges */}
             <div className="p-3.5 rounded-xl bg-obsidian-950/70 border border-white/5 space-y-3">
               <span className="text-[11px] font-mono text-emerald-400 uppercase font-bold block">
-                Weight & Making Charges
+                {t('weightAndMakingCharges', 'Weight & Making Charges')}
               </span>
 
               <div className="grid grid-cols-2 gap-3 text-xs font-mono">
                 <div>
-                  <label className="block text-[10px] text-slate-400 mb-1">Weight (g)</label>
+                  <label className="block text-[10px] text-slate-400 mb-1">{t('weightGrams', 'Weight (g)')}</label>
                   <input 
                     type="number"
                     step="0.001"
@@ -904,20 +904,20 @@ export default function MetalExchangeView({ onNavigate }) {
             <div>
               <div className="flex items-center gap-2 mb-1">
                 <span className="text-xs uppercase font-mono tracking-widest text-purple-400 font-bold block">
-                  Final Exchange Calculation
+                  {t('finalExchangeCalculation', 'Final Exchange Calculation')}
                 </span>
                 <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">
-                  Voucher #{voucherNo}
+                  {t('voucherPrefix', 'Voucher #')}{voucherNo}
                 </span>
               </div>
               <div className="text-xl sm:text-2xl font-serif font-extrabold text-white">
                 {cashBalanceDifference >= 0 ? (
                   <span className="text-emerald-400">
-                    Customer Gets Balance Refund: ₹{Math.round(cashBalanceDifference).toLocaleString('en-IN')}
+                    {t('customerGetsRefund', 'Customer Gets Balance Refund:')} ₹{Math.round(cashBalanceDifference).toLocaleString('en-IN')}
                   </span>
                 ) : (
                   <span className="text-amber-400">
-                    Customer Pays Remaining: ₹{Math.abs(Math.round(cashBalanceDifference)).toLocaleString('en-IN')}
+                    {t('customerPaysRemaining', 'Customer Pays Remaining:')} ₹{Math.abs(Math.round(cashBalanceDifference)).toLocaleString('en-IN')}
                   </span>
                 )}
               </div>
@@ -934,13 +934,13 @@ export default function MetalExchangeView({ onNavigate }) {
                 {isSaving ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin text-obsidian-950" />
-                    <span>Saving & Syncing...</span>
+                    <span>{t('savingAndSyncing', 'Saving & Syncing...')}</span>
                   </>
                 ) : (
                   <>
                     <Printer className="w-4 h-4 text-obsidian-950" />
                     <Save className="w-4 h-4 text-obsidian-950" />
-                    <span>Save & Print Bill</span>
+                    <span>{t('saveAndPrintBill', 'Save & Print Bill')}</span>
                   </>
                 )}
               </button>
@@ -953,7 +953,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 title="Save record to Sales & Purchases without opening print dialog"
               >
                 <Save className="w-4 h-4 text-emerald-400" />
-                <span>Save to Records</span>
+                <span>{t('saveToRecords', 'Save to Records')}</span>
               </button>
 
               <button 
@@ -963,7 +963,7 @@ export default function MetalExchangeView({ onNavigate }) {
                 title="Preview barter slip memorandum before saving"
               >
                 <FileText className="w-4 h-4 text-purple-400" />
-                <span>Slip Preview</span>
+                <span>{t('slipPreview', 'Slip Preview')}</span>
               </button>
             </div>
           </div>
@@ -971,7 +971,7 @@ export default function MetalExchangeView({ onNavigate }) {
           {/* Simple Summary */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
             <div className="p-3.5 rounded-xl bg-obsidian-950/80 border border-white/5">
-              <span className="text-slate-400 block text-[10px]">Old Metal Value:</span>
+              <span className="text-slate-400 block text-[10px]">{t('oldMetalValue', 'Old Metal Value:')}</span>
               <span className="text-amber-300 font-bold">
                 ₹{Math.round(inwardValuation || 0).toLocaleString('en-IN')}
               </span>
@@ -979,7 +979,7 @@ export default function MetalExchangeView({ onNavigate }) {
             </div>
 
             <div className="p-3.5 rounded-xl bg-obsidian-950/80 border border-white/5">
-              <span className="text-slate-400 block text-[10px]">New Jewellery Price:</span>
+              <span className="text-slate-400 block text-[10px]">{t('newJewelleryPrice', 'New Jewellery Price:')}</span>
               <span className="text-emerald-300 font-bold">
                 ₹{Math.round(outwardTotalPayable || 0).toLocaleString('en-IN')}
               </span>
@@ -987,7 +987,7 @@ export default function MetalExchangeView({ onNavigate }) {
             </div>
 
             <div className="p-3.5 rounded-xl bg-obsidian-950/80 border border-white/5">
-              <span className="text-slate-400 block text-[10px]">Gold Weight Balance:</span>
+              <span className="text-slate-400 block text-[10px]">{t('goldWeightBalance', 'Gold Weight Balance:')}</span>
               <span className="text-purple-300 font-bold">
                 {sameMetalTrade && typeof fineWeightDifference === 'number' && !isNaN(fineWeightDifference) ? (
                   fineWeightDifference >= 0 
@@ -1007,7 +1007,7 @@ export default function MetalExchangeView({ onNavigate }) {
       <PrintModal
         isOpen={showVoucherModal}
         onClose={() => setShowVoucherModal(false)}
-        title="Old Gold Exchange Barter Slip Preview"
+        title={t('exchangeBarterSlipPreview', 'Old Gold Exchange Barter Slip Preview')}
         formatToggle={false}
       >
         <MetalExchangeTemplate 
