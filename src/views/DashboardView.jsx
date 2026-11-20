@@ -8,7 +8,7 @@ import PrintModal from '../components/print/PrintModal';
 import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
 
 export default function DashboardView({ onNavigate }) {
-  const { rates, inventory, invoices, karagirs, refineryBatches, showroom, purchasedGoldSummary, t } = useJewellery();
+  const { rates, inventory, invoices, karagirs, refineryBatches, showroom, purchasedGoldSummary, language, t } = useJewellery();
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [printFormat, setPrintFormat] = useState('a4');
