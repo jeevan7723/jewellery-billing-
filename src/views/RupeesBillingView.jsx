@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useJewellery } from '../context/JewelleryContext';
 import { 
   IndianRupee, Printer, Plus, Trash2, CheckCircle2, 
-  Sparkles, User, Phone, Receipt, Camera, ScanBarcode 
+  Sparkles, User, Phone, Receipt, Camera, ScanBarcode, Scale 
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import PrintModal from '../components/print/PrintModal';
