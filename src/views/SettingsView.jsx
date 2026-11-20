@@ -100,20 +100,20 @@ export default function SettingsView() {
             <span className="text-xs font-mono font-bold text-gold-400 px-2 py-0.5 rounded bg-gold-500/10 border border-gold-500/30">
               MODULE #09
             </span>
-            <span className="text-xs font-mono text-slate-400">Daily Rates & Shop Settings</span>
+            <span className="text-xs font-mono text-slate-400">{t('dailyRatesTitle', 'Daily Rates &')} {t('shopSettingsTitleAccent', 'Shop Settings')}</span>
           </div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Daily Rates & <span className="gold-gradient-text">Shop Settings</span>
+            {t('dailyRatesTitle', 'Daily Rates &')} <span className="gold-gradient-text">{t('shopSettingsTitleAccent', 'Shop Settings')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Set today's gold and silver rates, shop address, and GST bill details.
+            {t('settingsSubtitle', "Set today's gold and silver rates, shop address, and GST bill details.")}
           </p>
         </div>
 
         {savedSuccess && (
           <div className="px-4 py-2 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-mono text-xs font-bold flex items-center gap-2 animate-in fade-in">
             <CheckCircle2 className="w-4 h-4" />
-            <span>Settings Saved Successfully!</span>
+            <span>{t('settingsSavedSuccess', 'Settings Saved Successfully!')}</span>
           </div>
         )}
       </div>
@@ -125,16 +125,16 @@ export default function SettingsView() {
           <div className="flex items-center gap-2 pb-3 border-b border-white/10">
             <TrendingUp className="w-5 h-5 text-gold-400" />
             <h3 className="font-serif text-lg font-bold text-white">
-              Today's Gold & Silver Rates (₹ per gram)
+              {t('todaysRatesPerGram', "Today's Gold & Silver Rates (₹ per gram)")}
             </h3>
           </div>
           <p className="text-xs text-slate-400 font-mono">
-            Updating these rates changes prices in billing, metal exchange, and stock valuation immediately.
+            {t('ratesNotice', 'Updating these rates changes prices in billing, metal exchange, and stock valuation immediately.')}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">Gold 24K (Pure Gold 999) *</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('gold24kLabel', 'Gold 24K (Pure Gold 999) *')}</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-sm">₹</span>
                 <input 
@@ -148,7 +148,7 @@ export default function SettingsView() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">Gold 22K (916 Hallmarked) *</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('gold22kLabel', 'Gold 22K (916 Hallmarked) *')}</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-sm">₹</span>
                 <input 
@@ -162,7 +162,7 @@ export default function SettingsView() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">Gold 18K (750 Gold) *</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('gold18kLabel', 'Gold 18K (750 Gold) *')}</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-sm">₹</span>
                 <input 
@@ -176,7 +176,7 @@ export default function SettingsView() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">Silver 999 (Pure Silver) *</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('silver999Label', 'Silver 999 (Pure Silver) *')}</label>
               <div className="relative">
                 <span className="absolute left-3 top-2.5 text-slate-400 font-mono text-sm">₹</span>
                 <input 
@@ -196,10 +196,10 @@ export default function SettingsView() {
             <div className="flex items-center justify-between">
               <label htmlFor="making-charge-percent" className="text-xs font-mono font-bold text-gold-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Hammer className="w-4 h-4 text-gold-400" />
-                <span>Default Making Charges (%)</span>
+                <span>{t('defaultMakingPercent', 'Default Making Charges (%)')}</span>
               </label>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gold-500/10 text-gold-300 border border-gold-500/30 font-bold">
-                Default: 5%
+                {t('defaultBadge', 'Default: 5%')}
               </span>
             </div>
 
@@ -293,7 +293,7 @@ export default function SettingsView() {
               className="px-6 py-2.5 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
             >
               <Save className="w-4 h-4" />
-              <span>Save Today's Rates & Making Charges</span>
+              <span>{t('saveRatesAndMaking', "Save Today's Rates & Making Charges")}</span>
             </button>
           </div>
         </form>
@@ -303,12 +303,12 @@ export default function SettingsView() {
           <div className="flex items-center gap-2 pb-3 border-b border-white/10">
             <Building2 className="w-5 h-5 text-gold-400" />
             <h3 className="font-serif text-lg font-bold text-white">
-              Shop Details & Bill Header
+              {t('shopDetailsHeader', 'Shop Details & Bill Header')}
             </h3>
           </div>
 
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1">Jewellery Shop Name *</label>
+            <label className="block text-xs font-mono text-slate-400 mb-1">{t('shopNameLabel', 'Jewellery Shop Name *')}</label>
             <input 
               type="text"
               required
@@ -319,7 +319,7 @@ export default function SettingsView() {
           </div>
 
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1">Tagline</label>
+            <label className="block text-xs font-mono text-slate-400 mb-1">{t('taglineLabel', 'Tagline')}</label>
             <input 
               type="text"
               value={tagline}
@@ -330,7 +330,7 @@ export default function SettingsView() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">GSTIN Number *</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('gstinLabel', 'GSTIN Number *')}</label>
               <input 
                 type="text"
                 required
@@ -341,7 +341,7 @@ export default function SettingsView() {
             </div>
 
             <div>
-              <label className="block text-xs font-mono text-slate-400 mb-1">HSN Code *</label>
+              <label className="block text-xs font-mono text-slate-400 mb-1">{t('hsnCodeLabel', 'HSN Code *')}</label>
               <input 
                 type="text"
                 required
@@ -353,7 +353,7 @@ export default function SettingsView() {
           </div>
 
           <div>
-            <label className="block text-xs font-mono text-slate-400 mb-1">Shop Address</label>
+            <label className="block text-xs font-mono text-slate-400 mb-1">{t('shopAddressLabel', 'Shop Address')}</label>
             <input 
               type="text"
               value={address}
@@ -368,7 +368,7 @@ export default function SettingsView() {
               className="px-6 py-2.5 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
             >
               <Save className="w-4 h-4" />
-              <span>Save Shop Details</span>
+              <span>{t('saveShopDetails', 'Save Shop Details')}</span>
             </button>
           </div>
         </form>
