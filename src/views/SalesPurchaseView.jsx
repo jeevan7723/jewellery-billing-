@@ -10,7 +10,7 @@ import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
 import MetalExchangeTemplate from '../components/print/MetalExchangeTemplate';
 
 export default function SalesPurchaseView({ onNavigate }) {
-  const { invoices = [], showroom, deleteInvoice, rates } = useJewellery();
+  const { invoices = [], showroom, deleteInvoice, rates, t = (k, f) => f } = useJewellery();
   const [activeTab, setActiveTab] = useState('sales');
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
@@ -95,10 +95,10 @@ export default function SalesPurchaseView({ onNavigate }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Sales & <span className="gold-gradient-text">Purchases</span>
+            {t('salesPurchaseTitle', 'Sales &')} <span className="gold-gradient-text">{t('salesPurchaseTitleAccent', 'Purchases')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            View customer sales bills and all inward gold purchases (including Old Gold Barter).
+            {t('salesPurchaseSubtitle', 'View customer sales bills and all inward gold purchases (including Old Gold Barter).')}
           </p>
         </div>
 

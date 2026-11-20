@@ -9,7 +9,7 @@ import PrintModal from '../components/print/PrintModal';
 import ReportTemplate from '../components/print/ReportTemplate';
 
 export default function ReportsView() {
-  const { invoices, inventory, karagirs, refineryBatches, rates, showroom } = useJewellery();
+  const { invoices, inventory, karagirs, refineryBatches, rates, showroom, t = (k, f) => f } = useJewellery();
   const [reportType, setReportType] = useState('sales'); // 'sales' | 'inventory' | 'karagir' | 'refinery'
   const [showPrintModal, setShowPrintModal] = useState(false);
 
@@ -104,13 +104,13 @@ export default function ReportsView() {
             <span className="text-xs font-mono font-bold text-gold-400 px-2 py-0.5 rounded bg-gold-500/10 border border-gold-500/30">
               MODULE #06
             </span>
-            <span className="text-xs font-mono text-slate-400">Reports & Download Center</span>
+            <span className="text-xs font-mono text-slate-400">{t('reportsNavSubtitle', 'Reports & Download Center')}</span>
           </div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Reports & <span className="gold-gradient-text">Data Download</span>
+            {t('reportsTitle', 'Reports &')} <span className="gold-gradient-text">{t('reportsTitleAccent', 'Data Download')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Download or print sales bills, current stock, karagir gold balance, and refinery melting logs.
+            {t('reportsSubtitle', 'Download or print sales bills, current stock, karagir gold balance, and refinery melting logs.')}
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export default function ReportsView() {
             className="px-4 py-2.5 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
           >
             <Download className="w-4 h-4" />
-            <span>Download CSV / Excel</span>
+            <span>{t('downloadCsvExcel', 'Download CSV / Excel')}</span>
           </button>
           <button 
             type="button"
@@ -128,7 +128,7 @@ export default function ReportsView() {
             className="px-4 py-2.5 rounded-xl glass-card hover:border-gold-500/50 text-xs font-bold text-white flex items-center gap-2 cursor-pointer"
           >
             <Printer className="w-4 h-4 text-gold-400" />
-            <span>Print Report</span>
+            <span>{t('printReport', 'Print Report')}</span>
           </button>
         </div>
       </div>
@@ -136,10 +136,10 @@ export default function ReportsView() {
       {/* Report Types Tabs */}
       <div className="flex items-center gap-2 p-1.5 rounded-2xl glass-panel border border-white/10 overflow-x-auto no-scrollbar">
         {[
-          { id: 'sales', label: '1. Sales Bills (GST)', count: invoices.length },
-          { id: 'inventory', label: '2. Current Stock', count: inventory.length },
-          { id: 'karagir', label: '3. Karagir Gold Balance', count: karagirs.length },
-          { id: 'refinery', label: '4. Refinery Melting Log', count: refineryBatches.length },
+          { id: 'sales', label: t('tabSalesBills', '1. Sales Bills (GST)'), count: invoices.length },
+          { id: 'inventory', label: t('tabCurrentStock', '2. Current Stock'), count: inventory.length },
+          { id: 'karagir', label: t('tabKaragirBalance', '3. Karagir Gold Balance'), count: karagirs.length },
+          { id: 'refinery', label: t('tabRefineryLog', '4. Refinery Melting Log'), count: refineryBatches.length },
         ].map(tab => (
           <button
             key={tab.id}
@@ -158,19 +158,19 @@ export default function ReportsView() {
       {/* Report Summary Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 font-mono text-xs">
         <div className="p-4 rounded-2xl glass-card border border-white/10">
-          <span className="text-slate-400 block text-[10px]">Total Sales</span>
+          <span className="text-slate-400 block text-[10px]">{t('totalSalesMetric', 'Total Sales')}</span>
           <span className="font-serif text-xl font-bold text-white">₹{totalSalesVal.toLocaleString('en-IN')}</span>
         </div>
         <div className="p-4 rounded-2xl glass-card border border-white/10">
-          <span className="text-slate-400 block text-[10px]">Total GST (3%)</span>
+          <span className="text-slate-400 block text-[10px]">{t('totalGstMetric', 'Total GST (3%)')}</span>
           <span className="font-serif text-xl font-bold text-gold-300">₹{totalGstVal.toLocaleString('en-IN')}</span>
         </div>
         <div className="p-4 rounded-2xl glass-card border border-white/10">
-          <span className="text-slate-400 block text-[10px]">Total Stock Net Weight</span>
+          <span className="text-slate-400 block text-[10px]">{t('totalStockNetMetric', 'Total Stock Net Weight')}</span>
           <span className="font-serif text-xl font-bold text-slate-200">{totalStockNet.toFixed(3)}g</span>
         </div>
         <div className="p-4 rounded-2xl glass-card border border-white/10">
-          <span className="text-slate-400 block text-[10px]">Karagir Pending Gold</span>
+          <span className="text-slate-400 block text-[10px]">{t('karagirPendingGoldMetric', 'Karagir Pending Gold')}</span>
           <span className="font-serif text-xl font-bold text-purple-300">{totalKaragirMetal.toFixed(3)}g</span>
         </div>
       </div>

@@ -6,7 +6,7 @@ import PrintModal from '../components/print/PrintModal';
 import ReportTemplate from '../components/print/ReportTemplate';
 
 export default function RefineryView() {
-  const { refineryBatches, addRefineryBatch, showroom, purchasedGoldSummary } = useJewellery();
+  const { refineryBatches, addRefineryBatch, showroom, purchasedGoldSummary, t = (k, f) => f } = useJewellery();
   const [showAddModal, setShowAddModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
@@ -55,10 +55,10 @@ export default function RefineryView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Gold Refinery & <span className="text-amber-500">Melting</span>
+            {t('refineryTitle', 'Gold Refinery &')} <span className="text-amber-500">{t('refineryTitleAccent', 'Melting')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Track scrap gold sent for melting, post-melt weight, melting loss, and pure gold received.
+            {t('refinerySubtitle', 'Track scrap gold sent for melting, post-melt weight, melting loss, and pure gold received.')}
           </p>
         </div>
 

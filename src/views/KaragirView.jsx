@@ -9,7 +9,7 @@ import PrintModal from '../components/print/PrintModal';
 import ReportTemplate from '../components/print/ReportTemplate';
 
 export default function KaragirView() {
-  const { karagirs, addKaragir, issueMetalToKaragir, returnMetalFromKaragir, showroom } = useJewellery();
+  const { karagirs, addKaragir, issueMetalToKaragir, returnMetalFromKaragir, showroom, t = (k, f) => f } = useJewellery();
   
   const [selectedKaragirId, setSelectedKaragirId] = useState(karagirs[0]?.id || '');
   const [showIssueModal, setShowIssueModal] = useState(false);
@@ -76,10 +76,10 @@ export default function KaragirView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Karagir <span className="text-amber-400">Management</span>
+            {t('karagirTitle', 'Karagir')} <span className="text-amber-400">{t('karagirTitleAccent', 'Management')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Track gold given to karagirs, finished jewellery received, scrap returned, and remaining gold balance.
+            {t('karagirSubtitle', 'Track gold given to karagirs, finished jewellery received, scrap returned, and remaining gold balance.')}
           </p>
         </div>
 

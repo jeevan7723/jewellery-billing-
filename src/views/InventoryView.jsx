@@ -8,7 +8,7 @@ import confetti from 'canvas-confetti';
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 
 export default function InventoryView() {
-  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem } = useJewellery();
+  const { inventory, addInventoryItem, updateInventoryItem, deleteInventoryItem, t = (k, f) => f } = useJewellery();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
@@ -170,10 +170,10 @@ export default function InventoryView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Stock & <span className="gold-gradient-text">Inventory</span>
+            {t('inventoryTitle', 'Stock &')} <span className="gold-gradient-text">{t('inventoryTitleAccent', 'Inventory')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Track all jewellery items in shop, gross weight, stone deduction, net gold weight, and barcode tags.
+            {t('inventorySubtitle', 'Track all jewellery items in shop, gross weight, stone deduction, net gold weight, and barcode tags.')}
           </p>
         </div>
 
@@ -182,7 +182,7 @@ export default function InventoryView() {
           className="px-5 py-2.5 rounded-xl gold-gradient-btn text-xs font-bold flex items-center gap-2 cursor-pointer shadow-gold-glow"
         >
           <Plus className="w-4 h-4" />
-          <span>Add New Jewellery Item</span>
+          <span>{t('addItem', 'Add New Jewellery Item')}</span>
         </button>
       </div>
 

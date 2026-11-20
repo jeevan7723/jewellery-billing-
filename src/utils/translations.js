@@ -282,7 +282,47 @@ export const translations = {
     scanWithCamera: '📷 Scan with Camera',
     printAllTags: 'Print All Tags',
     tapToScan: 'Tap to Scan',
-    mobileCameraReady: 'Mobile Camera Ready'
+    mobileCameraReady: 'Mobile Camera Ready',
+
+    // Reports & Downloads
+    reportsTitle: 'Reports &',
+    reportsTitleAccent: 'Data Download',
+    reportsNavSubtitle: 'Reports & Download Center',
+    reportsSubtitle: 'Download or print sales bills, current stock, karagir gold balance, and refinery melting logs.',
+    downloadCsvExcel: 'Download CSV / Excel',
+    printReport: 'Print Report',
+    tabSalesBills: '1. Sales Bills (GST)',
+    tabCurrentStock: '2. Current Stock',
+    tabKaragirBalance: '3. Karagir Gold Balance',
+    tabRefineryLog: '4. Refinery Melting Log',
+    totalSalesMetric: 'Total Sales',
+    totalGstMetric: 'Total GST (3%)',
+    totalStockNetMetric: 'Total Stock Net Weight',
+    karagirPendingGoldMetric: 'Karagir Pending Gold',
+    noSalesInvoicesYet: 'No sales invoices recorded yet.',
+
+    // Theme & Appearance
+    themeAppearanceHeader: 'Showroom Theme & Appearance',
+    themeAppearanceSubtitle: 'Customize the visual environment for billing counters, point-of-sale terminals, and executive desks.',
+    obsidianDarkMode: 'Obsidian Dark Mode',
+    obsidianDarkModeDesc: 'Deep black & gold contrast. Ideal for low-light jewellery counters and executive suites.',
+    showroomLightMode: 'Showroom Light Mode',
+    showroomLightModeDesc: 'Crisp ivory & gold aesthetics. Ideal for brightly lit retail showrooms and daylight counters.',
+    themeActive: 'ACTIVE',
+
+    // Other View Headers
+    inventoryTitle: 'Stock &',
+    inventoryTitleAccent: 'Inventory',
+    inventorySubtitle: 'Manage your showroom vault stock, barcoded items, categories, and weights.',
+    karagirTitle: 'Karagir',
+    karagirTitleAccent: 'Management',
+    karagirSubtitle: 'Issue pure gold to artisans, record finished ornaments, calculate making charges, and track pending weight balance.',
+    refineryTitle: 'Gold Refinery &',
+    refineryTitleAccent: 'Melting',
+    refinerySubtitle: 'Track old gold sent to refinery for melting, dross loss, and pure 24K bullion recovery.',
+    salesPurchaseTitle: 'Sales &',
+    salesPurchaseTitleAccent: 'Purchases',
+    salesPurchaseSubtitle: 'Complete register of GST sales tax invoices, customer receipts, and old gold purchase entries.'
   },
 
   mr: {
@@ -566,6 +606,46 @@ export const translations = {
     scanWithCamera: '📷 कॅमेऱ्याने स्कॅन करा',
     printAllTags: 'सर्व टॅग्ज प्रिंट करा',
     tapToScan: 'स्कॅन करण्यासाठी दाबा',
-    mobileCameraReady: 'मोबाईल कॅमेरा तयार आहे'
+    mobileCameraReady: 'मोबाईल कॅमेरा तयार आहे',
+
+    // Reports & Downloads
+    reportsTitle: 'अहवाल आणि',
+    reportsTitleAccent: 'डेटा डाउनलोड',
+    reportsNavSubtitle: 'अहवाल व डाउनलोड केंद्र',
+    reportsSubtitle: 'विक्री बिले, चालू स्टॉक, कारागीर शिल्लक सोने आणि रिफायनरी गाळणी नोंदी डाउनलोड किंवा प्रिंट करा.',
+    downloadCsvExcel: 'CSV / Excel डाउनलोड करा',
+    printReport: 'अहवाल प्रिंट करा',
+    tabSalesBills: '१. विक्री बिले (GST)',
+    tabCurrentStock: '२. चालू स्टॉक',
+    tabKaragirBalance: '३. कारागीर सोने शिल्लक',
+    tabRefineryLog: '४. रिफायनरी गाळणी नोंदी',
+    totalSalesMetric: 'एकूण विक्री',
+    totalGstMetric: 'एकूण जीएसटी (३%)',
+    totalStockNetMetric: 'स्टॉकमधील एकूण निव्वळ वजन',
+    karagirPendingGoldMetric: 'कारागिरांकडील बाकी सोने',
+    noSalesInvoicesYet: 'कोणतीही विक्री बिले अद्याप नोंदवलेली नाहीत.',
+
+    // Theme & Appearance
+    themeAppearanceHeader: 'शोरूम थीम आणि स्वरूप',
+    themeAppearanceSubtitle: 'बिलिंग काउंटर, पॉईंट-ऑफ-सेल टर्मिनल्स आणि ऑफिससाठी डिस्प्ले थीम निवडा.',
+    obsidianDarkMode: 'ऑब्सिडियन डार्क मोड',
+    obsidianDarkModeDesc: 'गडद काळा आणि सोनेरी लुक. कमी प्रकाशातील काउंटरसाठी व डोळ्यांच्या आरामासाठी उत्तम.',
+    showroomLightMode: 'शोरूम लाईट मोड',
+    showroomLightModeDesc: 'शुभ्र पांढरा आणि सोनेरी लुक. उजेड असलेल्या दुकानांसाठी व दिवसा काउंटरवर काम करण्यासाठी उत्तम.',
+    themeActive: 'सुरू',
+
+    // Other View Headers
+    inventoryTitle: 'स्टॉक आणि',
+    inventoryTitleAccent: 'इन्व्हेंटरी',
+    inventorySubtitle: 'तिजोरीतील दागिने, बारकोड टॅग, प्रकार आणि वजनांचे व्यवस्थापन करा.',
+    karagirTitle: 'कारागीर',
+    karagirTitleAccent: 'हिशोब व्यवस्थापन',
+    karagirSubtitle: 'कारागिरांना दिलेले शुद्ध सोने, तयार दागिन्यांची आवक, घडणावळ हिशोब आणि शिल्लक सोन्याचा मागोवा घ्या.',
+    refineryTitle: 'सोन्याची गाळणी आणि',
+    refineryTitleAccent: 'रिफायनरी',
+    refinerySubtitle: 'गाळणीसाठी पाठवलेले जुने सोने, घट व कचरा (Dross) आणि परत मिळालेले शुद्ध २४K सोने यांची नोंद ठेवा.',
+    salesPurchaseTitle: 'विक्री आणि',
+    salesPurchaseTitleAccent: 'खरेदी नोंदी',
+    salesPurchaseSubtitle: 'जीएसटी विक्री इनव्हॉइस, ग्राहकांच्या पावत्या आणि जुने सोने खरेदी नोंदींचे संपूर्ण रजिस्टर.'
   }
 };

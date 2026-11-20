@@ -383,10 +383,10 @@ export default function SettingsView() {
           </div>
           <div>
             <h3 className="font-serif text-lg font-bold text-white">
-              Showroom Theme & Appearance
+              {t('themeAppearanceHeader', 'Showroom Theme & Appearance')}
             </h3>
             <p className="text-xs text-slate-400">
-              Customize the visual environment for billing counters, point-of-sale terminals, and executive desks.
+              {t('themeAppearanceSubtitle', 'Customize the visual environment for billing counters, point-of-sale terminals, and executive desks.')}
             </p>
           </div>
         </div>
@@ -407,15 +407,15 @@ export default function SettingsView() {
               </div>
               <div>
                 <h4 className="font-bold text-sm text-white flex items-center gap-2">
-                  <span>Obsidian Dark Mode</span>
+                  <span>{t('obsidianDarkMode', 'Obsidian Dark Mode')}</span>
                   {theme === 'dark' && (
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40">
-                      ACTIVE
+                      {t('themeActive', 'ACTIVE')}
                     </span>
                   )}
                 </h4>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Deep black & gold contrast. Ideal for low-light jewellery counters and executive suites.
+                  {t('obsidianDarkModeDesc', 'Deep black & gold contrast. Ideal for low-light jewellery counters and executive suites.')}
                 </p>
               </div>
             </div>
@@ -441,15 +441,15 @@ export default function SettingsView() {
               </div>
               <div>
                 <h4 className="font-bold text-sm text-white flex items-center gap-2">
-                  <span>Showroom Light Mode</span>
+                  <span>{t('showroomLightMode', 'Showroom Light Mode')}</span>
                   {theme === 'light' && (
                     <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 border border-emerald-400/40">
-                      ACTIVE
+                      {t('themeActive', 'ACTIVE')}
                     </span>
                   )}
                 </h4>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Crisp ivory & gold aesthetics. Ideal for brightly lit retail showrooms and daylight counters.
+                  {t('showroomLightModeDesc', 'Crisp ivory & gold aesthetics. Ideal for brightly lit retail showrooms and daylight counters.')}
                 </p>
               </div>
             </div>
