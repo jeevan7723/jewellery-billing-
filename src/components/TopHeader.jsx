@@ -3,6 +3,7 @@ import { Menu, Plus, ScanBarcode, Cloud, CloudCheck, CloudOff } from 'lucide-rea
 import { APP_MODULES } from './Sidebar';
 import { useJewellery } from '../context/JewelleryContext';
 import ThemeToggle from './ThemeToggle';
+import LanguageToggle from './LanguageToggle';
 
 export default function TopHeader({ 
   activeView, 
@@ -10,7 +11,7 @@ export default function TopHeader({
   onToggleMobileSidebar, 
   isCollapsed 
 }) {
-  const { rates, showroom, cloudStatus } = useJewellery();
+  const { rates, showroom, cloudStatus, t } = useJewellery();
   const currentModule = APP_MODULES.find(m => m.id === activeView) || APP_MODULES[0];
 
   return (
@@ -32,7 +33,7 @@ export default function TopHeader({
           <span className="text-slate-600 hidden sm:inline">/</span>
           <div className="flex items-center gap-1.5">
             <span className="font-serif font-bold text-white text-sm sm:text-base">
-              {currentModule.label}
+              {t(currentModule.id, currentModule.label)}
             </span>
           </div>
         </div>
@@ -47,7 +48,7 @@ export default function TopHeader({
           title="Scan Barcode"
         >
           <ScanBarcode className="w-3.5 h-3.5" />
-          <span>Scan</span>
+          <span>{t('scan', 'Scan')}</span>
         </button>
 
         {/* Firebase Cloud Sync Status */}
@@ -81,7 +82,7 @@ export default function TopHeader({
           }`} />
           <Cloud className="w-3.5 h-3.5 hidden xs:inline" />
           <span className="hidden sm:inline">
-            {cloudStatus?.isSyncing ? 'Syncing...' : cloudStatus?.connected ? 'Live Sync Active' : cloudStatus?.loading ? 'Connecting...' : 'Local Mode'}
+            {cloudStatus?.isSyncing ? t('syncing', 'Syncing...') : cloudStatus?.connected ? t('liveSyncActive', 'Live Sync Active') : cloudStatus?.loading ? t('connecting', 'Connecting...') : t('localMode', 'Local Mode')}
           </span>
         </div>
 
@@ -92,7 +93,7 @@ export default function TopHeader({
           title="Click to change daily rates"
         >
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-slate-400">22K Gold:</span>
+          <span className="text-slate-400">{t('gold22k', '22K Gold')}:</span>
           <span className="text-gold-300 font-bold">₹{rates.gold22k}/g</span>
         </div>
 
@@ -102,7 +103,7 @@ export default function TopHeader({
           className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-obsidian-900/90 border border-white/10 text-slate-300 hover:border-gold-500/40 cursor-pointer transition-colors"
           title="Click to change daily rates & making charges"
         >
-          <span className="text-slate-400">Silver:</span>
+          <span className="text-slate-400">{t('silver', 'Silver')}:</span>
           <span className="text-slate-100 font-bold">₹{rates.silver999}/g</span>
         </div>
 
@@ -112,9 +113,12 @@ export default function TopHeader({
           className="hidden xl:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-obsidian-900/90 border border-white/10 text-slate-300 hover:border-gold-500/40 cursor-pointer transition-colors"
           title="Owner default making charges rate (Click to change)"
         >
-          <span className="text-slate-400">Making:</span>
+          <span className="text-slate-400">{t('making', 'Making')}:</span>
           <span className="text-gold-400 font-bold">{rates.makingChargePercent ?? 5}%</span>
         </div>
+
+        {/* Language Toggle (English <-> Marathi मराठी) */}
+        <LanguageToggle />
 
         {/* Theme Mode Toggle (Dark / Light) */}
         <ThemeToggle />
@@ -125,7 +129,7 @@ export default function TopHeader({
           className="flex items-center gap-1.5 px-3 py-1.5 sm:px-3.5 rounded-xl gold-gradient-btn text-xs font-bold cursor-pointer shadow-gold-glow active:scale-95 transition-transform"
         >
           <Plus className="w-3.5 h-3.5" />
-          <span>New Bill</span>
+          <span>{t('newBill', 'New Bill')}</span>
         </button>
       </div>
     </header>

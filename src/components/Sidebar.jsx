@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { useJewellery } from '../context/JewelleryContext';
 import ThemeToggle from './ThemeToggle';
+import LanguageToggle from './LanguageToggle';
 
 export const APP_MODULES = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: 'Home' },
@@ -28,7 +29,7 @@ export default function Sidebar({
   isCollapsed,
   onToggleCollapse
 }) {
-  const { rates, showroom } = useJewellery();
+  const { rates, showroom, t } = useJewellery();
 
   return (
     <>
@@ -97,13 +98,15 @@ export default function Sidebar({
         <div className="flex-1 overflow-y-auto px-3 py-3 space-y-1 no-scrollbar">
           {!isCollapsed && (
             <div className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold">
-              Main Menu
+              {t('mainMenu', 'Main Menu')}
             </div>
           )}
 
           {APP_MODULES.map((module) => {
             const Icon = module.icon;
             const isActive = activeView === module.id;
+            const translatedLabel = t(module.id, module.label);
+            const translatedBadge = t(module.id + '_badge', module.badge);
 
             return (
               <button
@@ -112,7 +115,7 @@ export default function Sidebar({
                   onSelectView(module.id);
                   if (onClose) onClose();
                 }}
-                title={isCollapsed ? module.label : undefined}
+                title={isCollapsed ? translatedLabel : undefined}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all duration-200 cursor-pointer group text-left ${
                   isActive
                     ? 'bg-gradient-to-r from-gold-500/20 to-amber-600/10 text-gold-200 border border-gold-500/40 shadow-inner'
@@ -127,13 +130,13 @@ export default function Sidebar({
 
                 {!isCollapsed && (
                   <div className="flex-1 flex items-center justify-between overflow-hidden">
-                    <span className="truncate">{module.label}</span>
+                    <span className="truncate">{translatedLabel}</span>
                     <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border transition-colors ${
                       isActive 
                         ? 'bg-gold-500/20 text-gold-300 border-gold-500/40' 
                         : 'bg-white/5 text-slate-500 border-white/5'
                     }`}>
-                      {module.badge}
+                      {translatedBadge}
                     </span>
                   </div>
                 )}
@@ -142,15 +145,22 @@ export default function Sidebar({
           })}
         </div>
 
-        {/* Bottom Section: Live Rates Widget & Theme Toggle */}
+        {/* Bottom Section: Live Rates Widget, Language & Theme Toggle */}
         <div className="p-3 sm:p-4 border-t border-white/10 space-y-2.5">
           {!isCollapsed ? (
-            <div className="flex items-center justify-between px-1 text-[11px] font-mono text-slate-400">
-              <span className="text-slate-500 uppercase tracking-wider text-[10px] font-bold">Theme Mode</span>
-              <ThemeToggle variant="pill" />
-            </div>
+            <>
+              <div className="flex items-center justify-between px-1 text-[11px] font-mono text-slate-400">
+                <span className="text-slate-500 uppercase tracking-wider text-[10px] font-bold">{t('language', 'Language')}</span>
+                <LanguageToggle variant="pill" />
+              </div>
+              <div className="flex items-center justify-between px-1 text-[11px] font-mono text-slate-400">
+                <span className="text-slate-500 uppercase tracking-wider text-[10px] font-bold">{t('themeMode', 'Theme Mode')}</span>
+                <ThemeToggle variant="pill" />
+              </div>
+            </>
           ) : (
-            <div className="flex justify-center pb-1">
+            <div className="flex flex-col items-center gap-2 pb-1">
+              <LanguageToggle variant="icon-only" />
               <ThemeToggle variant="icon-only" />
             </div>
           )}
@@ -160,16 +170,16 @@ export default function Sidebar({
               <div className="flex items-center justify-between text-[10px] text-slate-400">
                 <span className="flex items-center gap-1 text-gold-400 font-bold">
                   <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-                  TODAY'S RATES
+                  {t('todaysRates', "TODAY'S RATES")}
                 </span>
-                <span className="text-emerald-400">● LIVE</span>
+                <span className="text-emerald-400">{t('live', '● LIVE')}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Gold 22K (916):</span>
+                <span className="text-slate-400">{t('gold22k', '22K Gold')}:</span>
                 <span className="font-bold text-gold-300">₹{rates.gold22k}/g</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-400">Silver:</span>
+                <span className="text-slate-400">{t('silver', 'Silver')}:</span>
                 <span className="font-bold text-slate-200">₹{rates.silver999}/g</span>
               </div>
             </div>

@@ -10,7 +10,7 @@ import TaxInvoiceTemplate from '../components/print/TaxInvoiceTemplate';
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 
 export default function RupeesBillingView() {
-  const { rates, showroom, inventory, addInvoice, updateInventoryItem } = useJewellery();
+  const { rates, showroom, inventory, addInvoice, updateInventoryItem, t } = useJewellery();
 
   // Customer KYC
   const [customerName, setCustomerName] = useState('');
@@ -212,7 +212,7 @@ export default function RupeesBillingView() {
           <div className="p-4 rounded-2xl bg-obsidian-900/80 border border-white/5 space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-mono uppercase tracking-wider text-gold-400 font-bold flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5" /> Customer Details
+                <User className="w-3.5 h-3.5" /> {t('customerDetails', 'Customer Details')}
               </span>
               <button
                 type="button"
@@ -234,7 +234,7 @@ export default function RupeesBillingView() {
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">Customer Name *</label>
+                <label className="block text-[11px] font-mono text-slate-400 mb-1">{t('customerName', 'Customer Name')} *</label>
                 <input 
                   type="text"
                   required
@@ -246,7 +246,7 @@ export default function RupeesBillingView() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">Phone Number *</label>
+                <label className="block text-[11px] font-mono text-slate-400 mb-1">{t('phone', 'Phone Number')} *</label>
                 <input 
                   type="text"
                   required
@@ -258,7 +258,7 @@ export default function RupeesBillingView() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 mb-1">City</label>
+                <label className="block text-[11px] font-mono text-slate-400 mb-1">{t('city', 'City')}</label>
                 <input 
                   type="text"
                   placeholder="e.g. Mumbai"
@@ -509,7 +509,7 @@ export default function RupeesBillingView() {
                 className="w-full py-3 rounded-xl gold-gradient-btn text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-gold-glow"
               >
                 <Receipt className="w-4 h-4" />
-                <span>Save & Print Bill</span>
+                <span>{t('saveAndPrint', 'Save & Print Bill')}</span>
               </button>
             </div>
           </div>

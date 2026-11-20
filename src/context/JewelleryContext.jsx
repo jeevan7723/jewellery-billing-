@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
+import { translations } from '../utils/translations';
 import {
   collection,
   doc,
@@ -262,6 +263,48 @@ export function JewelleryProvider({ children }) {
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
   }, [theme]);
+
+  // Bilingual State (English 'en' / Marathi 'mr')
+  const [language, setLanguageState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('language');
+        if (saved === 'en' || saved === 'mr') return saved;
+      } catch (e) {}
+    }
+    return 'en';
+  });
+
+  const setLanguage = (newLang) => {
+    setLanguageState(newLang);
+    try {
+      localStorage.setItem('language', newLang);
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = newLang;
+      }
+    } catch (e) {}
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'mr' : 'en');
+  };
+
+  const t = (key, fallback) => {
+    return translations[language]?.[key] || fallback || translations['en']?.[key] || key;
+  };
+
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = language;
+    }
+    const handleLangStorage = (e) => {
+      if (e.key === 'language' && (e.newValue === 'en' || e.newValue === 'mr')) {
+        setLanguageState(e.newValue);
+      }
+    };
+    window.addEventListener('storage', handleLangStorage);
+    return () => window.removeEventListener('storage', handleLangStorage);
+  }, [language]);
 
   // Real-Time Firebase Subscriptions
   useEffect(() => {
@@ -751,7 +794,11 @@ export function JewelleryProvider({ children }) {
       syncAllToCloud,
       theme,
       setTheme,
-      toggleTheme
+      toggleTheme,
+      language,
+      setLanguage,
+      toggleLanguage,
+      t
     }}>
       {children}
     </JewelleryContext.Provider>

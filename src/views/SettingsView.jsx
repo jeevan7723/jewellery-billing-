@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useJewellery, INITIAL_RATES, INITIAL_INVENTORY, INITIAL_KARAGIRS, INITIAL_REFINERY_BATCHES, INITIAL_INVOICES, INITIAL_SHOWROOM } from '../context/JewelleryContext';
-import { Settings, Save, RotateCcw, Building2, TrendingUp, CheckCircle2, Shield, Wrench, Sparkles, Cloud, Database, RefreshCw, Palette, Sun, Moon, Hammer, Percent } from 'lucide-react';
+import { Settings, Save, RotateCcw, Building2, TrendingUp, CheckCircle2, Shield, Wrench, Sparkles, Cloud, Database, RefreshCw, Palette, Sun, Moon, Hammer, Percent, Languages } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 export default function SettingsView() {
-  const { rates, updateRates, showroom, setShowroom, cloudStatus, syncAllToCloud, theme, setTheme } = useJewellery();
+  const { rates, updateRates, showroom, setShowroom, cloudStatus, syncAllToCloud, theme, setTheme, language, setLanguage, t } = useJewellery();
   const [syncingCloud, setSyncingCloud] = useState(false);
   const [syncMessage, setSyncMessage] = useState(null);
 
@@ -457,6 +457,96 @@ export default function SettingsView() {
               theme === 'light' ? 'border-gold-500 bg-gold-500' : 'border-slate-500'
             }`}>
               {theme === 'light' && <div className="w-2 h-2 rounded-full bg-white" />}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Language & Regional Preferences (English / Marathi मराठी) */}
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-white/10 shadow-glass-lg space-y-6">
+        <div className="flex items-center gap-3 pb-4 border-b border-white/10">
+          <div className="p-3 rounded-2xl bg-gold-500/10 border border-gold-500/20 text-gold-400">
+            <Languages className="w-6 h-6" />
+          </div>
+          <div>
+            <h3 className="font-serif text-lg font-bold text-white flex items-center gap-2">
+              <span>{t('languageSettings', 'Language & Regional Preferences')}</span>
+              <span className="text-xs font-mono font-normal text-gold-400">(भाषा प्राधान्ये)</span>
+            </h3>
+            <p className="text-xs text-slate-400">
+              {language === 'mr' 
+                ? 'बिलिंग, पावती आणि मेनूसाठी भाषा निवडा. इंग्रजी आणि मराठी दोन्ही भाषांमध्ये सहजपणे वापरा.'
+                : 'Choose the interface language for POS billing counters, receipts, and menu navigation.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* English Option Card */}
+          <div
+            onClick={() => setLanguage('en')}
+            className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+              language === 'en'
+                ? 'bg-obsidian-900 border-gold-500 shadow-gold-glow'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-obsidian-950 border border-gold-500/30 flex items-center justify-center text-gold-400 font-mono font-black text-sm">
+                EN
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <span>English (Default)</span>
+                  {language === 'en' && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40">
+                      ACTIVE
+                    </span>
+                  )}
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Standard Indian jewellery industry terminology with English numerals and labels.
+                </p>
+              </div>
+            </div>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              language === 'en' ? 'border-gold-500 bg-gold-500' : 'border-slate-500'
+            }`}>
+              {language === 'en' && <div className="w-2 h-2 rounded-full bg-obsidian-950" />}
+            </div>
+          </div>
+
+          {/* Marathi Option Card */}
+          <div
+            onClick={() => setLanguage('mr')}
+            className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between ${
+              language === 'mr'
+                ? 'bg-obsidian-900 border-gold-500 shadow-gold-glow'
+                : 'bg-white/5 border-white/10 hover:border-white/20'
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500/20 to-gold-500/20 border border-amber-400/40 flex items-center justify-center text-gold-300 font-serif font-black text-sm">
+                मरा
+              </div>
+              <div>
+                <h4 className="font-bold text-sm text-white flex items-center gap-2">
+                  <span>मराठी (Marathi)</span>
+                  {language === 'mr' && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-gold-500/20 text-gold-300 border border-gold-500/40">
+                      सक्रिय (ACTIVE)
+                    </span>
+                  )}
+                </h4>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  महाराष्ट्र सराफा पेढी प्रमाणित मराठी भाषा (दागिने, घडणावळ, गाळणी, कारागीर हिशोब).
+                </p>
+              </div>
+            </div>
+            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+              language === 'mr' ? 'border-gold-500 bg-gold-500' : 'border-slate-500'
+            }`}>
+              {language === 'mr' && <div className="w-2 h-2 rounded-full bg-obsidian-950" />}
             </div>
           </div>
         </div>
