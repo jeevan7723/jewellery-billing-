@@ -114,24 +114,17 @@ export default function TaxInvoiceTemplate({ invoice, showroom: rawShowroom, for
             <span>₹{sgstAmount.toLocaleString('en-IN')}</span>
           </div>
           {/* SEPARATE PURCHASED GOLD TOTAL PRICE LINE IN THERMAL */}
-          {oldGoldCredit > 0 ? (
-            <div className="flex justify-between font-bold text-gray-900 border-t border-dashed border-gray-400 pt-1">
-              <div>
-                <span>{isMarathi ? 'वजा: खरेदी सोने एकूण किंमत' : 'Less: Purchased Gold Total'}:</span>
-                {inwardWeight > 0 && (
-                  <span className="block text-[8px] font-normal text-gray-600">
-                    ({inwardWeight.toFixed(3)}g @ ₹{inwardRate}/g)
-                  </span>
-                )}
-              </div>
-              <span className="font-bold">-₹{oldGoldCredit.toLocaleString('en-IN')}</span>
+          <div className="flex justify-between items-center font-bold text-gray-900 border-t border-b border-dashed border-gray-400 py-1 my-1 bg-amber-50/70 px-1">
+            <div>
+              <span className="uppercase">{isMarathi ? 'खरेदी सोने एकूण किंमत' : 'Purchased Gold Total'}:</span>
+              {oldGoldCredit > 0 && inwardWeight > 0 && (
+                <span className="block text-[8px] font-normal text-gray-600">
+                  ({inwardWeight.toFixed(3)}g @ ₹{inwardRate}/g)
+                </span>
+              )}
             </div>
-          ) : (
-            <div className="flex justify-between text-gray-500 text-[9px] border-t border-dashed border-gray-300 pt-0.5">
-              <span>{isMarathi ? 'खरेदी सोने एकूण किंमत:' : 'Purchased Gold Total:'}</span>
-              <span>₹0</span>
-            </div>
-          )}
+            <span className="font-bold">{oldGoldCredit > 0 ? `-₹${oldGoldCredit.toLocaleString('en-IN')}` : '₹0'}</span>
+          </div>
           <div className="flex justify-between text-xs font-bold pt-1 border-t border-black">
             <span>{isMarathi ? 'एकूण देय रक्कम:' : 'NET PAYABLE:'}</span>
             <span>₹{grandTotal.toLocaleString('en-IN')}</span>
@@ -319,22 +312,41 @@ export default function TaxInvoiceTemplate({ invoice, showroom: rawShowroom, for
             </span>
           </div>
 
-          {/* DEDICATED SEPARATE PURCHASED GOLD TOTAL PRICE CALLOUT */}
-          {oldGoldCredit > 0 && (
-            <div className="p-2.5 border-2 border-amber-400 rounded-lg bg-amber-50 text-[11px] flex justify-between items-center shadow-sm">
-              <div>
-                <span className="text-[10px] font-mono uppercase font-black text-amber-900 block flex items-center gap-1">
-                  <span>★</span> {isMarathi ? 'खरेदी जुन्या सोन्याची एकूण किंमत (क्रेडिट):' : 'PURCHASED OLD GOLD TOTAL PRICE (CREDIT):'}
-                </span>
-                <span className="text-slate-700 text-[10px] font-mono">
-                  {inwardWeight.toFixed(3)}g {formatMetal(inwardMetal)} ({inwardKarat}) @ ₹{inwardRate.toLocaleString('en-IN')}/g
-                </span>
-              </div>
-              <span className="font-serif font-black text-base text-amber-950">
-                ₹{oldGoldCredit.toLocaleString('en-IN')}
+          {/* DEDICATED SEPARATE PURCHASED GOLD TOTAL VALUE CARD */}
+          <div className="p-3 border-2 border-amber-400 rounded-xl bg-gradient-to-r from-amber-50 via-amber-100/60 to-amber-50 text-[11px] shadow-sm">
+            <div className="flex justify-between items-center border-b border-amber-300 pb-1.5 mb-2">
+              <span className="text-[10px] font-mono uppercase font-black text-amber-950 flex items-center gap-1.5">
+                <span>🪙</span> {isMarathi ? 'खरेदी जुन्या सोन्याचे एकूण मूल्य (Purchased Gold Total Value):' : 'PURCHASED OLD GOLD TOTAL VALUE:'}
+              </span>
+              <span className="font-mono text-[9px] px-2 py-0.5 rounded bg-amber-200 text-amber-900 font-bold uppercase">
+                {oldGoldCredit > 0 ? (isMarathi ? 'जमा / वजावट लागू' : 'Credited') : (isMarathi ? 'शून्य (Nil)' : 'Nil')}
               </span>
             </div>
-          )}
+
+            <div className="flex justify-between items-end">
+              <div className="space-y-0.5 text-[10px] text-slate-700 font-mono">
+                <div>
+                  <span className="text-slate-500">{isMarathi ? 'जमा जुना धातू:' : 'Old Metal Deposited:'}</span>{' '}
+                  <strong className="text-slate-900">
+                    {oldGoldCredit > 0 ? `${inwardWeight.toFixed(3)}g ${formatMetal(inwardMetal)} (${inwardKarat})` : (isMarathi ? 'कोणताही जुना धातू नाही (None)' : 'No Old Metal')}
+                  </strong>
+                </div>
+                <div>
+                  <span className="text-slate-500">{isMarathi ? 'खरेदी लागू दर:' : 'Purchased Gold Rate:'}</span>{' '}
+                  <strong className="text-amber-900">{inwardRate > 0 ? `₹${inwardRate.toLocaleString('en-IN')}/g` : '—'}</strong>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <span className="text-[9px] font-mono text-slate-500 block uppercase">
+                  {isMarathi ? 'एकूण खरेदी मूल्य (Total Value):' : 'Total Value:'}
+                </span>
+                <span className="font-serif font-black text-base text-amber-950">
+                  {oldGoldCredit > 0 ? `-₹${oldGoldCredit.toLocaleString('en-IN')}` : '₹0'}
+                </span>
+              </div>
+            </div>
+          </div>
 
           <div className="p-2.5 border border-amber-300 rounded bg-amber-50/60 text-[10px] text-amber-950 space-y-1">
             <div className="font-bold flex items-center gap-1">
@@ -405,32 +417,24 @@ export default function TaxInvoiceTemplate({ invoice, showroom: rawShowroom, for
                 <td className="py-1.5 px-3 text-right font-bold text-slate-900">₹{gstAmount.toLocaleString('en-IN')}</td>
               </tr>
               {/* SEPARATE PROMINENT ROW FOR PURCHASED GOLD TOTAL PRICE */}
-              {oldGoldCredit > 0 ? (
-                <tr className="border-b-2 border-amber-400 bg-amber-100/80 text-amber-950 font-bold">
-                  <td className="py-2 px-3">
-                    <span className="block font-bold">
-                      {isMarathi ? 'वजा: खरेदी जुन्या सोन्याची एकूण किंमत:' : 'Less: Purchased Gold Total Price:'}
+              <tr className={`border-y-2 ${oldGoldCredit > 0 ? 'border-amber-400 bg-amber-100/90 text-amber-950' : 'border-amber-300 bg-amber-50/80 text-amber-950'} font-bold`}>
+                <td className="py-2 px-3">
+                  <div className="flex items-center gap-1 font-bold text-[11px]">
+                    <span>🪙</span>
+                    <span>
+                      {isMarathi ? 'खरेदी जुन्या सोन्याचे एकूण मूल्य:' : 'Purchased Gold Total Value:'}
                     </span>
-                    {inwardRate > 0 && (
-                      <span className="block text-[9px] text-amber-800 font-normal">
-                        ({inwardWeight.toFixed(3)}g {formatMetal(inwardMetal)} {inwardKarat} @ ₹{inwardRate.toLocaleString('en-IN')}/g)
-                      </span>
-                    )}
-                  </td>
-                  <td className="py-2 px-3 text-right font-serif font-bold text-amber-950 text-sm">
-                    -₹{oldGoldCredit.toLocaleString('en-IN')}
-                  </td>
-                </tr>
-              ) : (
-                <tr className="border-b border-slate-200 bg-amber-50/40 text-slate-700">
-                  <td className="py-1.5 px-3 font-semibold text-[10px]">
-                    {isMarathi ? 'खरेदी जुन्या सोन्याची एकूण किंमत:' : 'Purchased Gold Total Price:'}
-                  </td>
-                  <td className="py-1.5 px-3 text-right font-mono font-bold text-slate-700 text-[10px]">
-                    ₹0
-                  </td>
-                </tr>
-              )}
+                  </div>
+                  {oldGoldCredit > 0 && inwardRate > 0 && (
+                    <span className="block text-[9px] text-amber-800 font-normal pl-4">
+                      ({inwardWeight.toFixed(3)}g {formatMetal(inwardMetal)} {inwardKarat} @ ₹{inwardRate.toLocaleString('en-IN')}/g)
+                    </span>
+                  )}
+                </td>
+                <td className="py-2 px-3 text-right font-serif font-black text-amber-950 text-sm">
+                  {oldGoldCredit > 0 ? `-₹${oldGoldCredit.toLocaleString('en-IN')}` : '₹0'}
+                </td>
+              </tr>
               <tr 
                 className="bg-slate-900 text-white keep-white"
                 style={{ color: '#ffffff' }}
