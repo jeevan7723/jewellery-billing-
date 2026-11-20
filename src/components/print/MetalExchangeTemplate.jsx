@@ -41,6 +41,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
     inwardFineEquivalent = 0,
     inwardRate = 0,
     inwardValuation = 0,
+    purchasedGoldValue = 0,
     outwardMetal = 'Gold',
     outwardKarat = '22K',
     outwardDescription = isMarathi ? 'दागिने वस्तू' : 'Jewellery Article',
@@ -62,7 +63,7 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
   const safeInwardNet = Number(inwardNetWeight) || 0;
   const safeMeltingLoss = Number(inwardMeltingLossPercent) || 0;
   const safeInwardFine = Number(inwardFineEquivalent) || 0;
-  const safeInwardValuation = Number(inwardValuation) || 0;
+  const safeInwardValuation = Number(inwardValuation || purchasedGoldValue) || 0;
 
   const PURITY_RATIOS = {
     '24K': 0.999,
@@ -165,16 +166,16 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
         </div>
       </div>
 
-      {/* Customer Info & Mode Bar */}
-      <div className="grid grid-cols-12 gap-3 bg-slate-50 border border-slate-300 rounded p-3 mb-4 text-[11px] items-center">
-        <div className="col-span-5">
+      {/* Customer Info & Mode Bar (With Separate Purchased Gold Total Price) */}
+      <div className="grid grid-cols-12 gap-2 bg-slate-50 border border-slate-300 rounded p-3 mb-4 text-[11px] items-center">
+        <div className="col-span-4">
           <span className="text-slate-500 uppercase text-[10px] font-mono block">
             {isMarathi ? 'ग्राहकाचे नाव व तपशील:' : 'Customer Particulars:'}
           </span>
           <span className="font-bold text-sm text-slate-900">{customerName}</span>
           {phone && phone !== '—' && <span className="text-slate-600 ml-2 font-mono">({phone})</span>}
         </div>
-        <div className="col-span-4 text-center border-l border-slate-200">
+        <div className="col-span-3 text-center border-l border-slate-200">
           <span className="text-slate-500 uppercase text-[10px] font-mono block">
             {isMarathi ? 'खरेदी केलेला दर:' : 'Purchased Gold Rate:'}
           </span>
@@ -182,11 +183,20 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
             ₹{effectiveInwardRate.toLocaleString('en-IN')} / g {inwardKarat ? `(${inwardKarat})` : ''}
           </span>
         </div>
-        <div className="col-span-3 text-right border-l border-slate-200">
+        {/* SEPARATE PURCHASED GOLD TOTAL PRICE CALLOUT */}
+        <div className="col-span-3 text-center border-l border-amber-300 bg-amber-100/70 py-1 px-2 rounded border">
+          <span className="text-amber-900 uppercase text-[10px] font-mono font-bold block">
+            {isMarathi ? 'खरेदी सोन्याची एकूण किंमत:' : 'Purchased Gold Total Price:'}
+          </span>
+          <span className="font-bold font-serif text-sm text-amber-950">
+            ₹{safeInwardValuation.toLocaleString('en-IN')}
+          </span>
+        </div>
+        <div className="col-span-2 text-right border-l border-slate-200">
           <span className="text-slate-500 uppercase text-[10px] font-mono block">
             {isMarathi ? 'अदलाबदल पद्धत:' : 'Exchange Mode:'}
           </span>
-          <span className="font-bold font-mono text-xs uppercase px-2 py-0.5 bg-purple-100 text-purple-900 rounded border border-purple-300">
+          <span className="font-bold font-mono text-[10px] uppercase px-1.5 py-0.5 bg-purple-100 text-purple-900 rounded border border-purple-300 block truncate">
             {exchangeModeDisplay()}
           </span>
         </div>
@@ -250,11 +260,12 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 </td>
                 <td className="py-1 text-right text-xs">{safeInwardFine.toFixed(3)}g</td>
               </tr>
-              <tr className="pt-2 text-slate-900">
-                <td className="py-1 font-bold">
-                  {isMarathi ? 'जुन्या सोन्याचे मूल्यांकन:' : 'Purchased Gold Valuation:'}
+              {/* Highlighted Purchased Gold Valuation row */}
+              <tr className="border-t-2 border-amber-400 bg-amber-100/70 text-slate-950 font-bold">
+                <td className="py-1.5 font-bold">
+                  {isMarathi ? 'खरेदी सोन्याची एकूण किंमत (Total Price):' : 'Purchased Gold Total Price:'}
                 </td>
-                <td className="py-1 text-right font-bold font-serif text-sm">
+                <td className="py-1.5 text-right font-bold font-serif text-sm text-amber-950">
                   ₹{safeInwardValuation.toLocaleString('en-IN')}
                 </td>
               </tr>
@@ -315,11 +326,12 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                 </td>
                 <td className="py-1 text-right font-medium text-slate-900">₹45.00</td>
               </tr>
-              <tr className="pt-2 text-slate-900">
-                <td className="py-1 font-bold">
-                  {isMarathi ? 'नवीन दागिन्यांचे मूल्यांकन:' : 'New Jewellery Valuation:'}
+              {/* Highlighted New Jewellery Valuation row */}
+              <tr className="border-t-2 border-emerald-400 bg-emerald-100/70 text-slate-950 font-bold">
+                <td className="py-1.5 font-bold">
+                  {isMarathi ? 'नवीन दागिन्यांची एकूण किंमत (Total Price):' : 'New Jewellery Total Price:'}
                 </td>
-                <td className="py-1 text-right font-bold font-serif text-sm">
+                <td className="py-1.5 text-right font-bold font-serif text-sm text-emerald-950">
                   ₹{safeOutwardValuation.toLocaleString('en-IN')}
                 </td>
               </tr>
@@ -329,12 +341,14 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
 
       </div>
 
-      {/* Barter Settlement Summary */}
+      {/* Barter Settlement Summary: SEPARATE PURCHASED GOLD TOTAL PRICE BREAKDOWN */}
       <div className="border-2 border-slate-900 rounded p-4 mb-4 bg-slate-50">
-        <div className="flex justify-between items-center">
+        
+        {/* Header line of settlement */}
+        <div className="flex justify-between items-center pb-2 border-b border-slate-200">
           <div>
             <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500">
-              {isMarathi ? 'निव्वळ देवाणघेवाण हिशोब (Settlement)' : 'Net Barter Settlement'}
+              {isMarathi ? 'निव्वळ देवाणघेवाण हिशोब (Settlement Summary)' : 'Net Barter Settlement Summary'}
             </div>
             <div className="font-serif text-lg font-black text-slate-900">
               {isCustomerRefund 
@@ -350,21 +364,6 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                         : `BALANCED TRADE (NIL BALANCE)`)
                   )
               }
-            </div>
-            <div className="text-[10px] text-slate-600 font-mono mt-0.5">
-              {hasValidMetalDiff ? (
-                isMarathi ? (
-                  <>निव्वळ शुद्ध {formatMetal(inwardMetal)} फरक: <strong>{safeDiff.toFixed(3)}g</strong> ({isCustomerRefund ? 'शिल्लक धातू ग्राहकास जमा' : (isCustomerPayable ? 'अतिरिक्त धातू ग्राहकास नावे' : 'संतुलित देवाणघेवाण')})</>
-                ) : (
-                  <>Net pure {inwardMetal} difference: <strong>{safeDiff.toFixed(3)}g</strong> ({isCustomerRefund ? 'Surplus metal credited' : (isCustomerPayable ? 'Additional metal debited' : 'Balanced trade')})</>
-                )
-              ) : (
-                isMarathi ? (
-                  <>{formatMetal(inwardMetal)} ({inwardKarat}) च्या बदल्यात {formatMetal(outwardMetal)} ({outwardKarat})</>
-                ) : (
-                  <>Exchange of {inwardMetal} ({inwardKarat}) for {outwardMetal} ({outwardKarat})</>
-                )
-              )}
             </div>
           </div>
 
@@ -383,6 +382,76 @@ export default function MetalExchangeTemplate({ exchangeData, showroom: rawShowr
                     : (isMarathi ? 'शून्य बाकी' : 'Nil Balance'))}
             </span>
           </div>
+        </div>
+
+        {/* 3-PART SEPARATE BREAKDOWN CARDS */}
+        <div className="grid grid-cols-3 gap-3 my-3">
+          
+          {/* Card 1: New Jewellery Valuation */}
+          <div className="p-2.5 rounded border border-emerald-300 bg-emerald-50/60">
+            <span className="text-[10px] font-mono uppercase text-emerald-900 font-bold block">
+              {isMarathi ? '१. नवीन दागिन्यांची किंमत:' : '1. New Jewellery Valuation:'}
+            </span>
+            <span className="font-serif text-base font-black text-emerald-950 block my-0.5">
+              ₹{safeOutwardValuation.toLocaleString('en-IN')}
+            </span>
+            <span className="text-[9px] text-slate-600 block font-mono">
+              ({safeOutwardGross.toFixed(3)}g {outwardKarat})
+            </span>
+          </div>
+
+          {/* Card 2: PROMINENT SEPARATE PURCHASED GOLD TOTAL PRICE */}
+          <div className="p-2.5 rounded border-2 border-amber-500 bg-amber-100 shadow-sm ring-1 ring-amber-400">
+            <span className="text-[10px] font-mono uppercase text-amber-950 font-black block flex items-center gap-1">
+              <span>★</span> {isMarathi ? '२. खरेदी सोन्याची एकूण किंमत:' : '2. Purchased Gold Total Price:'}
+            </span>
+            <span className="font-serif text-base font-black text-amber-950 block my-0.5">
+              -₹{safeInwardValuation.toLocaleString('en-IN')}
+            </span>
+            <span className="text-[9px] text-amber-900 block font-mono font-medium">
+              ({safeInwardNet.toFixed(3)}g Net • ₹{effectiveInwardRate.toLocaleString('en-IN')}/g)
+            </span>
+          </div>
+
+          {/* Card 3: Final Barter Settlement Balance */}
+          <div className="p-2.5 rounded border border-slate-300 bg-white">
+            <span className="text-[10px] font-mono uppercase text-slate-700 font-bold block">
+              {isCustomerRefund 
+                ? (isMarathi ? '३. शिल्लक परतावा रक्कम:' : '3. Balance Refund Due:')
+                : (isCustomerPayable 
+                    ? (isMarathi ? '३. निव्वळ देय बाकी रक्कम:' : '3. Net Payable Balance:')
+                    : (isMarathi ? '३. अंतिम बाकी:' : '3. Final Balance:'))}
+            </span>
+            <span className={`font-serif text-base font-black block my-0.5 ${
+              isCustomerRefund ? 'text-emerald-700' : (isCustomerPayable ? 'text-amber-900' : 'text-slate-800')
+            }`}>
+              ₹{absSettlement.toLocaleString('en-IN')}
+            </span>
+            <span className="text-[9px] text-slate-500 block font-mono">
+              {isCustomerRefund 
+                ? (isMarathi ? '(सोने जास्त जमा झाले)' : '(Metal surplus credited)')
+                : (isCustomerPayable 
+                    ? (isMarathi ? '(नवीन दागिन्यांची बाकी)' : '(Customer balance due)')
+                    : (isMarathi ? '(शून्य बाकी)' : '(Nil balance)'))}
+            </span>
+          </div>
+
+        </div>
+
+        <div className="text-[10px] text-slate-600 font-mono">
+          {hasValidMetalDiff ? (
+            isMarathi ? (
+              <>निव्वळ शुद्ध {formatMetal(inwardMetal)} फरक: <strong>{safeDiff.toFixed(3)}g</strong> ({isCustomerRefund ? 'शिल्लक धातू ग्राहकास जमा' : (isCustomerPayable ? 'अतिरिक्त धातू ग्राहकास नावे' : 'संतुलित देवाणघेवाण')})</>
+            ) : (
+              <>Net pure {inwardMetal} difference: <strong>{safeDiff.toFixed(3)}g</strong> ({isCustomerRefund ? 'Surplus metal credited' : (isCustomerPayable ? 'Additional metal debited' : 'Balanced trade')})</>
+            )
+          ) : (
+            isMarathi ? (
+              <>{formatMetal(inwardMetal)} ({inwardKarat}) च्या बदल्यात {formatMetal(outwardMetal)} ({outwardKarat})</>
+            ) : (
+              <>Exchange of {inwardMetal} ({inwardKarat}) for {outwardMetal} ({outwardKarat})</>
+            )
+          )}
         </div>
 
         <div className="text-[11px] font-serif font-bold text-slate-800 pt-2 border-t border-slate-200 mt-2">
