@@ -34,6 +34,19 @@ export default function BarcodeBillingView() {
   const [billFormat, setBillFormat] = useState('thermal'); // 'thermal' | 'a4'
   const [checkoutInvoice, setCheckoutInvoice] = useState(null);
 
+  // Old Gold / Purchased Gold Deduction
+  const [hasOldGold, setHasOldGold] = useState(false);
+  const [oldGoldWeight, setOldGoldWeight] = useState('');
+  const [oldGoldRate, setOldGoldRate] = useState(rates.gold22k);
+  const [oldGoldValueManual, setOldGoldValueManual] = useState('');
+
+  const numOldWeight = parseFloat(oldGoldWeight) || 0;
+  const numOldRate = parseFloat(oldGoldRate) || 0;
+  const autoOldGoldValue = Math.round(numOldWeight * numOldRate);
+  const oldGoldCredit = hasOldGold 
+    ? (oldGoldValueManual !== '' ? (parseFloat(oldGoldValueManual) || 0) : autoOldGoldValue)
+    : 0;
+
   const handleScan = (code) => {
     setScannedCode(code);
     const found = inventory.find(i => i.barcode.toLowerCase() === code.trim().toLowerCase());
@@ -51,6 +64,8 @@ export default function BarcodeBillingView() {
       : (matchedItem.makingChargeType === 'perGram' ? matchedItem.netWeight * matchedItem.makingChargeRate : metalVal * (matchedItem.makingChargeRate / 100));
     const subtotal = Math.round(metalVal + making + 45);
     const gst = Math.round(subtotal * 0.03);
+    const grossTotal = subtotal + gst;
+    const finalGrandTotal = Math.max(0, grossTotal - oldGoldCredit);
 
     const newInv = {
       invoiceNo: `KC-BAR-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -73,11 +88,23 @@ export default function BarcodeBillingView() {
       discount: 0,
       subtotal,
       gst3Percent: gst,
-      grandTotal: subtotal + gst,
+      exchangeCredit: oldGoldCredit,
+      inwardValuation: oldGoldCredit,
+      purchasedGoldValue: oldGoldCredit,
+      inwardGrossWeight: numOldWeight,
+      purchasedGoldGrossWeight: numOldWeight,
+      inwardRate: numOldRate,
+      purchasedGoldRate: numOldRate,
+      inwardMetal: 'Gold',
+      inwardKarat: '22K',
+      grandTotal: finalGrandTotal,
     };
 
     setCheckoutInvoice(newInv);
     setShowBillModal(true);
+    setHasOldGold(false);
+    setOldGoldWeight('');
+    setOldGoldValueManual('');
     confetti({
       particleCount: 80,
       spread: 70,
@@ -247,6 +274,59 @@ export default function BarcodeBillingView() {
                 className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono"
               />
             </div>
+          </div>
+
+          {/* Optional Old Gold / Purchased Gold Deduction */}
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input 
+                  type="checkbox"
+                  checked={hasOldGold}
+                  onChange={(e) => setHasOldGold(e.target.checked)}
+                  className="w-4 h-4 rounded text-gold-500 focus:ring-gold-400 bg-obsidian-950 border-white/20"
+                />
+                <span className="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold">
+                  {t('deductOldPurchasedGold', 'Deduct Old / Purchased Gold (जुने सोने जमा)')}
+                </span>
+              </label>
+              {hasOldGold && (
+                <span className="text-xs font-mono font-bold text-amber-300">
+                  -₹{oldGoldCredit.toLocaleString('en-IN')}
+                </span>
+              )}
+            </div>
+
+            {hasOldGold && (
+              <div className="pt-2 border-t border-amber-500/20 grid grid-cols-2 gap-3 animate-in fade-in duration-200">
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-300 mb-1">Old Gold Wt (g)</label>
+                  <input 
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    placeholder="0.000"
+                    value={oldGoldWeight}
+                    onChange={(e) => {
+                      setOldGoldWeight(e.target.value);
+                      setOldGoldValueManual('');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold text-amber-300"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-300 mb-1">Purchased Gold Price (₹)</label>
+                  <input 
+                    type="number"
+                    step="1"
+                    placeholder={String(autoOldGoldValue)}
+                    value={oldGoldValueManual !== '' ? oldGoldValueManual : (autoOldGoldValue > 0 ? autoOldGoldValue : '')}
+                    onChange={(e) => setOldGoldValueManual(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-black text-amber-400 bg-amber-950/40"
+                  />
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Quick POS Checkout Button */}

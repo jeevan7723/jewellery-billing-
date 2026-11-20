@@ -31,6 +31,14 @@ export default function RupeesBillingView() {
   const [hallmarkFee, setHallmarkFee] = useState(45);
   const [discount, setDiscount] = useState(0);
 
+  // Old Gold / Purchased Gold Exchange Deduction
+  const [hasOldGold, setHasOldGold] = useState(false);
+  const [oldGoldMetal, setOldGoldMetal] = useState('Gold');
+  const [oldGoldKarat, setOldGoldKarat] = useState('22K');
+  const [oldGoldWeight, setOldGoldWeight] = useState('');
+  const [oldGoldRate, setOldGoldRate] = useState(rates.gold22k);
+  const [oldGoldValueManual, setOldGoldValueManual] = useState('');
+
   // Auto-sync making charges % with Gold Rate Settings
   useEffect(() => {
     if (rates.makingChargePercent !== undefined && !selectedInventoryId && makingType === 'percentage') {
@@ -116,13 +124,24 @@ export default function RupeesBillingView() {
   const activeHallmark = hasItem ? Number(hallmarkFee || 0) : 0;
   const taxableAmount = hasItem ? Math.max(0, metalValue + makingTotal + activeHallmark - Number(discount || 0)) : 0;
   const gstAmount = taxableAmount * 0.03; // 3% Jewellery GST
-  const grandTotal = Math.round(taxableAmount + gstAmount);
+  const grossPayable = Math.round(taxableAmount + gstAmount);
+
+  // Purchased Gold calculation
+  const numOldWeight = parseFloat(oldGoldWeight) || 0;
+  const numOldRate = parseFloat(oldGoldRate) || 0;
+  const autoOldGoldValue = Math.round(numOldWeight * numOldRate);
+  const oldGoldCredit = hasOldGold 
+    ? (oldGoldValueManual !== '' ? (parseFloat(oldGoldValueManual) || 0) : autoOldGoldValue)
+    : 0;
+
+  const grandTotal = Math.max(0, grossPayable - oldGoldCredit);
 
   const handleCreateBill = async (e) => {
     e.preventDefault();
     const cleanGrandTotal = Math.round(Number(grandTotal)) || 0;
     const cleanSubtotal = Math.round(Number(taxableAmount)) || 0;
     const cleanGst = Math.round(Number(gstAmount)) || 0;
+    const cleanOldGold = Math.round(Number(oldGoldCredit)) || 0;
 
     const newInv = {
       invoiceNo: `KC-BILL-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -147,6 +166,17 @@ export default function RupeesBillingView() {
       discount: Number(discount) || 0,
       subtotal: cleanSubtotal,
       gst3Percent: cleanGst,
+      exchangeCredit: cleanOldGold,
+      inwardValuation: cleanOldGold,
+      purchasedGoldValue: cleanOldGold,
+      inwardGrossWeight: numOldWeight,
+      purchasedGoldGrossWeight: numOldWeight,
+      inwardRate: numOldRate,
+      purchasedGoldRate: numOldRate,
+      inwardMetal: oldGoldMetal,
+      purchasedGoldMetal: oldGoldMetal,
+      inwardKarat: oldGoldKarat,
+      purchasedGoldKarat: oldGoldKarat,
       grandTotal: cleanGrandTotal,
     };
 
@@ -176,6 +206,9 @@ export default function RupeesBillingView() {
     setCustomerName('');
     setPhone('');
     setCity('');
+    setHasOldGold(false);
+    setOldGoldWeight('');
+    setOldGoldValueManual('');
   };
 
   return (
@@ -224,6 +257,9 @@ export default function RupeesBillingView() {
                   setItemName('');
                   setGrossWeight('');
                   setStoneWeight('');
+                  setHasOldGold(false);
+                  setOldGoldWeight('');
+                  setOldGoldValueManual('');
                 }}
                 className="text-[11px] font-mono text-slate-400 hover:text-amber-400 cursor-pointer transition-colors underline"
                 title="Clear all fields"
@@ -485,6 +521,81 @@ export default function RupeesBillingView() {
             </div>
           </div>
 
+          {/* Old Gold / Purchased Gold (Deduction / Exchange) */}
+          <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input 
+                  type="checkbox"
+                  checked={hasOldGold}
+                  onChange={(e) => setHasOldGold(e.target.checked)}
+                  className="w-4 h-4 rounded text-gold-500 focus:ring-gold-400 bg-obsidian-950 border-white/20"
+                />
+                <span className="text-xs font-mono uppercase tracking-wider text-amber-300 font-bold flex items-center gap-1.5">
+                  <Scale className="w-3.5 h-3.5 text-amber-400" />
+                  {t('deductOldPurchasedGold', 'Deduct Old / Purchased Gold (जुने सोने जमा)')}
+                </span>
+              </label>
+              {hasOldGold && (
+                <span className="text-xs font-mono font-bold text-amber-300">
+                  -₹{oldGoldCredit.toLocaleString('en-IN')}
+                </span>
+              )}
+            </div>
+
+            {hasOldGold && (
+              <div className="pt-2 border-t border-amber-500/20 grid grid-cols-1 sm:grid-cols-3 gap-3 animate-in fade-in duration-200">
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-300 mb-1">
+                    {t('oldGoldWeight', 'Old Gold Wt (g)')} *
+                  </label>
+                  <input 
+                    type="number"
+                    step="0.001"
+                    min="0"
+                    placeholder="0.000"
+                    value={oldGoldWeight}
+                    onChange={(e) => {
+                      setOldGoldWeight(e.target.value);
+                      setOldGoldValueManual('');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold text-amber-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-300 mb-1">
+                    {t('purchasedGoldRate', 'Purchased Gold Rate (₹/g)')}
+                  </label>
+                  <input 
+                    type="number"
+                    step="1"
+                    value={oldGoldRate}
+                    onChange={(e) => {
+                      setOldGoldRate(parseFloat(e.target.value) || 0);
+                      setOldGoldValueManual('');
+                    }}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-bold text-amber-300"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-mono text-slate-300 mb-1">
+                    {t('purchasedGoldTotalPrice', 'Purchased Gold Total Price')} (₹)
+                  </label>
+                  <input 
+                    type="number"
+                    step="1"
+                    placeholder={String(autoOldGoldValue)}
+                    value={oldGoldValueManual !== '' ? oldGoldValueManual : (autoOldGoldValue > 0 ? autoOldGoldValue : '')}
+                    onChange={(e) => setOldGoldValueManual(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl glass-input text-xs font-mono font-black text-amber-400 bg-amber-950/40"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Payment Mode & Submit */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -590,6 +701,13 @@ export default function RupeesBillingView() {
                 <span>{t('gst', 'GST (3%)')}</span>
                 <span>+₹{Math.round(gstAmount).toLocaleString('en-IN')}</span>
               </div>
+
+              {oldGoldCredit > 0 && (
+                <div className="flex justify-between text-amber-300 font-bold text-[11px] bg-amber-500/10 p-2 rounded-xl border border-amber-500/30">
+                  <span>{t('lessPurchasedGold', 'Less: Purchased Gold Total Price')} ({numOldWeight.toFixed(3)}g):</span>
+                  <span>-₹{oldGoldCredit.toLocaleString('en-IN')}</span>
+                </div>
+              )}
             </div>
 
             {/* Total */}
@@ -659,6 +777,17 @@ export default function RupeesBillingView() {
             discount,
             subtotal: Math.round(taxableAmount),
             gst3Percent: Math.round(gstAmount),
+            exchangeCredit: oldGoldCredit,
+            inwardValuation: oldGoldCredit,
+            purchasedGoldValue: oldGoldCredit,
+            inwardGrossWeight: numOldWeight,
+            purchasedGoldGrossWeight: numOldWeight,
+            inwardRate: numOldRate,
+            purchasedGoldRate: numOldRate,
+            inwardMetal: oldGoldMetal,
+            purchasedGoldMetal: oldGoldMetal,
+            inwardKarat: oldGoldKarat,
+            purchasedGoldKarat: oldGoldKarat,
             grandTotal,
           }}
           showroom={showroom}
