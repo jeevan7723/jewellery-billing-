@@ -185,19 +185,19 @@ export default function RupeesBillingView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Make New Bill <span className="gold-gradient-text">(Rupees Billing)</span>
+            {t('billingTitle', 'Make New Bill')} <span className="gold-gradient-text">{t('billingTitleAccent', '(Rupees Billing)')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Enter customer details, pick an item, enter scale weight, add making charges, and calculate 3% GST.
+            {t('billingSubtitle', 'Enter customer details, pick an item, enter scale weight, add making charges, and calculate 3% GST.')}
           </p>
         </div>
 
         <div className="flex items-center gap-3 font-mono text-xs">
           <div className="px-3 py-1.5 rounded-xl bg-obsidian-900 border border-white/10 text-slate-300">
-            Gold 22K: <strong className="text-gold-300">₹{rates.gold22k}/g</strong>
+            {t('gold22k', 'Gold 22K')}: <strong className="text-gold-300">₹{rates.gold22k}/g</strong>
           </div>
           <div className="px-3 py-1.5 rounded-xl bg-obsidian-900 border border-white/10 text-slate-300">
-            Silver: <strong className="text-slate-100">₹{rates.silver999}/g</strong>
+            {t('silver', 'Silver')}: <strong className="text-slate-100">₹{rates.silver999}/g</strong>
           </div>
         </div>
       </div>
@@ -274,7 +274,7 @@ export default function RupeesBillingView() {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="block text-xs font-mono text-slate-400 uppercase">
-                Pick Item from Stock or Scan Tag
+                {t('pickItemStock', 'Pick Item from Stock or Scan Tag')}
               </label>
               <button
                 type="button"
@@ -282,7 +282,7 @@ export default function RupeesBillingView() {
                 className="px-3 py-1 rounded-xl bg-sky-500/20 text-sky-300 border border-sky-500/40 text-xs font-mono font-bold flex items-center gap-1.5 hover:bg-sky-500/30 cursor-pointer shadow-sm transition-all"
               >
                 <Camera className="w-3.5 h-3.5" />
-                <span>📷 Scan Barcode Tag</span>
+                <span>{t('scanBarcodeTag', '📷 Scan Barcode Tag')}</span>
               </button>
             </div>
             <select 
@@ -290,7 +290,7 @@ export default function RupeesBillingView() {
               onChange={handleInventorySelect}
               className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs cursor-pointer"
             >
-              <option value="">-- Choose from stock, scan tag, or type new item below --</option>
+              <option value="">{t('chooseFromStock', '-- Choose from stock, scan tag, or type new item below --')}</option>
               {inventory.map(item => (
                 <option key={item.id} value={item.id} className="bg-obsidian-900">
                   {item.name} ({item.karat}) • Net: {item.netWeight}g • Tag: {item.barcode}
@@ -303,12 +303,12 @@ export default function RupeesBillingView() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-mono text-slate-400 mb-1.5 uppercase">
-                Item Name *
+                {t('itemName', 'Item Name')} *
               </label>
               <input 
                 type="text"
                 required
-                placeholder="Enter jewellery item name..."
+                placeholder={t('enterItemName', 'Enter jewellery item name...')}
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-xl glass-input text-xs font-semibold"
@@ -317,7 +317,7 @@ export default function RupeesBillingView() {
 
             <div>
               <label className="block text-xs font-mono text-slate-400 mb-1.5 uppercase">
-                Purity / Karat *
+                {t('purityKarat', 'Purity / Karat')} *
               </label>
               <select 
                 value={karat}
@@ -335,12 +335,12 @@ export default function RupeesBillingView() {
           {/* Weights */}
           <div className="p-4 rounded-2xl bg-obsidian-900/80 border border-white/5 space-y-3">
             <span className="text-xs font-mono text-gold-400 font-bold uppercase block">
-              Scale Weight (in grams)
+              {t('scaleWeightTitle', 'Scale Weight (in grams)')}
             </span>
 
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1">Gross Weight (g)</label>
+                <label className="block text-[11px] text-slate-400 mb-1">{t('grossWeight', 'Gross Weight (g)')}</label>
                 <input 
                   type="number"
                   step="0.001"
@@ -352,7 +352,7 @@ export default function RupeesBillingView() {
               </div>
 
               <div>
-                <label className="block text-[11px] text-slate-400 mb-1">Stone / Wax Wt (g)</label>
+                <label className="block text-[11px] text-slate-400 mb-1">{t('stoneWeight', 'Stone / Wax Wt (g)')}</label>
                 <input 
                   type="number"
                   step="0.001"
@@ -364,7 +364,7 @@ export default function RupeesBillingView() {
               </div>
 
               <div>
-                <label className="block text-[11px] text-gold-300 mb-1 font-bold">Net Gold Wt (g)</label>
+                <label className="block text-[11px] text-gold-300 mb-1 font-bold">{t('netGoldWt', 'Net Gold Wt (g)')}</label>
                 <div className="px-3 py-2 rounded-xl bg-gold-500/10 border border-gold-500/30 text-sm font-mono font-extrabold text-gold-300">
                   {netWeight.toFixed(3)}g
                 </div>
@@ -376,7 +376,7 @@ export default function RupeesBillingView() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-mono text-slate-400 mb-1.5 uppercase">
-                Gold Rate (₹ per gram)
+                {t('ratePerGram', 'Gold Rate (₹ per gram)')}
               </label>
               <input 
                 type="number"
@@ -389,7 +389,7 @@ export default function RupeesBillingView() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-mono text-slate-400 uppercase">
-                  Making Charges
+                  {t('makingCharges', 'Making Charges')}
                 </label>
                 <div className="flex gap-1 text-[10px] font-mono">
                   <button 
@@ -455,7 +455,7 @@ export default function RupeesBillingView() {
                   </div>
 
                   <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
-                    <span>Auto Per Gram:</span>
+                    <span>{t('autoPerGram', 'Auto Per Gram:')}</span>
                     <span className="text-white font-bold">
                       ₹{Math.round((ratePerGram * Number(makingValue || 0)) / 100).toLocaleString('en-IN')} / g
                     </span>
@@ -475,7 +475,7 @@ export default function RupeesBillingView() {
                     </span>
                   </div>
                   <div className="text-[10px] font-mono text-slate-400 flex items-center justify-between pt-0.5">
-                    <span>Equivalent %:</span>
+                    <span>{t('equivalentPercent', 'Equivalent %:')}</span>
                     <span className="text-gold-400 font-bold">
                       {ratePerGram > 0 ? ((Number(makingValue || 0) / ratePerGram) * 100).toFixed(1) : 0}%
                     </span>
@@ -489,17 +489,17 @@ export default function RupeesBillingView() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-mono text-slate-400 mb-1.5 uppercase">
-                Payment Mode
+                {t('paymentMode', 'Payment Mode')}
               </label>
               <select 
                 value={paymentMode}
                 onChange={(e) => setPaymentMode(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-xl glass-input text-xs cursor-pointer"
               >
-                <option value="Cash" className="bg-obsidian-900">Cash</option>
-                <option value="UPI / QR" className="bg-obsidian-900">UPI / QR Code</option>
-                <option value="Card" className="bg-obsidian-900">Debit / Credit Card</option>
-                <option value="Bank Transfer" className="bg-obsidian-900">Bank Transfer / NEFT</option>
+                <option value="Cash" className="bg-obsidian-900">{t('cash', 'Cash')}</option>
+                <option value="UPI / QR" className="bg-obsidian-900">{t('upiQrCode', 'UPI / QR Code')}</option>
+                <option value="Card" className="bg-obsidian-900">{t('debitCreditCard', 'Debit / Credit Card')}</option>
+                <option value="Bank Transfer" className="bg-obsidian-900">{t('bankTransferNeft', 'Bank Transfer / NEFT')}</option>
               </select>
             </div>
 
@@ -535,7 +535,7 @@ export default function RupeesBillingView() {
               </div>
               <div className="text-right">
                 <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-gold-500/20 text-gold-300 font-bold block mb-1">
-                  TAX INVOICE
+                  {t('taxInvoiceTitle', 'TAX INVOICE')}
                 </span>
                 <div className="text-xs font-mono font-bold text-gold-300">
                   {generatedInvoice ? generatedInvoice.invoiceNo : '#KC-BILL-PREVIEW'}
@@ -545,23 +545,23 @@ export default function RupeesBillingView() {
 
             {/* Customer Box */}
             <div className="bg-obsidian-900/60 p-3 rounded-xl border border-white/5 mb-4 text-xs font-mono">
-              <div className="text-slate-400 text-[10px] uppercase">Customer:</div>
-              <div className="text-white font-bold">{customerName.trim() || 'Walk-in Customer'}</div>
+              <div className="text-slate-400 text-[10px] uppercase">{t('customer', 'Customer')}:</div>
+              <div className="text-white font-bold">{customerName.trim() || t('walkInCustomer', 'Walk-in Customer')}</div>
               <div className="text-slate-400 text-[11px]">
-                {(phone || city) ? [phone, city].filter(Boolean).join(' • ') : 'Walk-in / Counter Sale'}
+                {(phone || city) ? [phone, city].filter(Boolean).join(' • ') : t('walkInSale', 'Walk-in / Counter Sale')}
               </div>
             </div>
 
             {/* Itemized Calculation */}
             <div className="space-y-2 mb-4 text-xs font-mono">
               <div className="flex justify-between font-bold text-slate-200 border-b border-white/5 pb-1">
-                <span>Item</span>
-                <span>Amount</span>
+                <span>{t('itemHeader', 'Item')}</span>
+                <span>{t('amountHeader', 'Amount')}</span>
               </div>
               
               <div className="flex justify-between text-slate-300">
                 <div>
-                  <div className="text-white font-medium">{itemName.trim() || 'New Jewellery Item'}</div>
+                  <div className="text-white font-medium">{itemName.trim() || t('newJewelleryItem', 'New Jewellery Item')}</div>
                   <div className="text-[10px] text-slate-400">
                     Net: {netWeight.toFixed(3)}g @ ₹{numRate}/g ({karat})
                   </div>
@@ -572,22 +572,22 @@ export default function RupeesBillingView() {
               </div>
 
               <div className="flex justify-between text-slate-400 text-[11px]">
-                <span>Making Charges ({makingType === 'perGram' ? `₹${makingValue}/g` : `${makingValue}%`})</span>
+                <span>{t('makingCharges', 'Making Charges')} ({makingType === 'perGram' ? `₹${makingValue}/g` : `${makingValue}%`})</span>
                 <span>₹{Math.round(makingTotal).toLocaleString('en-IN')}</span>
               </div>
 
               <div className="flex justify-between text-slate-400 text-[11px]">
-                <span>Hallmarking Charge</span>
+                <span>{t('hallmarkingCharge', 'Hallmarking Charge')}</span>
                 <span>₹{hallmarkFee}</span>
               </div>
 
               <div className="border-t border-white/5 pt-1.5 flex justify-between text-slate-300 text-[11px]">
-                <span>Subtotal</span>
+                <span>{t('subtotal', 'Subtotal')}</span>
                 <span>₹{Math.round(taxableAmount).toLocaleString('en-IN')}</span>
               </div>
 
               <div className="flex justify-between text-gold-300 text-[11px]">
-                <span>GST (3%)</span>
+                <span>{t('gst', 'GST (3%)')}</span>
                 <span>+₹{Math.round(gstAmount).toLocaleString('en-IN')}</span>
               </div>
             </div>
@@ -597,7 +597,7 @@ export default function RupeesBillingView() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-[10px] font-mono text-gold-300 uppercase tracking-widest">
-                    Total Amount
+                    {t('grandTotal', 'Total Amount')}
                   </div>
                   <div className="font-serif text-3xl font-extrabold text-white">
                     ₹{grandTotal.toLocaleString('en-IN')}
@@ -618,7 +618,7 @@ export default function RupeesBillingView() {
               className="w-full py-2.5 rounded-xl gold-gradient-btn text-xs font-bold flex items-center justify-center gap-2 cursor-pointer shadow-gold-glow"
             >
               <Printer className="w-4 h-4" />
-              <span>Print Bill (A4 / Thermal Roll)</span>
+              <span>{t('printBillAction', 'Print Bill (A4 / Thermal Roll)')}</span>
             </button>
 
           </div>
@@ -630,7 +630,7 @@ export default function RupeesBillingView() {
       <PrintModal
         isOpen={showPrintModal}
         onClose={() => setShowPrintModal(false)}
-        title="GST Tax Invoice Preview"
+        title={t('gstTaxInvoicePreview', 'GST Tax Invoice Preview')}
         formatToggle={true}
         format={printFormat}
         onFormatChange={setPrintFormat}

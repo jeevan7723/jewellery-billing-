@@ -11,7 +11,7 @@ import JewelleryTagTemplate from '../components/print/JewelleryTagTemplate';
 import BarcodeScannerModal from '../components/BarcodeScannerModal';
 
 export default function BarcodeBillingView() {
-  const { rates, inventory, showroom, addInvoice, updateInventoryItem } = useJewellery();
+  const { rates, inventory, showroom, addInvoice, updateInventoryItem, t = (k, f) => f } = useJewellery();
   const [scannedCode, setScannedCode] = useState('');
   const [matchedItem, setMatchedItem] = useState(() => inventory[0] || null);
   const [customerName, setCustomerName] = useState('');
@@ -100,10 +100,10 @@ export default function BarcodeBillingView() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Barcode Billing & <span className="text-sky-400">Print Tags</span>
+            {t('barcodeBillingTitle', 'Barcode Billing &')} <span className="text-sky-400">{t('barcodeBillingTitleAccent', 'Print Tags')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Scan barcode tag for quick counter checkout, and print thermal jewellery rat-tail tags.
+            {t('barcodeBillingSubtitle', 'Scan barcode tag for quick counter checkout, and print thermal jewellery rat-tail tags.')}
           </p>
         </div>
 
@@ -114,7 +114,7 @@ export default function BarcodeBillingView() {
             className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-obsidian-950 text-xs font-bold flex items-center gap-2 cursor-pointer shadow-lg hover:brightness-110 transition-all"
           >
             <Camera className="w-4 h-4" />
-            <span>📷 Scan with Camera</span>
+            <span>{t('scanWithCamera', '📷 Scan with Camera')}</span>
           </button>
           <button 
             type="button"
@@ -125,7 +125,7 @@ export default function BarcodeBillingView() {
             className="px-4 py-2.5 rounded-xl glass-card hover:border-sky-500/50 text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer"
           >
             <Layers className="w-4 h-4 text-sky-400" />
-            <span>Print All Tags ({inventory.length})</span>
+            <span>{t('printAllTags', 'Print All Tags')} ({inventory.length})</span>
           </button>
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function BarcodeBillingView() {
         <div className="space-y-0.5">
           <div className="text-xs font-bold text-white flex items-center gap-1.5">
             <Smartphone className="w-4 h-4 text-sky-400" />
-            <span>Mobile Camera Ready</span>
+            <span>{t('mobileCameraReady', 'Mobile Camera Ready')}</span>
           </div>
           <p className="text-[10px] text-slate-300 font-mono">
             Tap to open your phone's back camera & scan barcode tag
@@ -147,7 +147,7 @@ export default function BarcodeBillingView() {
           className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-sky-400 to-blue-500 text-obsidian-950 font-black text-xs flex items-center gap-1.5 cursor-pointer shadow-lg shadow-sky-500/20 active:scale-95 transition-transform whitespace-nowrap"
         >
           <Camera className="w-4 h-4 text-obsidian-950" />
-          <span>Tap to Scan</span>
+          <span>{t('tapToScan', 'Tap to Scan')}</span>
         </button>
       </div>
 

@@ -31,7 +31,7 @@ const METAL_PURITY_OPTIONS = {
 };
 
 export default function MetalExchangeView({ onNavigate }) {
-  const { rates: contextRates, showroom: contextShowroom, inventory = [], addInvoice, updateInventoryItem } = useJewellery();
+  const { rates: contextRates, showroom: contextShowroom, inventory = [], addInvoice, updateInventoryItem, t = (k, f) => f } = useJewellery();
 
   const rates = {
     gold24k: 7425,
@@ -423,26 +423,26 @@ export default function MetalExchangeView({ onNavigate }) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
         <div>
           <h1 className="font-serif text-2xl sm:text-4xl font-extrabold text-white">
-            Old Gold & <span className="text-purple-400">Metal Exchange</span>
+            {t('metalExchangeTitle', 'Old Gold &')} <span className="text-purple-400">{t('metalExchangeTitleAccent', 'Metal Exchange')}</span>
           </h1>
           <p className="text-xs text-slate-300 font-light mt-1">
-            Calculate exchange value when customers bring old gold or silver to buy new jewellery.
+            {t('metalExchangeSubtitle', 'Calculate exchange value when customers bring old gold or silver to buy new jewellery.')}
           </p>
         </div>
 
         <div className="px-3.5 py-1.5 rounded-xl bg-obsidian-900 border border-white/10 text-xs font-mono text-slate-300 flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span>Today's Rate: <strong>Gold ₹{rates.gold24k}/g • Silver ₹{rates.silver999}/g</strong></span>
+          <span>{t('todaysRateTitle', "Today's Rate:")} <strong>Gold ₹{rates.gold24k}/g • Silver ₹{rates.silver999}/g</strong></span>
         </div>
       </div>
 
       {/* 4 Simple Exchange Options */}
       <div className="p-2 rounded-2xl glass-panel border border-white/10 flex items-center gap-2 overflow-x-auto no-scrollbar">
         {[
-          { id: 'gold-to-gold', label: '🪙 Gold to Gold', desc: 'Old Gold for New Gold' },
-          { id: 'silver-to-silver', label: '🥈 Silver to Silver', desc: 'Old Silver for New Silver' },
-          { id: 'gold-to-silver', label: '🪙 ➔ 🥈 Gold to Silver', desc: 'Give Gold, Take Silver' },
-          { id: 'silver-to-gold', label: '🥈 ➔ 🪙 Silver to Gold', desc: 'Give Silver, Take Gold' },
+          { id: 'gold-to-gold', label: t('goldToGold', '🪙 Gold to Gold'), desc: t('goldToGoldDesc', 'Old Gold for New Gold') },
+          { id: 'silver-to-silver', label: t('silverToSilver', '🥈 Silver to Silver'), desc: t('silverToSilverDesc', 'Old Silver for New Silver') },
+          { id: 'gold-to-silver', label: t('goldToSilver', '🪙 ➔ 🥈 Gold to Silver'), desc: t('goldToSilverDesc', 'Give Gold, Take Silver') },
+          { id: 'silver-to-gold', label: t('silverToGold', '🥈 ➔ 🪙 Silver to Gold'), desc: t('silverToGoldDesc', 'Give Silver, Take Gold') },
         ].map((tab) => (
           <button
             key={tab.id}
